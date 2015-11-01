@@ -2,10 +2,9 @@
 LIST_BINARY_EXTENSIONS="dylib so 0 vis pvr"
 TEMP="$(mktemp -d)"
 CURRENT_PATH="$(pwd)"
-BASENAME="$(basename "$0")"
 cd "$TEMP"
 if [[ "$#" -lt 3 ]]; then
-  echo "Usage: $BASENAME (file name/url) (Developer Identity) (.mobileprovision file) [(new app id)]"
+  echo "Usage: "$(basename "$0")" (file name/url) (Developer Identity) (.mobileprovision file) [(new app id)]"
   exit
 fi
 
