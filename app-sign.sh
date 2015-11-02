@@ -37,7 +37,7 @@ case "$Extension" in
     echo "Extracting .deb file"
     mkdir "$TEMP/deb"
     cd "$TEMP/deb"
-    ar -x "$FilePath" || (echo "Error extracting .deb"; exit 1) > /dev/null
+    ar -x "$FilePath" > /dev/null || (echo "Error extracting .deb"; exit 1)
     tar --lzma -xvf "$TEMP/deb/data.tar.lzma" || (echo "Error untarring .deb"; exit 1)
     mv "$TEMP/deb/Applications/" "$OUTPUT/Payload/"
     ;;
