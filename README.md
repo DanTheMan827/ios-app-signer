@@ -1,5 +1,9 @@
-Usage
+App Signer
 ======
+This script was made primarily for downloading and/or signing .deb files for Kodi but it can be used to (re)sign and iOS app file.
+
+Usage
+------
 app-sign.sh (file name/url) (Developer Identity) [(.mobileprovision file)] [(new app id)]
 
 You can ommit the mobileprovision file if you just want to re-sign the app.
