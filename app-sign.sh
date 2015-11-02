@@ -1,16 +1,17 @@
 #!/bin/bash
 # This script was tested on 10.11.1 with Xcode 7.1 installed, your mileage may vary.
 
+if [[ "$#" -lt 3 ]]; then
+  echo "Usage: "$(basename "$0")" (file name/url) (Developer Identity) (.mobileprovision file) [(new app id)]"
+  exit
+fi
+
 LIST_BINARY_EXTENSIONS="dylib so 0 vis pvr"
 TEMP="$(mktemp -d)"
 OUTPUT="$TEMP/out"
 mkdir "$OUTPUT"
 CURRENT_PATH="$(pwd)"
 cd "$TEMP"
-if [[ "$#" -lt 3 ]]; then
-  echo "Usage: "$(basename "$0")" (file name/url) (Developer Identity) (.mobileprovision file) [(new app id)]"
-  exit
-fi
 
 Extension="${1##*.}"
 
