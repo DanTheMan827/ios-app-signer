@@ -97,8 +97,10 @@ defaults delete "$OUTPUT/Payload/$AppBundleName/Info.plist" CFBundleResourceSpec
 security cms -D -i "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision" > "$TEMP/mobileprovision.plist"
 /usr/libexec/PlistBuddy -c "Print :Entitlements" "$TEMP/mobileprovision.plist" -x > "$EntitlementsPlist"
 
+cd "$OUTPUT/Payload/"
+
 for binext in $LIST_BINARY_EXTENSIONS; do
-  for signfile in $(find "$OUTPUT/Payload/$AppBundleName" -name "*.$binext" -type f); do
+  for signfile in $(find "./$AppBundleName" -name "*.$binext" -type f); do
     if[ -e "$EntitlementsPlist"]; then
       codesign -vvv -fs "$2" --no-strict "--entitlements=$EntitlementsPlist" "$signfile"
     else
@@ -108,7 +110,7 @@ for binext in $LIST_BINARY_EXTENSIONS; do
 done
 
 if[ -e "$EntitlementsPlist"]; then
-  codesign -vvv -fs "$2" --no-strict "--entitlements=$EntitlementsPlist"  "$OUTPUT/Payload/$AppBundleName"
+  codesign -vvv -fs "$2" --no-strict "--entitlements=$EntitlementsPlist"  "./$AppBundleName"
 else
   codesign -vvv -fs "$2" --no-strict   "$OUTPUT/Payload/$AppBundleName"
 fi
