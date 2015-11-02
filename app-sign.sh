@@ -23,11 +23,7 @@ Extension="${1##*.}"
 FilePath="$1"
 
 if [[ "$1" == http*://* && ("$Extension" == "deb" || "$Extension" == "ipa")]]; then
-  curl "$1" > "$TEMP/app.$Extension"
-  if [ $? != 0 ]; then
-    echo "Error Downloading: $1"
-    exit 1
-  fi
+  curl "$1" > "$TEMP/app.$Extension" || (echo "Error Downloading: $1"; exit)
   FilePath="$TEMP/app.$Extension"
 fi
 
