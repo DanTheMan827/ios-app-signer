@@ -34,8 +34,7 @@ case "$Extension" in
     mv Applications/ "$OUTPUT/Payload/"
     ;;
   ipa )
-    cd "$OUTPUT"
-    unzip "$TEMP/app.$Extension"
+    unzip -q "$TEMP/app.$Extension" -d "$OUTPUT"
     ;;
   app )
     mkdir "$OUTPUT/Payload"
