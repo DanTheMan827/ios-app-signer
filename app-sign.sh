@@ -91,4 +91,4 @@ zip -qry "$CURRENT_PATH/$AppIdentifier-signed.ipa" "."
 echo $CURRENT_PATH
 cd "$CURRENT_PATH"
 echo "$TEMP"
-#rm -rf "$TEMP"
+rm -rf "$TEMP"
