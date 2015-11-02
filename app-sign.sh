@@ -6,7 +6,7 @@ if [[ "$#" -lt 2 ]]; then
   echo "You can ommit the mobileprovision file if you just want to re-sign the app."
   echo "It is also possible to specify a new app id, this is only possible if you have a wildcard .mobileprovision file."
   echo "The application id will be changed to the mobileprovision file if it is not a wildcard."
-  echo "It is also possible to change the app id without specifying a mobileprovision file, you just need to two quotes \"\""
+  echo "It is also possible to change the app id without specifying a mobileprovision file, just use two quotes \"\""
   exit
 fi
 
