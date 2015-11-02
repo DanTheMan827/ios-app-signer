@@ -41,13 +41,13 @@ case "$Extension" in
     echo "Extracting .deb file"
     mkdir "$TEMP/deb"
     cd "$TEMP/deb"
-    ar -x "$FilePath"
-    tar --lzma -xvf "$TEMP/deb/data.tar.lzma"
+    ar -x "$FilePath" || (echo "Error extracting .deb"; exit 1)
+    tar --lzma -xvf "$TEMP/deb/data.tar.lzma" || (echo "Error untarring .deb"; exit 1)
     mv "$TEMP/deb/Applications/" "$OUTPUT/Payload/"
     ;;
   ipa )
     echo "Unzipping .ipa file"
-    unzip -q "$FilePath" -d "$OUTPUT"
+    unzip -q "$FilePath" -d "$OUTPUT" || (echo "Error extracting $FilePath"; exit 1)
     ;;
   app )
     if [ ! -d "$FilePath" ]; then
