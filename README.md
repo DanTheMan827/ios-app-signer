@@ -1,4 +1,4 @@
-App Signer
+iOS App Signer
 ======
 This script was made primarily for downloading and/or signing .deb files for Kodi but it can be used to (re)sign any iOS app file.
 
