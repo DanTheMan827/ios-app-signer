@@ -1,4 +1,6 @@
 #!/bin/bash
+# This script was tested on 10.11.1 with Xcode 7.1 installed, your mileage may vary.
+
 LIST_BINARY_EXTENSIONS="dylib so 0 vis pvr"
 TEMP="$(mktemp -d)"
 OUTPUT="$TEMP/out"
