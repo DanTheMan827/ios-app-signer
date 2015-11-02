@@ -1,6 +1,8 @@
 #!/bin/bash
 LIST_BINARY_EXTENSIONS="dylib so 0 vis pvr"
 TEMP="$(mktemp -d)"
+OUTPUT="$TEMP/out"
+mkdir "$OUTPUT"
 CURRENT_PATH="$(pwd)"
 cd "$TEMP"
 if [[ "$#" -lt 3 ]]; then
@@ -10,7 +12,6 @@ fi
 
 Extension="${1##*.}"
 
-echo "$Extension"
 if [[ "$1" == http*://* && ("$Extension" == "deb" || "$Extension" == "ipa")]]; then
   curl "$1" > "app.$Extension"
 else
@@ -23,68 +24,71 @@ case "$Extension" in
   deb )
     ar -x "app.$Extension"
     tar --lzma -xvf data.tar.lzma
-    mv Applications/ Payload/
+    mv Applications/ "$OUTPUT/Payload/"
     ;;
   ipa )
-    unzip "app.$Extension"
+  	cd "$OUTPUT"
+    unzip "$TEMP/app.$Extension"
     ;;
   app )
+  	cd "$OUTPUT"
     mkdir Payload
     cp -r "$1" "Payload"
     ;;
   *) echo "Filetype not supported"; exit
 esac
 
-AppBundleName="$(ls ./Payload/ | sort -n | head -1)"
-echo "AppBundleName - $AppBundleName"
+AppBundleName="$(ls "$OUTPUT/Payload/" | sort -n | head -1)"
 
-EntitlementsPlist="$TEMP/entitlements.plist"
+EntitlementsPlist="$OUTPUT/entitlements.plist"
 
-rm -rf "Payload/$AppBundleName/_CodeSignature/"
+AppIdentifier="$(defaults read $OUTPUT/Payload/$AppBundleName/Info.plist CFBundleIdentifier)"
+CFBundleName="$(defaults read $OUTPUT/Payload/$AppBundleName/Info.plist CFBundleName)"
+CFBundleExecutable="$(defaults read $OUTPUT/Payload/$AppBundleName/Info.plist CFBundleExecutable)"
 
-AppIdentifier="$(defaults read $TEMP/Payload/$AppBundleName/Info.plist CFBundleIdentifier)"
-CFBundleName="$(defaults read $TEMP/Payload/$AppBundleName/Info.plist CFBundleName)"
-CFBundleExecutable="$(defaults read $TEMP/Payload/$AppBundleName/Info.plist CFBundleExecutable)"
+cp "$3" "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision"
+MobileProvisionIdentifier="$(egrep -a -A 2 application-identifier $OUTPUT/Payload/$AppBundleName/embedded.mobileprovision | grep string | sed -e 's/<string>//' -e 's/<\/string>//' -e 's/ //')"
+TeamIdentifier="$(egrep -a -A 2 com.apple.developer.team-identifier $OUTPUT/Payload/$AppBundleName/embedded.mobileprovision | grep string | sed -e 's/<string>//' -e 's/<\/string>//' -e 's/ //' | xargs)"
 
-echo "CFBundleName - $CFBundleName"
-echo "AppIdentifier - $AppIdentifier"
-#if [ -n "$3" ]; then
-	cp "$3" "Payload/$AppBundleName/embedded.mobileprovision"
-    MobileProvisionIdentifier="$(egrep -a -A 2 application-identifier $TEMP/Payload/$AppBundleName/embedded.mobileprovision | grep string | sed -e 's/<string>//' -e 's/<\/string>//' -e 's/ //')"
-    TeamIdentifier="$(egrep -a -A 2 com.apple.developer.team-identifier $TEMP/Payload/$AppBundleName/embedded.mobileprovision | grep string | sed -e 's/<string>//' -e 's/<\/string>//' -e 's/ //' | xargs)"
-    
-    echo "MobileProvisionIdentifier - $MobileProvisionIdentifier"
-    MobileProvisionIdentifier=${MobileProvisionIdentifier#*.}
-    echo "MobileProvisionIdentifier - $MobileProvisionIdentifier"
-    if [ "$MobileProvisionIdentifier" != "*" ]; then
-        defaults write "$TEMP/Payload/$AppBundleName/Info.plist" CFBundleIdentifier "$MobileProvisionIdentifier"
-        AppIdentifier="$MobileProvisionIdentifier"
-        echo "New App Identifier - $AppIdentifier"
-    fi
-#fi
-
-if [ -n "$4" ]
-  then
-    defaults write "$TEMP/Payload/$AppBundleName/Info.plist" CFBundleIdentifier "$4"
-    AppIdentifier="$4"
+MobileProvisionIdentifier=${MobileProvisionIdentifier#*.}
+if [ "$MobileProvisionIdentifier" != "*" ]; then
+  defaults write "$OUTPUT/Payload/$AppBundleName/Info.plist" CFBundleIdentifier "$MobileProvisionIdentifier"
+  AppIdentifier="$MobileProvisionIdentifier"
+  echo "New App Identifier - $AppIdentifier"
 fi
 
-touch "$EntitlementsPlist"
-defaults write "$EntitlementsPlist" "application-identifier" "$TeamIdentifier.$AppIdentifier"
-defaults write "$EntitlementsPlist" "com.apple.developer.team-identifier" "$TeamIdentifier"
-defaults write "$EntitlementsPlist" "get-task-allow" -bool TRUE
-defaults write "$EntitlementsPlist" "keychain-access-groups" -array-add "$TeamIdentifier.*"
+if [ -n "$4" ];then
+  defaults write "$OUTPUT/Payload/$AppBundleName/Info.plist" CFBundleIdentifier "$4"
+  AppIdentifier="$4"
+fi
 
-for binext in $LIST_BINARY_EXTENSIONS
-do
-  codesign -fvvv -s "$2" -i "$AppIdentifier" --entitlements "$EntitlementsPlist" `find "$TEMP/Payload/$AppBundleName/" -name "*.$binext" -type f`
+defaults delete "$OUTPUT/Payload/$AppBundleName/Info.plist" CFBundleResourceSpecification
+
+security cms -D -i "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision" > "$TEMP/mobileprovision.plist"
+
+/usr/libexec/PlistBuddy -c "Print :Entitlements" "$TEMP/mobileprovision.plist" -x > "$EntitlementsPlist"
+
+for binext in $LIST_BINARY_EXTENSIONS; do
+  for signfile in $(find "$OUTPUT/Payload/$AppBundleName" -name "*.$binext" -type f); do
+    codesign -vvv -fs "$2" --no-strict "--entitlements=$EntitlementsPlist" "$signfile"
+  done
+   
 done
-codesign -fvvv -s "$2" -i "$AppIdentifier" --entitlements "$EntitlementsPlist" "$TEMP/Payload/$AppBundleName/$CFBundleExecutable" "$TEMP/Payload/$AppBundleName"
+codesign -vvv -fs "$2" --no-strict "--entitlements=$EntitlementsPlist"  "$OUTPUT/Payload/$AppBundleName"
 
+for framework in $(find "$OUTPUT/Payload/$AppBundleName/Frameworks" -name "*.framework"); do
+  codesign -vvv -fs "$2" --no-strict "--entitlements=$EntitlementsPlist" "$framework"
+done
+for dylib in $(find "$OUTPUT/Payload/$AppBundleName/Frameworks" -name "*.dylib"); do
+  codesign -vvv -fs "$2" --no-strict "--entitlements=$EntitlementsPlist" "$dylib"
+done
 
+codesign -vvv -fs "$2" --no-strict "--entitlements=$EntitlementsPlist"  "$OUTPUT/Payload/$AppBundleName"
 
 rm "$CURRENT_PATH/$AppIdentifier-signed.ipa"
-zip -r "$CURRENT_PATH/$AppIdentifier-signed.ipa" Payload/
+cd "$OUTPUT"
+zip -qry "$CURRENT_PATH/$AppIdentifier-signed.ipa" "."
 echo $CURRENT_PATH
 cd "$CURRENT_PATH"
-rm -rf "$TEMP"
+echo "$TEMP"
+#rm -rf "$TEMP"
