@@ -52,7 +52,7 @@ if [ -n "$3" && -e "$3" ]; then
   cp "$3" "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision"
 fi
 
-if [ -z "$3" && -e "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision"]; then
+if [ -n "$3" && -e "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision"]; then
   MobileProvisionIdentifier="$(egrep -a -A 2 application-identifier "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision" | grep string | sed -e 's/<string>//' -e 's/<\/string>//' -e 's/ //')"
   MobileProvisionIdentifier="${MobileProvisionIdentifier#*.}"
   
