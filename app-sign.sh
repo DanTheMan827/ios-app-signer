@@ -26,8 +26,9 @@ if [[ "$1" == http*://* && ("$Extension" == "deb" || "$Extension" == "ipa")]]; t
     exit 1
   fi
   FilePath="$TEMP/app.$Extension"
-else
-  if [[ ! -e "$1" ]]; then
+fi
+
+if [[ ! -e "$FilePath" ]]; then
     echo "File not found: $1"
     exit 1
 fi
