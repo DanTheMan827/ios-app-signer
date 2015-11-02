@@ -7,7 +7,7 @@ if [[ "$#" -lt 2 ]]; then
   echo "It is also possible to specify a new app id, this is only possible if you have a wildcard .mobileprovision file."
   echo "The application id will be changed to the mobileprovision file if it is not a wildcard."
   echo "It is also possible to change the app id without specifying a mobileprovision file, just use two quotes \"\""
-  exit
+  exit 1
 fi
 
 LIST_BINARY_EXTENSIONS="dylib so 0 vis pvr framework"
@@ -17,30 +17,36 @@ mkdir "$OUTPUT"
 CURRENT_PATH="$(pwd)"
 
 Extension="${1##*.}"
+FilePath="$1"
 
 if [[ "$1" == http*://* && ("$Extension" == "deb" || "$Extension" == "ipa")]]; then
   curl "$1" > "$TEMP/app.$Extension"
-else
-  if [[ "$Extension" != "app" ]]; then
-    cp "$1" "$TEMP/app.$Extension"
+  if [ $? != 0 ]; then
+    echo "Error downloading $1"
+    exit 1
   fi
+  FilePath="$TEMP/app.$Extension"
+else
+  if [[ ! -e "$1" ]]; then
+    echo "File not found: $1"
+    exit 1
 fi
 
 case "$Extension" in
   deb )
     cd "$TEMP"
-    ar -x "$TEMP/app.$Extension"
+    ar -x "$FilePath"
     tar --lzma -xvf data.tar.lzma
     mv Applications/ "$OUTPUT/Payload/"
     ;;
   ipa )
-    unzip -q "$TEMP/app.$Extension" -d "$OUTPUT"
+    unzip -q "$FilePath" -d "$OUTPUT"
     ;;
   app )
     mkdir "$OUTPUT/Payload"
-    cp -r "$1" "$OUTPUT/Payload"
+    cp -r "$FilePath" "$OUTPUT/Payload"
     ;;
-  *) echo "Filetype not supported"; exit
+  *) echo "Filetype not supported"; exit 1
 esac
 
 AppBundleName="$(ls "$OUTPUT/Payload/" | sort -n | head -1)"
@@ -52,7 +58,7 @@ if [ -n "$3" && -e "$3" ]; then
   cp "$3" "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision"
 fi
 
-if [ -n "$3" && -e "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision"]; then
+if [ -e "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision"]; then
   MobileProvisionIdentifier="$(egrep -a -A 2 application-identifier "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision" | grep string | sed -e 's/<string>//' -e 's/<\/string>//' -e 's/ //')"
   MobileProvisionIdentifier="${MobileProvisionIdentifier#*.}"
   
@@ -68,7 +74,7 @@ fi
 if [ -n "$4" ]; then
   if [[ "$MobileProvisionIdentifier" != "*" && "$MobileProvisionIdentifier" != "$4" ]]; then
     echo "You wanted to change the app identifier to $4 but your provisioning profile would not allow this! ($MobileProvisionIdentifier)"
-    exit
+    exit 1
   fi
   defaults write "$OUTPUT/Payload/$AppBundleName/Info.plist" CFBundleIdentifier "$4"
   AppIdentifier="$4"
