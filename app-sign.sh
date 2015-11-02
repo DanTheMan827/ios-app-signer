@@ -3,6 +3,7 @@
 
 if [[ "$#" -lt 2 ]]; then
   echo "Usage: "$(basename "$0")" (file name/url) (Developer Identity) [(.mobileprovision file)] [(new app id)]"
+  echo ""
   echo "You can ommit the mobileprovision file if you just want to re-sign the app."
   echo "It is also possible to specify a new app id, this is only possible if you have a wildcard .mobileprovision file."
   echo "The application id will be changed to the mobileprovision file if it is not a wildcard."
