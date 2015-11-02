@@ -7,6 +7,8 @@ if [[ "$#" -lt 2 ]]; then
   echo "It is also possible to specify a new app id, this is only possible if you have a wildcard .mobileprovision file."
   echo "The application id will be changed to the mobileprovision file if it is not a wildcard."
   echo "It is also possible to change the app id without specifying a mobileprovision file, just use two quotes \"\""
+  echo ""
+  echo "Supported filetypes are .deb, .ipa, and app bundles"
   exit 1
 fi
 
@@ -35,15 +37,23 @@ fi
 
 case "$Extension" in
   deb )
-    cd "$TEMP"
+    echo "Extracting .deb file"
+    mkdir "$TEMP/deb"
+    cd "$TEMP/deb"
     ar -x "$FilePath"
-    tar --lzma -xvf data.tar.lzma
-    mv Applications/ "$OUTPUT/Payload/"
+    tar --lzma -xvf "$TEMP/deb/data.tar.lzma"
+    mv "$TEMP/deb/Applications/" "$OUTPUT/Payload/"
     ;;
   ipa )
+    echo "Unzipping .ipa file"
     unzip -q "$FilePath" -d "$OUTPUT"
     ;;
   app )
+    if [ ! -d "$FilePath" ]; then
+      echo "$FilePath is not a directory"
+      exit 1
+    fi
+    echo "Copying .app to temp folder"
     mkdir "$OUTPUT/Payload"
     cp -r "$FilePath" "$OUTPUT/Payload"
     ;;
