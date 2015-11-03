@@ -1,6 +1,6 @@
 #!/bin/bash
 # This script was tested on 10.11.1 with Xcode 7.1 installed, your mileage may vary.
-echo "Script rev. 32"
+echo "iOS App Signer rev. 33"
 if [[ "$#" -lt 2 ]]; then
   echo "Usage: "$(basename "$0")" (file name/url) (Developer Identity) [(.mobileprovision file)] [(new app id)]"
   echo ""
