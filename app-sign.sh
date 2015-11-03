@@ -22,7 +22,7 @@ CURRENT_PATH="$(pwd)"
 Extension="${1##*.}"
 FilePath="$1"
 
-if [[ "$1" == http*://* && ("$Extension" == "deb" || "$Extension" == "ipa")]]; then
+if [[ "$1" == http*://* ]] && [[ ("$Extension" == "deb" || "$Extension" == "ipa") ]]; then
   curl "$1" > "$TEMP/app.$Extension" || (echo "Error Downloading: $1"; exit 1)
   FilePath="$TEMP/app.$Extension"
 fi
@@ -37,13 +37,15 @@ case "$Extension" in
     echo "Extracting .deb file"
     mkdir "$TEMP/deb"
     cd "$TEMP/deb"
-    ar -x "$FilePath" > /dev/null || (echo "Error extracting .deb"; exit 1)
-    tar --lzma -xvf "$TEMP/deb/data.tar.lzma" || (echo "Error untarring .deb"; exit 1)
+    ar -x "$FilePath" >/dev/null 2>&1 || (echo "Error extracting .deb"; exit 1)
+    
+    tar -xvf $TEMP/deb/data.tar* >/dev/null 2>&1  || (echo "Error untarring .deb data file"; exit 1)
+    
     mv "$TEMP/deb/Applications/" "$OUTPUT/Payload/"
     ;;
   ipa )
     echo "Unzipping .ipa file"
-    unzip -q "$FilePath" -d "$OUTPUT" || (echo "Error extracting $FilePath"; exit 1)
+    unzip -q "$FilePath" -d "$OUTPUT" > /dev/null || (echo "Error extracting $FilePath"; exit 1)
     ;;
   app )
     if [ ! -d "$FilePath" ]; then
@@ -61,16 +63,21 @@ AppBundleName="$(ls "$OUTPUT/Payload/" | sort -n | head -1)"
 EntitlementsPlist="$OUTPUT/entitlements.plist"
 AppIdentifier="$(defaults read "$OUTPUT/Payload/$AppBundleName/Info.plist" CFBundleIdentifier)"
 
-if [ -n "$3" && -e "$3" ]; then
-  rm "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision"
+if [[ -n "$3" ]] && [[ -e "$3" ]]; then
+  if [[ -e "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision" ]]; then
+    echo "Deleted .mobileprovision in app bundle"
+    rm "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision"
+  fi
+  
+  echo "Copy .mobileprovision to app bundle"
   cp "$3" "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision"
 fi
 
-if [ -e "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision"]; then
+if [[ -e "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision" ]]; then
   MobileProvisionIdentifier="$(egrep -a -A 2 application-identifier "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision" | grep string | sed -e 's/<string>//' -e 's/<\/string>//' -e 's/ //')"
   MobileProvisionIdentifier="${MobileProvisionIdentifier#*.}"
   
-  if [ "$MobileProvisionIdentifier" != "*" && "$MobileProvisionIdentifier" != "$AppIdentifier" && -z "$4" ]; then
+  if [[ "$MobileProvisionIdentifier" != "*" ]] && [[ "$MobileProvisionIdentifier" != "$AppIdentifier" ]] && [[ -z "$4" ]]; then
     defaults write "$OUTPUT/Payload/$AppBundleName/Info.plist" CFBundleIdentifier "$MobileProvisionIdentifier"
     AppIdentifier="$MobileProvisionIdentifier"
     echo "Changed app identifier to $AppIdentifier to match the provisioning profile"
@@ -79,8 +86,8 @@ else
   MobileProvisionIdentifier="*"
 fi
 
-if [ -n "$4" ]; then
-  if [[ "$MobileProvisionIdentifier" != "*" && "$MobileProvisionIdentifier" != "$4" ]]; then
+if [[ -n "$4" ]]; then
+  if [[ "$MobileProvisionIdentifier" != "*" ]] && [[ "$MobileProvisionIdentifier" != "$4" ]]; then
     echo "You wanted to change the app identifier to $4 but your provisioning profile would not allow this! ($MobileProvisionIdentifier)"
     exit 1
   fi
@@ -89,30 +96,44 @@ if [ -n "$4" ]; then
   echo "Changed app identifier to $AppIdentifier"
 fi
 
-defaults delete "$OUTPUT/Payload/$AppBundleName/Info.plist" CFBundleResourceSpecification
-security cms -D -i "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision" > "$TEMP/mobileprovision.plist"
-/usr/libexec/PlistBuddy -c "Print :Entitlements" "$TEMP/mobileprovision.plist" -x > "$EntitlementsPlist"
+defaults read "$OUTPUT/Payload/$AppBundleName/Info.plist" CFBundleResourceSpecification >/dev/null 2>&1 &&
+  defaults delete "$OUTPUT/Payload/$AppBundleName/Info.plist" CFBundleResourceSpecification
+
+if [[ -e "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision" ]]; then
+  security cms -D -i "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision" > "$TEMP/mobileprovision.plist"
+  /usr/libexec/PlistBuddy -c "Print :Entitlements" "$TEMP/mobileprovision.plist" -x > "$EntitlementsPlist"
+fi
 
 cd "$OUTPUT/Payload/"
 
 for binext in $LIST_BINARY_EXTENSIONS; do
   for signfile in $(find "./$AppBundleName" -name "*.$binext" -type f); do
-    if[ -e "$EntitlementsPlist"]; then
-      codesign -vvv -fs "$2" --no-strict "--entitlements=$EntitlementsPlist" "$signfile"
+    if [ -e "$EntitlementsPlist" ]; then
+      echo "Codesigning $signfile with entitlements"
+      codesign -fs "$2" --no-strict "--entitlements=$EntitlementsPlist" "$signfile"
     else
-      codesign -vvv -fs "$2" --no-strict "$signfile"
+      echo "Codesigning $signfile"
+      codesign -fs "$2" --no-strict "$signfile"
     fi
   done
 done
 
-if[ -e "$EntitlementsPlist"]; then
-  codesign -vvv -fs "$2" --no-strict "--entitlements=$EntitlementsPlist"  "./$AppBundleName"
+if [ -e "$EntitlementsPlist" ]; then
+  echo "Codesigning ./$AppBundleName with entitlements"
+  codesign -fs "$2" --no-strict "--entitlements=$EntitlementsPlist"  "./$AppBundleName"
 else
-  codesign -vvv -fs "$2" --no-strict   "$OUTPUT/Payload/$AppBundleName"
+  echo "Codesigning ./$AppBundleName"
+  codesign -fs "$2" --no-strict   "./$AppBundleName"
 fi
 
-rm "$CURRENT_PATH/$AppIdentifier-signed.ipa"
+if [[ -e "$CURRENT_PATH/$AppIdentifier-signed.ipa" ]]; then
+  echo "Deleted existing output file"
+  rm "$CURRENT_PATH/$AppIdentifier-signed.ipa"
+fi
 cd "$OUTPUT"
+echo "Packaging..."
 zip -qry "$CURRENT_PATH/$AppIdentifier-signed.ipa" "."
 cd "$CURRENT_PATH"
+echo "Doing some housekeeping..."
 rm -rf "$TEMP"
+echo "Done, the package is located at $CURRENT_PATH/$AppIdentifier-signed.ipa"
