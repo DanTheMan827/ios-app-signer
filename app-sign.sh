@@ -1,6 +1,6 @@
 #!/bin/bash
 # This script was tested on 10.11.1 with Xcode 7.1 installed, your mileage may vary.
-echo "iOS App Signer rev. 34"
+echo "iOS App Signer rev. 35"
 if [[ "$#" -lt 2 ]]; then
   echo "Usage: "$(basename "$0")" (file name/url) (Developer Identity) [(.mobileprovision file)] [(new app id)]"
   echo ""
@@ -16,7 +16,7 @@ fi
 LIST_BINARY_EXTENSIONS="dylib so 0 vis pvr framework"
 TEMP="$(mktemp -d)"
 OUTPUT="$TEMP/out"
-mkdir "$OUTPUT"
+mkdir "$OUTPUT" 2>&1
 CURRENT_PATH="$(pwd)"
 
 Extension="${1##*.}"
@@ -35,26 +35,26 @@ fi
 case "$Extension" in
   deb )
     echo "Extracting .deb file"
-    mkdir "$TEMP/deb"
-    cd "$TEMP/deb"
+    mkdir "$TEMP/deb" 2>&1
+    cd "$TEMP/deb" 2>&1
     ar -x "$FilePath" >/dev/null 2>&1 || (echo "Error extracting .deb"; exit 1)
     
-    tar -xvf $TEMP/deb/data.tar* >/dev/null 2>&1  || (echo "Error untarring .deb data file"; exit 1)
+    tar -xf $TEMP/deb/data.tar* 2>&1 || (echo "Error untarring .deb data file"; exit 1)
     
-    mv "$TEMP/deb/Applications/" "$OUTPUT/Payload/"
+    mv "$TEMP/deb/Applications/" "$OUTPUT/Payload/" 2>&1
     ;;
   ipa )
     echo "Unzipping .ipa file"
-    unzip -q "$FilePath" -d "$OUTPUT" > /dev/null || (echo "Error extracting $FilePath"; exit 1)
+    unzip -q "$FilePath" -d "$OUTPUT" 2>&1 || (echo "Error extracting $FilePath"; exit 1)
     ;;
   app )
     if [ ! -d "$FilePath" ]; then
       echo "$FilePath is not a directory"
       exit 1
     fi
-    echo "Copying .app to temp folder"
-    mkdir "$OUTPUT/Payload"
-    cp -r "$FilePath" "$OUTPUT/Payload"
+    echo "Copying .app to temp folder" 2>&1
+    mkdir "$OUTPUT/Payload" 2>&1
+    cp -r "$FilePath" "$OUTPUT/Payload" 2>&1
     ;;
   *) echo "Filetype not supported"; exit 1
 esac
@@ -66,11 +66,11 @@ AppIdentifier="$(defaults read "$OUTPUT/Payload/$AppBundleName/Info.plist" CFBun
 if [[ -n "$3" ]] && [[ -e "$3" ]]; then
   if [[ -e "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision" ]]; then
     echo "Deleted .mobileprovision in app bundle"
-    rm "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision"
+    rm "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision" 2>&1
   fi
   
   echo "Copy .mobileprovision to app bundle"
-  cp "$3" "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision"
+  cp "$3" "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision" 2>&1
 fi
 
 if [[ -e "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision" ]]; then
@@ -78,7 +78,7 @@ if [[ -e "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision" ]]; then
   MobileProvisionIdentifier="${MobileProvisionIdentifier#*.}"
   
   if [[ "$MobileProvisionIdentifier" != "*" ]] && [[ "$MobileProvisionIdentifier" != "$AppIdentifier" ]] && [[ -z "$4" ]]; then
-    defaults write "$OUTPUT/Payload/$AppBundleName/Info.plist" CFBundleIdentifier "$MobileProvisionIdentifier"
+    defaults write "$OUTPUT/Payload/$AppBundleName/Info.plist" CFBundleIdentifier "$MobileProvisionIdentifier" 2>&1
     AppIdentifier="$MobileProvisionIdentifier"
     echo "Changed app identifier to $AppIdentifier to match the provisioning profile"
   fi
@@ -91,13 +91,13 @@ if [[ -n "$4" ]]; then
     echo "You wanted to change the app identifier to $4 but your provisioning profile would not allow this! ($MobileProvisionIdentifier)"
     exit 1
   fi
-  defaults write "$OUTPUT/Payload/$AppBundleName/Info.plist" CFBundleIdentifier "$4"
+  defaults write "$OUTPUT/Payload/$AppBundleName/Info.plist" CFBundleIdentifier "$4" 2>&1
   AppIdentifier="$4"
   echo "Changed app identifier to $AppIdentifier"
 fi
 
-defaults read "$OUTPUT/Payload/$AppBundleName/Info.plist" CFBundleResourceSpecification >/dev/null 2>&1 &&
-  defaults delete "$OUTPUT/Payload/$AppBundleName/Info.plist" CFBundleResourceSpecification
+defaults read "$OUTPUT/Payload/$AppBundleName/Info.plist" CFBundleResourceSpecification > /dev/null &&
+  defaults delete "$OUTPUT/Payload/$AppBundleName/Info.plist" CFBundleResourceSpecification 2>&1
 
 if [[ -e "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision" ]]; then
   security cms -D -i "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision" > "$TEMP/mobileprovision.plist"
@@ -116,17 +116,17 @@ fi
 for binext in $LIST_BINARY_EXTENSIONS; do
   for signfile in $(find "./$AppBundleName" -name "*.$binext" -type f); do
     if [ -e "$EntitlementsPlist" ]; then
-      codesign -vvv -fs "$2" --no-strict "--entitlements=$EntitlementsPlist" "$signfile"
+      codesign -vvv -fs "$2" --no-strict "--entitlements=$EntitlementsPlist" "$signfile" 2>&1
     else
-      codesign -vvv -fs "$2" --no-strict "$signfile"
+      codesign -vvv -fs "$2" --no-strict "$signfile" 2>&1
     fi
   done
 done
 
 if [ -e "$EntitlementsPlist" ]; then
-  codesign -vvv -fs "$2" --no-strict "--entitlements=$EntitlementsPlist"  "./$AppBundleName"
+  codesign -vvv -fs "$2" --no-strict "--entitlements=$EntitlementsPlist"  "./$AppBundleName" 2>&1
 else
-  codesign -vvv -fs "$2" --no-strict   "./$AppBundleName"
+  codesign -vvv -fs "$2" --no-strict   "./$AppBundleName" 2>&1
 fi
 
 if [[ -e "$CURRENT_PATH/$AppIdentifier-signed.ipa" ]]; then
