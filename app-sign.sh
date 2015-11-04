@@ -1,6 +1,6 @@
 #!/bin/bash
 # This script was tested on 10.11.1 with Xcode 7.1 installed, your mileage may vary.
-echo "iOS App Signer rev. 33"
+echo "iOS App Signer rev. 34"
 if [[ "$#" -lt 2 ]]; then
   echo "Usage: "$(basename "$0")" (file name/url) (Developer Identity) [(.mobileprovision file)] [(new app id)]"
   echo ""
@@ -105,25 +105,28 @@ if [[ -e "$OUTPUT/Payload/$AppBundleName/embedded.mobileprovision" ]]; then
 fi
 
 cd "$OUTPUT/Payload/"
-
+if [ -e "$EntitlementsPlist" ]; then
+  echo "Signing with entitlements"
+  echo "-------------------------"
+  cat "$EntitlementsPlist"
+  echo "-------------------------"
+else
+  echo "Signing without entitlements"
+fi
 for binext in $LIST_BINARY_EXTENSIONS; do
   for signfile in $(find "./$AppBundleName" -name "*.$binext" -type f); do
     if [ -e "$EntitlementsPlist" ]; then
-      echo "Codesigning $signfile with entitlements"
-      codesign -fs "$2" --no-strict "--entitlements=$EntitlementsPlist" "$signfile"
+      codesign -vvv -fs "$2" --no-strict "--entitlements=$EntitlementsPlist" "$signfile"
     else
-      echo "Codesigning $signfile"
-      codesign -fs "$2" --no-strict "$signfile"
+      codesign -vvv -fs "$2" --no-strict "$signfile"
     fi
   done
 done
 
 if [ -e "$EntitlementsPlist" ]; then
-  echo "Codesigning ./$AppBundleName with entitlements"
-  codesign -fs "$2" --no-strict "--entitlements=$EntitlementsPlist"  "./$AppBundleName"
+  codesign -vvv -fs "$2" --no-strict "--entitlements=$EntitlementsPlist"  "./$AppBundleName"
 else
-  echo "Codesigning ./$AppBundleName"
-  codesign -fs "$2" --no-strict   "./$AppBundleName"
+  codesign -vvv -fs "$2" --no-strict   "./$AppBundleName"
 fi
 
 if [[ -e "$CURRENT_PATH/$AppIdentifier-signed.ipa" ]]; then
