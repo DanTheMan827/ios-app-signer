@@ -494,6 +494,7 @@ class ViewController: NSViewController {
     }
     
     @IBAction func doSign(sender: NSButton) {
+        NSApplication.sharedApplication().windows[0].makeFirstResponder(self)
         startSigning()
         //NSThread.detachNewThreadSelector(Selector("signingThread"), toTarget: self, withObject: nil)
     }
