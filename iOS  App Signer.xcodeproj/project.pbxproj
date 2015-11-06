@@ -36,16 +36,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		652408C81BE743D4006FA4C6 /* AppSigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AppSigner.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		652408C81BE743D4006FA4C6 /* iOS  App Signer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "iOS  App Signer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		652408CB1BE743D4006FA4C6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		652408CD1BE743D4006FA4C6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		652408CF1BE743D4006FA4C6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		652408D21BE743D4006FA4C6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		652408D41BE743D4006FA4C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		652408D91BE743D4006FA4C6 /* AppSignerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AppSignerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		652408D91BE743D4006FA4C6 /* iOS  App Signer.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS  App Signer.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		652408DD1BE743D4006FA4C6 /* AppSignerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSignerTests.swift; sourceTree = "<group>"; };
 		652408DF1BE743D4006FA4C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		652408E41BE743D4006FA4C6 /* AppSignerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AppSignerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		652408E41BE743D4006FA4C6 /* iOS  App Signer.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS  App Signer.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		652408E81BE743D4006FA4C6 /* AppSignerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSignerUITests.swift; sourceTree = "<group>"; };
 		652408EA1BE743D4006FA4C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		652408F81BE747BF006FA4C6 /* MyPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = MyPlayground.playground; sourceTree = "<group>"; };
@@ -98,9 +98,9 @@
 		652408C91BE743D4006FA4C6 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				652408C81BE743D4006FA4C6 /* AppSigner.app */,
-				652408D91BE743D4006FA4C6 /* AppSignerTests.xctest */,
-				652408E41BE743D4006FA4C6 /* AppSignerUITests.xctest */,
+				652408C81BE743D4006FA4C6 /* iOS  App Signer.app */,
+				652408D91BE743D4006FA4C6 /* iOS  App Signer.xctest */,
+				652408E41BE743D4006FA4C6 /* iOS  App Signer.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -154,9 +154,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		652408C71BE743D4006FA4C6 /* AppSigner */ = {
+		652408C71BE743D4006FA4C6 /* iOS  App Signer */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 652408ED1BE743D4006FA4C6 /* Build configuration list for PBXNativeTarget "AppSigner" */;
+			buildConfigurationList = 652408ED1BE743D4006FA4C6 /* Build configuration list for PBXNativeTarget "iOS  App Signer" */;
 			buildPhases = (
 				652408C41BE743D4006FA4C6 /* Sources */,
 				652408C51BE743D4006FA4C6 /* Frameworks */,
@@ -166,14 +166,14 @@
 			);
 			dependencies = (
 			);
-			name = AppSigner;
+			name = "iOS  App Signer";
 			productName = AppSigner;
-			productReference = 652408C81BE743D4006FA4C6 /* AppSigner.app */;
+			productReference = 652408C81BE743D4006FA4C6 /* iOS  App Signer.app */;
 			productType = "com.apple.product-type.application";
 		};
-		652408D81BE743D4006FA4C6 /* AppSignerTests */ = {
+		652408D81BE743D4006FA4C6 /* iOS  App SignerTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 652408F01BE743D4006FA4C6 /* Build configuration list for PBXNativeTarget "AppSignerTests" */;
+			buildConfigurationList = 652408F01BE743D4006FA4C6 /* Build configuration list for PBXNativeTarget "iOS  App SignerTests" */;
 			buildPhases = (
 				652408D51BE743D4006FA4C6 /* Sources */,
 				652408D61BE743D4006FA4C6 /* Frameworks */,
@@ -184,14 +184,14 @@
 			dependencies = (
 				652408DB1BE743D4006FA4C6 /* PBXTargetDependency */,
 			);
-			name = AppSignerTests;
+			name = "iOS  App SignerTests";
 			productName = AppSignerTests;
-			productReference = 652408D91BE743D4006FA4C6 /* AppSignerTests.xctest */;
+			productReference = 652408D91BE743D4006FA4C6 /* iOS  App Signer.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		652408E31BE743D4006FA4C6 /* AppSignerUITests */ = {
+		652408E31BE743D4006FA4C6 /* iOS  App SignerUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 652408F31BE743D4006FA4C6 /* Build configuration list for PBXNativeTarget "AppSignerUITests" */;
+			buildConfigurationList = 652408F31BE743D4006FA4C6 /* Build configuration list for PBXNativeTarget "iOS  App SignerUITests" */;
 			buildPhases = (
 				652408E01BE743D4006FA4C6 /* Sources */,
 				652408E11BE743D4006FA4C6 /* Frameworks */,
@@ -202,9 +202,9 @@
 			dependencies = (
 				652408E61BE743D4006FA4C6 /* PBXTargetDependency */,
 			);
-			name = AppSignerUITests;
+			name = "iOS  App SignerUITests";
 			productName = AppSignerUITests;
-			productReference = 652408E41BE743D4006FA4C6 /* AppSignerUITests.xctest */;
+			productReference = 652408E41BE743D4006FA4C6 /* iOS  App Signer.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -235,7 +235,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 652408C31BE743D4006FA4C6 /* Build configuration list for PBXProject "AppSigner" */;
+			buildConfigurationList = 652408C31BE743D4006FA4C6 /* Build configuration list for PBXProject "iOS  App Signer" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -248,9 +248,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				652408C71BE743D4006FA4C6 /* AppSigner */,
-				652408D81BE743D4006FA4C6 /* AppSignerTests */,
-				652408E31BE743D4006FA4C6 /* AppSignerUITests */,
+				652408C71BE743D4006FA4C6 /* iOS  App Signer */,
+				652408D81BE743D4006FA4C6 /* iOS  App SignerTests */,
+				652408E31BE743D4006FA4C6 /* iOS  App SignerUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -315,12 +315,12 @@
 /* Begin PBXTargetDependency section */
 		652408DB1BE743D4006FA4C6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 652408C71BE743D4006FA4C6 /* AppSigner */;
+			target = 652408C71BE743D4006FA4C6 /* iOS  App Signer */;
 			targetProxy = 652408DA1BE743D4006FA4C6 /* PBXContainerItemProxy */;
 		};
 		652408E61BE743D4006FA4C6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 652408C71BE743D4006FA4C6 /* AppSigner */;
+			target = 652408C71BE743D4006FA4C6 /* iOS  App Signer */;
 			targetProxy = 652408E51BE743D4006FA4C6 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -425,7 +425,7 @@
 				INFOPLIST_FILE = AppSigner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.DanTheMan827.AppSigner;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "iOS  App Signer";
 			};
 			name = Debug;
 		};
@@ -437,7 +437,7 @@
 				INFOPLIST_FILE = AppSigner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.DanTheMan827.AppSigner;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "iOS  App Signer";
 			};
 			name = Release;
 		};
@@ -449,8 +449,8 @@
 				INFOPLIST_FILE = AppSignerTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.DanTheMan827.AppSignerTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AppSigner.app/Contents/MacOS/AppSigner";
+				PRODUCT_NAME = "iOS  App Signer";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/iOS  App Signer.app/Contents/MacOS/iOS  App Signer";
 			};
 			name = Debug;
 		};
@@ -462,8 +462,8 @@
 				INFOPLIST_FILE = AppSignerTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.DanTheMan827.AppSignerTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AppSigner.app/Contents/MacOS/AppSigner";
+				PRODUCT_NAME = "iOS  App Signer";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/iOS  App Signer.app/Contents/MacOS/iOS  App Signer";
 			};
 			name = Release;
 		};
@@ -474,7 +474,7 @@
 				INFOPLIST_FILE = AppSignerUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.DanTheMan827.AppSignerUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "iOS  App Signer";
 				TEST_TARGET_NAME = AppSigner;
 				USES_XCTRUNNER = YES;
 			};
@@ -487,7 +487,7 @@
 				INFOPLIST_FILE = AppSignerUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.DanTheMan827.AppSignerUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "iOS  App Signer";
 				TEST_TARGET_NAME = AppSigner;
 				USES_XCTRUNNER = YES;
 			};
@@ -496,7 +496,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		652408C31BE743D4006FA4C6 /* Build configuration list for PBXProject "AppSigner" */ = {
+		652408C31BE743D4006FA4C6 /* Build configuration list for PBXProject "iOS  App Signer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				652408EB1BE743D4006FA4C6 /* Debug */,
@@ -505,7 +505,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		652408ED1BE743D4006FA4C6 /* Build configuration list for PBXNativeTarget "AppSigner" */ = {
+		652408ED1BE743D4006FA4C6 /* Build configuration list for PBXNativeTarget "iOS  App Signer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				652408EE1BE743D4006FA4C6 /* Debug */,
@@ -514,7 +514,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		652408F01BE743D4006FA4C6 /* Build configuration list for PBXNativeTarget "AppSignerTests" */ = {
+		652408F01BE743D4006FA4C6 /* Build configuration list for PBXNativeTarget "iOS  App SignerTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				652408F11BE743D4006FA4C6 /* Debug */,
@@ -523,7 +523,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		652408F31BE743D4006FA4C6 /* Build configuration list for PBXNativeTarget "AppSignerUITests" */ = {
+		652408F31BE743D4006FA4C6 /* Build configuration list for PBXNativeTarget "iOS  App SignerUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				652408F41BE743D4006FA4C6 /* Debug */,

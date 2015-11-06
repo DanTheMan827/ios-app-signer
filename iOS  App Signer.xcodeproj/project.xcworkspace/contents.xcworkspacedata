@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:AppSigner.xcodeproj">
+      location = "self:/Users/Daniel/Documents/XCode/AppSigner/iOS  App Signer.xcodeproj">
    </FileRef>
 </Workspace>
