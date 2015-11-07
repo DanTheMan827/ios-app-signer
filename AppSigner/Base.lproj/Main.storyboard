@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="9059" systemVersion="15B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
+        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9059"/>
     </dependencies>
     <scenes>
@@ -82,7 +83,7 @@
                         <outlet property="delegate" destination="Voe-Tx-rLC" id="PrD-fu-P6m"/>
                     </connections>
                 </application>
-                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="AppSigner" customModuleProvider="target"/>
+                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="iOS__App_Signer" customModuleProvider="target"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="75" y="0.0"/>
@@ -109,7 +110,7 @@
         <!--View Controller-->
         <scene sceneID="hIz-AP-VOD">
             <objects>
-                <viewController id="XfG-lQ-9wD" customClass="ViewController" customModule="AppSigner" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="XfG-lQ-9wD" customClass="ViewController" customModule="iOS__App_Signer" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="m2S-Jp-Qdl">
                         <rect key="frame" x="0.0" y="0.0" width="480" height="165"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -238,6 +239,10 @@
                                     <action selector="inputFileChanged:" target="XfG-lQ-9wD" id="dyx-Gg-hnS"/>
                                 </connections>
                             </textField>
+                            <progressIndicator wantsLayer="YES" maxValue="100" displayedWhenStopped="NO" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="HWJ-Of-bu5">
+                                <rect key="frame" x="20" y="-1" width="440" height="20"/>
+                                <animations/>
+                            </progressIndicator>
                         </subviews>
                         <constraints>
                             <constraint firstItem="R7n-5x-Cdn" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="21" id="0bi-wg-h9s"/>
@@ -255,14 +260,17 @@
                             <constraint firstItem="6PG-wk-Y7j" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="20" id="KF7-C5-FqT"/>
                             <constraint firstItem="nPs-2D-0KB" firstAttribute="leading" secondItem="8rx-0O-jlW" secondAttribute="trailing" constant="8" id="RWo-qd-UUI"/>
                             <constraint firstItem="KTg-r5-W7c" firstAttribute="top" secondItem="nPs-2D-0KB" secondAttribute="bottom" constant="8" id="RjF-1P-11H"/>
+                            <constraint firstItem="HWJ-Of-bu5" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="20" id="S38-VL-jdF"/>
                             <constraint firstItem="KTg-r5-W7c" firstAttribute="centerY" secondItem="D77-ma-cRk" secondAttribute="centerY" id="Tfs-OL-11e"/>
                             <constraint firstItem="8rx-0O-jlW" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="20" id="Uac-8T-jTw"/>
                             <constraint firstItem="nii-m3-xWa" firstAttribute="leading" secondItem="D48-nz-Ybw" secondAttribute="trailing" constant="8" id="XS2-C6-KFA"/>
                             <constraint firstItem="Ofh-tw-iFg" firstAttribute="centerY" secondItem="D48-nz-Ybw" secondAttribute="centerY" id="YkC-At-Dos"/>
                             <constraint firstItem="D48-nz-Ybw" firstAttribute="leading" secondItem="Ofh-tw-iFg" secondAttribute="trailing" constant="8" id="clS-H3-ecD"/>
+                            <constraint firstAttribute="bottom" secondItem="HWJ-Of-bu5" secondAttribute="bottom" id="eU6-Ta-1y0"/>
                             <constraint firstItem="8rx-0O-jlW" firstAttribute="centerY" secondItem="nPs-2D-0KB" secondAttribute="centerY" id="exv-LX-vOl"/>
                             <constraint firstItem="D48-nz-Ybw" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="11" id="kNX-Fb-JM3"/>
                             <constraint firstItem="6PG-wk-Y7j" firstAttribute="top" secondItem="KTg-r5-W7c" secondAttribute="bottom" constant="7" id="kuB-xu-DX5"/>
+                            <constraint firstAttribute="trailing" secondItem="HWJ-Of-bu5" secondAttribute="trailing" constant="20" id="qmB-hl-sii"/>
                             <constraint firstItem="KTg-r5-W7c" firstAttribute="leading" secondItem="R7n-5x-Cdn" secondAttribute="trailing" constant="8" id="rWW-8F-YbQ"/>
                             <constraint firstItem="Fwu-oH-Waq" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="23" id="toF-nS-FwX"/>
                             <constraint firstAttribute="trailing" secondItem="nii-m3-xWa" secondAttribute="trailing" constant="20" id="tuP-xP-IXb"/>
@@ -278,6 +286,7 @@
                         <outlet property="ProvisioningProfilesPopup" destination="nPs-2D-0KB" id="er1-tf-RbB"/>
                         <outlet property="StartButton" destination="D77-ma-cRk" id="Bal-BQ-GGF"/>
                         <outlet property="StatusLabel" destination="6PG-wk-Y7j" id="vn9-Yl-isC"/>
+                        <outlet property="downloadProgress" destination="HWJ-Of-bu5" id="URD-8D-7Lf"/>
                     </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>

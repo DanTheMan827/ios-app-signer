@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class ViewController: NSViewController {
+class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDelegate {
     
     //MARK: IBOutlets
     @IBOutlet var ProvisioningProfilesPopup: NSPopUpButton!
@@ -19,6 +19,7 @@ class ViewController: NSViewController {
     @IBOutlet var StartButton: NSButton!
     @IBOutlet var NewApplicationIDTextField: NSTextField!
     
+    @IBOutlet var downloadProgress: NSProgressIndicator!
     //MARK: Variables
     var provisioningProfiles:[ProvisioningProfile] = []
     var codesigningCerts: [String] = []
@@ -32,9 +33,6 @@ class ViewController: NSViewController {
     let fileManager = NSFileManager.defaultManager()
     let arPath = "/usr/bin/ar"
     let mktempPath = "/usr/bin/mktemp"
-    let rmPath = "/bin/rm"
-    let cpPath = "/bin/cp"
-    let mvPath = "/bin/mv"
     let tarPath = "/usr/bin/tar"
     let unzipPath = "/usr/bin/unzip"
     let zipPath = "/usr/bin/zip"
@@ -175,6 +173,56 @@ class ViewController: NSViewController {
         }
         controlsEnabled(true)
     }
+    func bytesToSmallestSi(size: Double) -> String {
+        let prefixes = ["","K","M","G","T","P","E","Z","Y"]
+        for i in 1...6 {
+            let nextUnit = pow(1024.00, Double(i+1))
+            let unitMax = pow(1024.00, Double(i))
+            if size < nextUnit {
+                return "\(round((size / unitMax)*100)/100)\(prefixes[i])B"
+            }
+            
+        }
+        return "\(size)B"
+    }
+    //MARK: NSURL Delegate
+    var downloadSize: Int64?
+    var dataDownloaded = NSMutableData()
+    var downloading = false
+    var downloadError: NSError?
+    var downloadPath: String!
+    
+    func URLSession(session: NSURLSession, dataTask: NSURLSessionDataTask, didReceiveResponse response: NSURLResponse, completionHandler: (NSURLSessionResponseDisposition) -> Void) {
+        downloadSize = response.expectedContentLength
+        dataDownloaded = NSMutableData()
+        completionHandler(NSURLSessionResponseDisposition.Allow)
+        if response.expectedContentLength > 0 {
+            downloadProgress.startAnimation(nil)
+        }
+    }
+    
+    func URLSession(session: NSURLSession, dataTask: NSURLSessionDataTask, didReceiveData data: NSData) {
+        dataDownloaded.appendData(data)
+        if downloadSize == nil {
+            StatusLabel.stringValue = "Downloading file: \(bytesToSmallestSi(Double(dataDownloaded.length)))"
+        } else {
+            StatusLabel.stringValue = "Downloading file: \(bytesToSmallestSi(Double(dataDownloaded.length))) / \(bytesToSmallestSi(Double(downloadSize!)))"
+            let percentDownloaded = (Double(dataDownloaded.length) / Double(downloadSize!)) * 100
+            downloadProgress.doubleValue = percentDownloaded
+        }
+    }
+    
+    func URLSession(session: NSURLSession, task: NSURLSessionTask, didCompleteWithError error: NSError?) {
+        
+        if error != nil {
+            downloadError = error
+        } else {
+            dataDownloaded.writeToFile(downloadPath, atomically: true)
+        }
+        downloading = false
+        downloadProgress.doubleValue = 0.0
+        downloadProgress.stopAnimation(nil)
+    }
     
     //MARK: Codesigning
     func startSigning() {
@@ -213,19 +261,29 @@ class ViewController: NSViewController {
         let entitlementsPlist = tempFolder.stringByAppendingPathComponent("entitlements.plist")
         
         //MARK: Download file
+        downloading = false
+        downloadError = nil
+        downloadPath = tempFolder.stringByAppendingPathComponent("download.\(inputFile.pathExtension)")
+        
         if inputFile.lowercaseString.substringToIndex(inputFile.startIndex.advancedBy(4)) == "http" {
+            let defaultConfigObject = NSURLSessionConfiguration.defaultSessionConfiguration()
+            let defaultSession = NSURLSession(configuration: defaultConfigObject, delegate: self, delegateQueue: NSOperationQueue.mainQueue())
             if let url = NSURL(string: inputFile) {
-                setStatus("Downloading input file")
-                var request1: NSURLRequest = NSURLRequest(URL: url)
-                var response: AutoreleasingUnsafeMutablePointer<NSURLResponse?>=nil
-                if let fileData = (try? NSURLConnection.sendSynchronousRequest(request1, returningResponse: response)) {
-                    let downloadPath = tempFolder.stringByAppendingPathComponent("download.\(inputFile.pathExtension)")
-                    fileData.writeToFile(downloadPath, atomically: true)
-                    inputFile = downloadPath
-                } else {
-                    setStatus("Error downloading file")
-                    cleanup(tempFolder); return
-                }
+                downloading = true
+                
+                let dataTask = defaultSession.dataTaskWithURL(url)
+                setStatus("Downloading file")
+                dataTask.resume()
+            }
+            
+            while downloading {
+                usleep(100000)
+            }
+            if downloadError != nil {
+                setStatus("Error downloading file, \(downloadError!.localizedDescription.lowercaseString)")
+                cleanup(tempFolder); return
+            } else {
+                inputFile = downloadPath
             }
         }
         
