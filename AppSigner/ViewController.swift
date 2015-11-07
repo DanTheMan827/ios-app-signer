@@ -375,6 +375,22 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
             }
             break
             
+        case "xcarchive":
+            //MARK: Copy app bundle
+            if !inputIsDirectory {
+                setStatus("Unsupported input file")
+                cleanup(tempFolder); return
+            }
+            do {
+                try fileManager.createDirectoryAtPath(workingDirectory, withIntermediateDirectories: true, attributes: nil)
+                setStatus("Copying app to payload directory")
+                try fileManager.copyItemAtPath(inputFile.stringByAppendingPathComponent("Products/Applications/"), toPath: payloadDirectory)
+            } catch {
+                setStatus("Error copying app to payload directory")
+                cleanup(tempFolder); return
+            }
+            break
+            
         default:
             setStatus("Unsupported input file")
             cleanup(tempFolder); return
@@ -542,7 +558,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
         openDialog.canChooseDirectories = false
         openDialog.allowsMultipleSelection = false
         openDialog.allowsOtherFileTypes = false
-        openDialog.allowedFileTypes = ["ipa","IPA","deb","DEB","app","APP"]
+        openDialog.allowedFileTypes = ["ipa","IPA","deb","DEB","app","APP","xcarchive","XCARCHIVE"]
         openDialog.runModal()
         if let filename = openDialog.URLs.first {
             InputFileText.stringValue = filename.path!
