@@ -187,27 +187,31 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
     }
     //MARK: NSURL Delegate
     var downloadSize: Int64?
-    var dataDownloaded = NSMutableData()
+    var downloadFile: NSFileHandle!
+    var dataDownloaded: Int64 = 0
     var downloading = false
     var downloadError: NSError?
     var downloadPath: String!
     
     func URLSession(session: NSURLSession, dataTask: NSURLSessionDataTask, didReceiveResponse response: NSURLResponse, completionHandler: (NSURLSessionResponseDisposition) -> Void) {
         downloadSize = response.expectedContentLength
-        dataDownloaded = NSMutableData()
+        dataDownloaded = 0
         completionHandler(NSURLSessionResponseDisposition.Allow)
         if response.expectedContentLength > 0 {
             downloadProgress.startAnimation(nil)
         }
+        fileManager.createFileAtPath(downloadPath, contents: nil, attributes: nil)
+        downloadFile = NSFileHandle(forWritingAtPath: downloadPath)
     }
     
     func URLSession(session: NSURLSession, dataTask: NSURLSessionDataTask, didReceiveData data: NSData) {
-        dataDownloaded.appendData(data)
+        downloadFile.writeData(data)
+        dataDownloaded += data.length
         if downloadSize == nil {
-            StatusLabel.stringValue = "Downloading file: \(bytesToSmallestSi(Double(dataDownloaded.length)))"
+            StatusLabel.stringValue = "Downloading file: \(bytesToSmallestSi(Double(dataDownloaded)))"
         } else {
-            StatusLabel.stringValue = "Downloading file: \(bytesToSmallestSi(Double(dataDownloaded.length))) / \(bytesToSmallestSi(Double(downloadSize!)))"
-            let percentDownloaded = (Double(dataDownloaded.length) / Double(downloadSize!)) * 100
+            StatusLabel.stringValue = "Downloading file: \(bytesToSmallestSi(Double(dataDownloaded))) / \(bytesToSmallestSi(Double(downloadSize!)))"
+            let percentDownloaded = (Double(dataDownloaded) / Double(downloadSize!)) * 100
             downloadProgress.doubleValue = percentDownloaded
         }
     }
@@ -217,7 +221,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
         if error != nil {
             downloadError = error
         } else {
-            dataDownloaded.writeToFile(downloadPath, atomically: true)
+            downloadFile.closeFile()
         }
         downloading = false
         downloadProgress.doubleValue = 0.0
