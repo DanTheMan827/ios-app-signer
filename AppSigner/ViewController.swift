@@ -213,17 +213,19 @@ class ViewController: NSViewController {
         let entitlementsPlist = tempFolder.stringByAppendingPathComponent("entitlements.plist")
         
         //MARK: Download file
-        if let url = NSURL(string: inputFile) {
-            setStatus("Downloading input file")
-            var request1: NSURLRequest = NSURLRequest(URL: url)
-            var response: AutoreleasingUnsafeMutablePointer<NSURLResponse?>=nil
-            if let fileData = (try? NSURLConnection.sendSynchronousRequest(request1, returningResponse: response)) {
-                let downloadPath = tempFolder.stringByAppendingPathComponent("download.\(inputFile.pathExtension)")
-                fileData.writeToFile(downloadPath, atomically: true)
-                inputFile = downloadPath
-            } else {
-                setStatus("Error downloading file")
-                cleanup(tempFolder); return
+        if inputFile.lowercaseString.substringToIndex(inputFile.startIndex.advancedBy(4)) == "http" {
+            if let url = NSURL(string: inputFile) {
+                setStatus("Downloading input file")
+                var request1: NSURLRequest = NSURLRequest(URL: url)
+                var response: AutoreleasingUnsafeMutablePointer<NSURLResponse?>=nil
+                if let fileData = (try? NSURLConnection.sendSynchronousRequest(request1, returningResponse: response)) {
+                    let downloadPath = tempFolder.stringByAppendingPathComponent("download.\(inputFile.pathExtension)")
+                    fileData.writeToFile(downloadPath, atomically: true)
+                    inputFile = downloadPath
+                } else {
+                    setStatus("Error downloading file")
+                    cleanup(tempFolder); return
+                }
             }
         }
         
