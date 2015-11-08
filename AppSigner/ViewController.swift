@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDelegate {
+class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSessionDownloadDelegate {
     
     //MARK: IBOutlets
     @IBOutlet var ProvisioningProfilesPopup: NSPopUpButton!
@@ -18,8 +18,8 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
     @IBOutlet var BrowseButton: NSButton!
     @IBOutlet var StartButton: NSButton!
     @IBOutlet var NewApplicationIDTextField: NSTextField!
-    
     @IBOutlet var downloadProgress: NSProgressIndicator!
+    
     //MARK: Variables
     var provisioningProfiles:[ProvisioningProfile] = []
     var codesigningCerts: [String] = []
@@ -27,6 +27,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
     var ReEnableNewApplicationID = false
     var PreviousNewApplicationID = ""
     var outputFile: String?
+    var startSize: CGFloat?
     
     //MARK: Constants
     let defaults = NSUserDefaults()
@@ -38,6 +39,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
     let zipPath = "/usr/bin/zip"
     let defaultsPath = "/usr/bin/defaults"
     let codesignPath = "/usr/bin/codesign"
+    
     
     //MARK: Functions
     override func viewDidLoad() {
@@ -186,46 +188,25 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
         return "\(size)B"
     }
     //MARK: NSURL Delegate
-    var downloadSize: Int64?
-    var downloadFile: NSFileHandle!
-    var dataDownloaded: Int64 = 0
     var downloading = false
     var downloadError: NSError?
     var downloadPath: String!
     
-    func URLSession(session: NSURLSession, dataTask: NSURLSessionDataTask, didReceiveResponse response: NSURLResponse, completionHandler: (NSURLSessionResponseDisposition) -> Void) {
-        downloadSize = response.expectedContentLength
-        dataDownloaded = 0
-        completionHandler(NSURLSessionResponseDisposition.Allow)
-        if response.expectedContentLength > 0 {
-            downloadProgress.startAnimation(nil)
-        }
-        fileManager.createFileAtPath(downloadPath, contents: nil, attributes: nil)
-        downloadFile = NSFileHandle(forWritingAtPath: downloadPath)
-    }
-    
-    func URLSession(session: NSURLSession, dataTask: NSURLSessionDataTask, didReceiveData data: NSData) {
-        downloadFile.writeData(data)
-        dataDownloaded += data.length
-        if downloadSize == nil {
-            StatusLabel.stringValue = "Downloading file: \(bytesToSmallestSi(Double(dataDownloaded)))"
-        } else {
-            StatusLabel.stringValue = "Downloading file: \(bytesToSmallestSi(Double(dataDownloaded))) / \(bytesToSmallestSi(Double(downloadSize!)))"
-            let percentDownloaded = (Double(dataDownloaded) / Double(downloadSize!)) * 100
-            downloadProgress.doubleValue = percentDownloaded
-        }
-    }
-    
-    func URLSession(session: NSURLSession, task: NSURLSessionTask, didCompleteWithError error: NSError?) {
-        
-        if error != nil {
-            downloadError = error
-        } else {
-            downloadFile.closeFile()
+    func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didFinishDownloadingToURL location: NSURL) {
+        downloadError = downloadTask.error
+        if downloadError == nil {
+            try? fileManager.moveItemAtURL(location, toURL: NSURL(fileURLWithPath: downloadPath))
         }
         downloading = false
         downloadProgress.doubleValue = 0.0
         downloadProgress.stopAnimation(nil)
+    }
+    
+    func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
+        
+        //StatusLabel.stringValue = "Downloading file: \(bytesToSmallestSi(Double(totalBytesWritten))) / \(bytesToSmallestSi(Double(totalBytesExpectedToWrite)))"
+        let percentDownloaded = (Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)) * 100
+        downloadProgress.doubleValue = percentDownloaded
     }
     
     //MARK: Codesigning
@@ -275,9 +256,11 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
             if let url = NSURL(string: inputFile) {
                 downloading = true
                 
-                let dataTask = defaultSession.dataTaskWithURL(url)
+                let downloadTask = defaultSession.downloadTaskWithURL(url)
                 setStatus("Downloading file")
-                dataTask.resume()
+                downloadProgress.startAnimation(nil)
+                downloadTask.resume()
+                defaultSession.finishTasksAndInvalidate()
             }
             
             while downloading {
@@ -577,9 +560,6 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
         NSApplication.sharedApplication().windows[0].makeFirstResponder(self)
         startSigning()
         //NSThread.detachNewThreadSelector(Selector("signingThread"), toTarget: self, withObject: nil)
-    }
-    
-    @IBAction func inputFileChanged(sender: NSTextField) {
     }
 }
 
