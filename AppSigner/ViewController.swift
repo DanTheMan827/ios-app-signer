@@ -302,7 +302,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
         //MARK: Process input file
         switch(inputFile.pathExtension.lowercaseString){
         case "deb":
-            //MARK: Unpack deb
+            //MARK: --Unpack deb
             let debPath = tempFolder.stringByAppendingPathComponent("deb")
             do {
                 
@@ -343,7 +343,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
             break
             
         case "ipa":
-            //MARK: Unzip ipa
+            //MARK: --Unzip ipa
             do {
                 try fileManager.createDirectoryAtPath(workingDirectory, withIntermediateDirectories: true, attributes: nil)
                 setStatus("Extracting ipa file")
@@ -359,7 +359,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
             break
             
         case "app":
-            //MARK: Copy app bundle
+            //MARK: --Copy app bundle
             if !inputIsDirectory {
                 setStatus("Unsupported input file")
                 cleanup(tempFolder); return
@@ -375,7 +375,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
             break
             
         case "xcarchive":
-            //MARK: Copy app bundle from xcarchive
+            //MARK: --Copy app bundle from xcarchive
             if !inputIsDirectory {
                 setStatus("Unsupported input file")
                 cleanup(tempFolder); return
@@ -421,6 +421,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
             return output
         }
         
+        // Loop through app bundles in payload directory
         if let files = try? fileManager.contentsOfDirectoryAtPath(payloadDirectory) {
             var isDirectory: ObjCBool = true
             
@@ -429,7 +430,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
                 fileManager.fileExistsAtPath(payloadDirectory.stringByAppendingPathComponent(file), isDirectory: &isDirectory)
                 if !isDirectory { continue }
                 
-                //MARK: Bundle variable setup
+                //MARK: Bundle variables setup
                 let appBundlePath = payloadDirectory.stringByAppendingPathComponent(file)
                 let appBundleInfoPlist = appBundlePath.stringByAppendingPathComponent("Info.plist")
                 let appBundleProvisioningFilePath = appBundlePath.stringByAppendingPathComponent("embedded.mobileprovision")
@@ -498,9 +499,11 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
                 }
                 
                 //MARK: Codesigning
-                let signFunc = generateFileSignFunc(payloadDirectory, entitlementsPath: entitlementsPlist, signingCertificate: signingCertificate!)
-                recursiveDirectorySearch(appBundlePath, extensions: ["dylib","so","0","vis","pvr","framework"], found: signFunc)
-                signFunc(file: appBundlePath)
+                let signingFunction = generateFileSignFunc(payloadDirectory, entitlementsPath: entitlementsPlist, signingCertificate: signingCertificate!)
+                let signableExtensions = ["dylib","so","0","vis","pvr","framework"]
+                
+                recursiveDirectorySearch(appBundlePath, extensions: signableExtensions, found: signingFunction)
+                signingFunction(file: appBundlePath)
             }
         }
         
