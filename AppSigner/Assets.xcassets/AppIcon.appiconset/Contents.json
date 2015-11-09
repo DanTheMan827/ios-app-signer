@@ -3,58 +3,61 @@
     {
       "size" : "16x16",
       "idiom" : "mac",
-      "filename" : "Mimetypes-application-pkcs7-signature-icon-16.png",
+      "filename" : "16x16.png",
       "scale" : "1x"
     },
     {
       "size" : "16x16",
       "idiom" : "mac",
-      "filename" : "Mimetypes-application-pkcs7-signature-icon-32.png",
+      "filename" : "32x32-1.png",
       "scale" : "2x"
     },
     {
       "size" : "32x32",
       "idiom" : "mac",
-      "filename" : "Mimetypes-application-pkcs7-signature-icon-33.png",
+      "filename" : "32x32.png",
       "scale" : "1x"
     },
     {
       "size" : "32x32",
       "idiom" : "mac",
-      "filename" : "Mimetypes-application-pkcs7-signature-icon-64.png",
+      "filename" : "64x64.png",
       "scale" : "2x"
     },
     {
       "size" : "128x128",
       "idiom" : "mac",
-      "filename" : "Mimetypes-application-pkcs7-signature-icon-128.png",
+      "filename" : "128x128.png",
       "scale" : "1x"
     },
     {
       "size" : "128x128",
       "idiom" : "mac",
-      "filename" : "Mimetypes-application-pkcs7-signature-icon-256.png",
+      "filename" : "256x256-1.png",
       "scale" : "2x"
     },
     {
       "size" : "256x256",
       "idiom" : "mac",
-      "filename" : "Mimetypes-application-pkcs7-signature-icon-257.png",
+      "filename" : "256x256.png",
       "scale" : "1x"
     },
     {
-      "idiom" : "mac",
       "size" : "256x256",
+      "idiom" : "mac",
+      "filename" : "512x512.png",
       "scale" : "2x"
     },
     {
-      "idiom" : "mac",
       "size" : "512x512",
+      "idiom" : "mac",
+      "filename" : "document-sign-2.png",
       "scale" : "1x"
     },
     {
-      "idiom" : "mac",
       "size" : "512x512",
+      "idiom" : "mac",
+      "filename" : "document-sign.png",
       "scale" : "2x"
     }
   ],
