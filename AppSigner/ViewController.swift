@@ -19,6 +19,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
     @IBOutlet var StartButton: NSButton!
     @IBOutlet var NewApplicationIDTextField: NSTextField!
     @IBOutlet var downloadProgress: NSProgressIndicator!
+    @IBOutlet var appDisplayName: NSTextFieldCell!
     
     //MARK: Variables
     var provisioningProfiles:[ProvisioningProfile] = []
@@ -233,6 +234,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
         var provisioningFile = self.profileFilename
         let signingCertificate = self.CodesigningCertsPopup.selectedItem!.title
         let newApplicationID = self.NewApplicationIDTextField.stringValue.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+        let newDisplayName = self.appDisplayName.stringValue.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
         
         //MARK: Create working temp folder
         let tempTask = NSTask().execute(mktempPath, workingDirectory: nil, arguments: ["-d"])
@@ -363,7 +365,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
             break
             
         case "xcarchive":
-            //MARK: Copy app bundle
+            //MARK: Copy app bundle from xcarchive
             if !inputIsDirectory {
                 setStatus("Unsupported input file")
                 cleanup(tempFolder); return
@@ -426,7 +428,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
                 //MARK: Delete CFBundleResourceSpecification from Info.plist
                 NSLog(NSTask().execute(defaultsPath, workingDirectory: nil, arguments: ["delete",appBundleInfoPlist,"CFBundleResourceSpecification"]).output)
                 
-                //MARK: Generate entitlements.plist
+                //MARK: Copy Provisioning Profile
                 if provisioningFile != nil {
                     if fileManager.fileExistsAtPath(appBundleProvisioningFilePath) {
                         if (try? fileManager.removeItemAtPath(appBundleProvisioningFilePath)) == nil {
@@ -439,6 +441,8 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
                         cleanup(tempFolder); return
                     }
                 }
+                
+                //MARK: Generate entitlements.plist
                 if provisioningFile != nil || useAppBundleProfile {
                     setStatus("Parsing entitlements")
                     if let profile = ProvisioningProfile(filename: useAppBundleProfile ? appBundleProvisioningFilePath : provisioningFile!){
@@ -461,12 +465,24 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
                     
                 }
                 
+                //MARK: Change Application ID
                 if newApplicationID != "" {
                     setStatus("Changing App ID to \(newApplicationID)")
                     let IDChangeTask = NSTask().execute(defaultsPath, workingDirectory: nil, arguments: ["write",appBundleInfoPlist,"CFBundleIdentifier", newApplicationID])
                     if IDChangeTask.status != 0 {
                         setStatus("Error changing App ID")
                         NSLog(IDChangeTask.output)
+                        cleanup(tempFolder); return
+                    }
+                }
+                
+                //MARK: Change Display Name
+                if newDisplayName != "" {
+                    setStatus("Changing Display Name to \(newDisplayName))")
+                    let displayNameChangeTask = NSTask().execute(defaultsPath, workingDirectory: nil, arguments: ["write",appBundleInfoPlist,"CFBundleDisplayName", newDisplayName])
+                    if displayNameChangeTask.status != 0 {
+                        setStatus("Error changing display name")
+                        NSLog(displayNameChangeTask.output)
                         cleanup(tempFolder); return
                     }
                 }
