@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class ViewController: NSViewController {
+class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSessionDownloadDelegate {
     
     //MARK: IBOutlets
     @IBOutlet var ProvisioningProfilesPopup: NSPopUpButton!
@@ -18,6 +18,7 @@ class ViewController: NSViewController {
     @IBOutlet var BrowseButton: NSButton!
     @IBOutlet var StartButton: NSButton!
     @IBOutlet var NewApplicationIDTextField: NSTextField!
+    @IBOutlet var downloadProgress: NSProgressIndicator!
     
     //MARK: Variables
     var provisioningProfiles:[ProvisioningProfile] = []
@@ -26,20 +27,19 @@ class ViewController: NSViewController {
     var ReEnableNewApplicationID = false
     var PreviousNewApplicationID = ""
     var outputFile: String?
+    var startSize: CGFloat?
     
     //MARK: Constants
     let defaults = NSUserDefaults()
     let fileManager = NSFileManager.defaultManager()
     let arPath = "/usr/bin/ar"
     let mktempPath = "/usr/bin/mktemp"
-    let rmPath = "/bin/rm"
-    let cpPath = "/bin/cp"
-    let mvPath = "/bin/mv"
     let tarPath = "/usr/bin/tar"
     let unzipPath = "/usr/bin/unzip"
     let zipPath = "/usr/bin/zip"
     let defaultsPath = "/usr/bin/defaults"
     let codesignPath = "/usr/bin/codesign"
+    
     
     //MARK: Functions
     override func viewDidLoad() {
@@ -175,6 +175,39 @@ class ViewController: NSViewController {
         }
         controlsEnabled(true)
     }
+    func bytesToSmallestSi(size: Double) -> String {
+        let prefixes = ["","K","M","G","T","P","E","Z","Y"]
+        for i in 1...6 {
+            let nextUnit = pow(1024.00, Double(i+1))
+            let unitMax = pow(1024.00, Double(i))
+            if size < nextUnit {
+                return "\(round((size / unitMax)*100)/100)\(prefixes[i])B"
+            }
+            
+        }
+        return "\(size)B"
+    }
+    //MARK: NSURL Delegate
+    var downloading = false
+    var downloadError: NSError?
+    var downloadPath: String!
+    
+    func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didFinishDownloadingToURL location: NSURL) {
+        downloadError = downloadTask.error
+        if downloadError == nil {
+            try? fileManager.moveItemAtURL(location, toURL: NSURL(fileURLWithPath: downloadPath))
+        }
+        downloading = false
+        downloadProgress.doubleValue = 0.0
+        downloadProgress.stopAnimation(nil)
+    }
+    
+    func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
+        
+        //StatusLabel.stringValue = "Downloading file: \(bytesToSmallestSi(Double(totalBytesWritten))) / \(bytesToSmallestSi(Double(totalBytesExpectedToWrite)))"
+        let percentDownloaded = (Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)) * 100
+        downloadProgress.doubleValue = percentDownloaded
+    }
     
     //MARK: Codesigning
     func startSigning() {
@@ -213,17 +246,31 @@ class ViewController: NSViewController {
         let entitlementsPlist = tempFolder.stringByAppendingPathComponent("entitlements.plist")
         
         //MARK: Download file
-        if let url = NSURL(string: inputFile) {
-            setStatus("Downloading input file")
-            var request1: NSURLRequest = NSURLRequest(URL: url)
-            var response: AutoreleasingUnsafeMutablePointer<NSURLResponse?>=nil
-            if let fileData = (try? NSURLConnection.sendSynchronousRequest(request1, returningResponse: response)) {
-                let downloadPath = tempFolder.stringByAppendingPathComponent("download.\(inputFile.pathExtension)")
-                fileData.writeToFile(downloadPath, atomically: true)
-                inputFile = downloadPath
-            } else {
-                setStatus("Error downloading file")
+        downloading = false
+        downloadError = nil
+        downloadPath = tempFolder.stringByAppendingPathComponent("download.\(inputFile.pathExtension)")
+        
+        if inputFile.lowercaseString.substringToIndex(inputFile.startIndex.advancedBy(4)) == "http" {
+            let defaultConfigObject = NSURLSessionConfiguration.defaultSessionConfiguration()
+            let defaultSession = NSURLSession(configuration: defaultConfigObject, delegate: self, delegateQueue: NSOperationQueue.mainQueue())
+            if let url = NSURL(string: inputFile) {
+                downloading = true
+                
+                let downloadTask = defaultSession.downloadTaskWithURL(url)
+                setStatus("Downloading file")
+                downloadProgress.startAnimation(nil)
+                downloadTask.resume()
+                defaultSession.finishTasksAndInvalidate()
+            }
+            
+            while downloading {
+                usleep(100000)
+            }
+            if downloadError != nil {
+                setStatus("Error downloading file, \(downloadError!.localizedDescription.lowercaseString)")
                 cleanup(tempFolder); return
+            } else {
+                inputFile = downloadPath
             }
         }
         
@@ -309,6 +356,22 @@ class ViewController: NSViewController {
                 try fileManager.createDirectoryAtPath(payloadDirectory, withIntermediateDirectories: true, attributes: nil)
                 setStatus("Copying app to payload directory")
                 try fileManager.copyItemAtPath(inputFile, toPath: payloadDirectory.stringByAppendingPathComponent(inputFile.lastPathComponent))
+            } catch {
+                setStatus("Error copying app to payload directory")
+                cleanup(tempFolder); return
+            }
+            break
+            
+        case "xcarchive":
+            //MARK: Copy app bundle
+            if !inputIsDirectory {
+                setStatus("Unsupported input file")
+                cleanup(tempFolder); return
+            }
+            do {
+                try fileManager.createDirectoryAtPath(workingDirectory, withIntermediateDirectories: true, attributes: nil)
+                setStatus("Copying app to payload directory")
+                try fileManager.copyItemAtPath(inputFile.stringByAppendingPathComponent("Products/Applications/"), toPath: payloadDirectory)
             } catch {
                 setStatus("Error copying app to payload directory")
                 cleanup(tempFolder); return
@@ -482,7 +545,7 @@ class ViewController: NSViewController {
         openDialog.canChooseDirectories = false
         openDialog.allowsMultipleSelection = false
         openDialog.allowsOtherFileTypes = false
-        openDialog.allowedFileTypes = ["ipa","IPA","deb","DEB","app","APP"]
+        openDialog.allowedFileTypes = ["ipa","IPA","deb","DEB","app","APP","xcarchive","XCARCHIVE"]
         openDialog.runModal()
         if let filename = openDialog.URLs.first {
             InputFileText.stringValue = filename.path!
@@ -497,9 +560,6 @@ class ViewController: NSViewController {
         NSApplication.sharedApplication().windows[0].makeFirstResponder(self)
         startSigning()
         //NSThread.detachNewThreadSelector(Selector("signingThread"), toTarget: self, withObject: nil)
-    }
-    
-    @IBAction func inputFileChanged(sender: NSTextField) {
     }
 }
 
