@@ -41,7 +41,6 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
     let defaultsPath = "/usr/bin/defaults"
     let codesignPath = "/usr/bin/codesign"
     
-    
     //MARK: Functions
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -228,13 +227,34 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
     }
     
     func signingThread(){
+        
         //MARK: Set up variables
         var warnings = 0
         var inputFile = InputFileText.stringValue
         var provisioningFile = self.profileFilename
-        let signingCertificate = self.CodesigningCertsPopup.selectedItem!.title
+        let signingCertificate = self.CodesigningCertsPopup.selectedItem?.title
         let newApplicationID = self.NewApplicationIDTextField.stringValue.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
         let newDisplayName = self.appDisplayName.stringValue.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+        
+        //MARK: Sanity checks
+        
+        // Check signing certificate selection
+        if signingCertificate == nil {
+            setStatus("No signing certificate selected")
+            return
+        }
+        
+        // Check if input file exists
+        var inputIsDirectory: ObjCBool = false
+        if !fileManager.fileExistsAtPath(inputFile, isDirectory: &inputIsDirectory){
+            let alert = NSAlert()
+            alert.messageText = "Input file not found"
+            alert.addButtonWithTitle("OK")
+            alert.informativeText = "The file \(inputFile) could not be found"
+            alert.runModal()
+            controlsEnabled(true)
+            return
+        }
         
         //MARK: Create working temp folder
         let tempTask = NSTask().execute(mktempPath, workingDirectory: nil, arguments: ["-d"])
@@ -274,19 +294,6 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
             } else {
                 inputFile = downloadPath
             }
-        }
-        
-        //MARK: Check if input file exists
-        var inputIsDirectory: ObjCBool = false
-        if !fileManager.fileExistsAtPath(inputFile, isDirectory: &inputIsDirectory){
-            let alert = NSAlert()
-            alert.messageText = "Input file not found"
-            alert.addButtonWithTitle("OK")
-            alert.informativeText = "The file \(inputFile) could not be found"
-            alert.runModal()
-            controlsEnabled(true)
-            cleanup(tempFolder)
-            return
         }
         
         //MARK: Process input file
@@ -488,7 +495,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
                 }
                 
                 //MARK: Codesigning
-                let signFunc = generateFileSignFunc(payloadDirectory, entitlementsPath: entitlementsPlist, signingCertificate: signingCertificate)
+                let signFunc = generateFileSignFunc(payloadDirectory, entitlementsPath: entitlementsPlist, signingCertificate: signingCertificate!)
                 recursiveDirectorySearch(appBundlePath, extensions: ["dylib","so","0","vis","pvr","framework"], found: signFunc)
                 signFunc(file: appBundlePath)
             }
