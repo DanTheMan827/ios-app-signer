@@ -136,6 +136,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
             NewApplicationIDTextField.enabled = ReEnableNewApplicationID
             NewApplicationIDTextField.stringValue = PreviousNewApplicationID
             StartButton.enabled = true
+            appDisplayName.enabled = true
         } else {
             // Backup previous values
             PreviousNewApplicationID = NewApplicationIDTextField.stringValue
@@ -147,6 +148,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
             CodesigningCertsPopup.enabled = false
             NewApplicationIDTextField.enabled = false
             StartButton.enabled = false
+            appDisplayName.enabled = false
         }
     }
     
