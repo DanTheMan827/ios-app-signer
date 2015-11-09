@@ -48,7 +48,6 @@
 		652408E41BE743D4006FA4C6 /* iOS App Signer.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS App Signer.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		652408E81BE743D4006FA4C6 /* AppSignerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSignerUITests.swift; sourceTree = "<group>"; };
 		652408EA1BE743D4006FA4C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		652408F81BE747BF006FA4C6 /* MyPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = MyPlayground.playground; sourceTree = "<group>"; };
 		655FFF9C1BE9B3E300D43AD8 /* NSTask-execute.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSTask-execute.swift"; sourceTree = "<group>"; };
 		655FFF9E1BE9BA9D00D43AD8 /* StringByAppendingPathComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringByAppendingPathComponent.swift; sourceTree = "<group>"; };
 		655FFFA11BEAD93600D43AD8 /* ProvisioningProfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProvisioningProfile.swift; sourceTree = "<group>"; };
@@ -87,7 +86,6 @@
 				655FFFA01BEAD90800D43AD8 /* Classes */,
 				655FFF9E1BE9BA9D00D43AD8 /* StringByAppendingPathComponent.swift */,
 				655FFF9C1BE9B3E300D43AD8 /* NSTask-execute.swift */,
-				652408F81BE747BF006FA4C6 /* MyPlayground.playground */,
 				652408CA1BE743D4006FA4C6 /* AppSigner */,
 				652408DC1BE743D4006FA4C6 /* AppSignerTests */,
 				652408E71BE743D4006FA4C6 /* AppSignerUITests */,
