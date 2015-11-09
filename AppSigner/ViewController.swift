@@ -235,6 +235,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
         let signingCertificate = self.CodesigningCertsPopup.selectedItem?.title
         let newApplicationID = self.NewApplicationIDTextField.stringValue.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
         let newDisplayName = self.appDisplayName.stringValue.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+        let inputStartsWithHTTP = inputFile.lowercaseString.substringToIndex(inputFile.startIndex.advancedBy(4)) == "http"
         
         //MARK: Sanity checks
         
@@ -246,7 +247,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
         
         // Check if input file exists
         var inputIsDirectory: ObjCBool = false
-        if !fileManager.fileExistsAtPath(inputFile, isDirectory: &inputIsDirectory){
+        if !inputStartsWithHTTP && !fileManager.fileExistsAtPath(inputFile, isDirectory: &inputIsDirectory){
             let alert = NSAlert()
             alert.messageText = "Input file not found"
             alert.addButtonWithTitle("OK")
@@ -272,7 +273,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
         downloadError = nil
         downloadPath = tempFolder.stringByAppendingPathComponent("download.\(inputFile.pathExtension)")
         
-        if inputFile.lowercaseString.substringToIndex(inputFile.startIndex.advancedBy(4)) == "http" {
+        if inputStartsWithHTTP {
             let defaultConfigObject = NSURLSessionConfiguration.defaultSessionConfiguration()
             let defaultSession = NSURLSession(configuration: defaultConfigObject, delegate: self, delegateQueue: NSOperationQueue.mainQueue())
             if let url = NSURL(string: inputFile) {
