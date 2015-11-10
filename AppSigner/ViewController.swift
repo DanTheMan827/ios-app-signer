@@ -42,9 +42,9 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
     let codesignPath = "/usr/bin/codesign"
     
     //MARK: Functions
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        
         // Do any additional setup after loading the view.
         populateProvisioningProfiles()
         populateCodesigningCerts()
