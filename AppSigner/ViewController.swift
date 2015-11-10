@@ -260,7 +260,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
         }
         
         //MARK: Create working temp folder
-        let tempTask = NSTask().execute(mktempPath, workingDirectory: nil, arguments: ["-d","com.DanTheMan827.AppSigner.xxxxxxxxxx"])
+        let tempTask = NSTask().execute(mktempPath, workingDirectory: nil, arguments: ["-d","-t","com.DanTheMan827.AppSigner"])
         if tempTask.status != 0 {
             setStatus("Error creating temp folder")
             return
