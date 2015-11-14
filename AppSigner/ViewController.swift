@@ -459,11 +459,13 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
                 //MARK: Copy Provisioning Profile
                 if provisioningFile != nil {
                     if fileManager.fileExistsAtPath(appBundleProvisioningFilePath) {
+                        setStatus("Deleting embedded.mobileprovision")
                         if (try? fileManager.removeItemAtPath(appBundleProvisioningFilePath)) == nil {
                             setStatus("Error deleting embedded.mobileprovision")
                             cleanup(tempFolder); return
                         }
                     }
+                    setStatus("Copying provisioning profile to app bundle")
                     if (try? fileManager.copyItemAtPath(provisioningFile!, toPath: appBundleProvisioningFilePath)) == nil {
                         setStatus("Error copying provisioning profile")
                         cleanup(tempFolder); return

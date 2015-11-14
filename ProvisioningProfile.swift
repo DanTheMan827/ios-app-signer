@@ -71,8 +71,9 @@ struct ProvisioningProfile {
         do {
         let plistData = try NSPropertyListSerialization.dataWithPropertyList(self.entitlements!, format: .XMLFormat_v1_0, options: 0)
         return NSString(data: plistData, encoding: NSUTF8StringEncoding)
-        } catch {
+        } catch let error as NSError {
             NSLog("Error reading entitlements from \(filename.lastPathComponent)")
+            NSLog(error.localizedDescription)
             return nil
         }
     }
