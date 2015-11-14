@@ -29,6 +29,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
     var PreviousNewApplicationID = ""
     var outputFile: String?
     var startSize: CGFloat?
+    var NibLoaded = false
     
     //MARK: Constants
     let defaults = NSUserDefaults()
@@ -45,16 +46,19 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
     override func awakeFromNib() {
         super.awakeFromNib()
         
-        // Do any additional setup after loading the view.
-        populateProvisioningProfiles()
-        populateCodesigningCerts()
-        if let defaultCert = defaults.stringForKey("signingCertificate") {
-            if codesigningCerts.contains(defaultCert) {
-                NSLog("Loaded Codesigning Certificate from Defaults: \(defaultCert)")
-                CodesigningCertsPopup.selectItemWithTitle(defaultCert)
+        if NibLoaded == false {
+            NibLoaded = true
+            // Do any additional setup after loading the view.
+            populateProvisioningProfiles()
+            populateCodesigningCerts()
+            if let defaultCert = defaults.stringForKey("signingCertificate") {
+                if codesigningCerts.contains(defaultCert) {
+                    NSLog("Loaded Codesigning Certificate from Defaults: \(defaultCert)")
+                    CodesigningCertsPopup.selectItemWithTitle(defaultCert)
+                }
             }
+            setStatus("Ready")
         }
-        setStatus("Ready")
     }
     
     func setStatus(status: String){
