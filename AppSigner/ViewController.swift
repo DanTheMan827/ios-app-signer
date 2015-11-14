@@ -421,7 +421,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
             let useEntitlements = fileManager.fileExistsAtPath(entitlementsPath)
             func output(file:String){
                 let shortName = file.substringFromIndex(payloadDirectory.endIndex)
-                setStatus("Codesigning \(shortName)")
+                setStatus("Codesigning \(shortName)\(useEntitlements ? " with entitlements":"")")
                 var arguments = ["-vvv","-fs",signingCertificate,"--no-strict"]
                 if useEntitlements {
                     arguments.append("--entitlements=\(entitlementsPath)")
