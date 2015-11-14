@@ -54,12 +54,15 @@ struct ProvisioningProfile {
                         self.teamID = teamIdentifier
                         self.entitlements = entitlements
                 } else {
+                    NSLog("Error processing \(filename.lastPathComponent)")
                     return nil
                 }
             } else {
+                NSLog("Error parsing \(filename.lastPathComponent)")
                 return nil
             }
         } else {
+            NSLog("Error reading \(filename.lastPathComponent)")
             return nil
         }
     }
@@ -69,6 +72,7 @@ struct ProvisioningProfile {
         let plistData = try NSPropertyListSerialization.dataWithPropertyList(self.entitlements!, format: .XMLFormat_v1_0, options: 0)
         return NSString(data: plistData, encoding: NSUTF8StringEncoding)
         } catch {
+            NSLog("Error reading entitlements from \(filename.lastPathComponent)")
             return nil
         }
     }

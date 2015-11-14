@@ -77,9 +77,16 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
             "Choose Custom File",
             "––––––––––––––––––––––"
         ])
+        let formatter = NSDateFormatter()
+        formatter.dateStyle = .ShortStyle
+        formatter.timeStyle = .NoStyle
+        
         for profile in provisioningProfiles {
             if profile.expires.timeIntervalSince1970 > NSDate().timeIntervalSince1970 {
                 ProvisioningProfilesPopup.addItemWithTitle("\(profile.appID) (\(profile.teamID))")
+                setStatus("Added profile \(profile.appID), expires (\(formatter.stringFromDate(profile.expires)))")
+            } else {
+                setStatus("Skipped profile \(profile.appID), expired (\(formatter.stringFromDate(profile.expires)))")
             }
         }
         chooseProvisioningProfile(ProvisioningProfilesPopup)
@@ -107,10 +114,12 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
         CodesigningCertsPopup.removeAllItems()
         self.codesigningCerts = getCodesigningCerts()
         
+        setStatus("Found \(self.codesigningCerts.count) Codesigning Certificate\(self.codesigningCerts.count>1 || self.codesigningCerts.count<1 ? "s":"")")
         for cert in self.codesigningCerts {
             CodesigningCertsPopup.addItemWithTitle(cert)
+            setStatus("Added signing certificate \"\(cert)\"")
         }
-        setStatus("Found \(self.codesigningCerts.count) Codesigning Certificate\(self.codesigningCerts.count>1 || self.codesigningCerts.count<1 ? "s":"")")
+        
     }
     
     func checkProfileID(profile: ProvisioningProfile?){
@@ -273,6 +282,10 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
         let workingDirectory = tempFolder.stringByAppendingPathComponent("out")
         let payloadDirectory = workingDirectory.stringByAppendingPathComponent("Payload/")
         let entitlementsPlist = tempFolder.stringByAppendingPathComponent("entitlements.plist")
+        
+        NSLog("Temp folder: \(tempFolder)")
+        NSLog("Working directory: \(workingDirectory)")
+        NSLog("Payload directory: \(payloadDirectory)")
         
         //MARK: Download file
         downloading = false
@@ -460,10 +473,17 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
                 //MARK: Generate entitlements.plist
                 if provisioningFile != nil || useAppBundleProfile {
                     setStatus("Parsing entitlements")
+                    
                     if let profile = ProvisioningProfile(filename: useAppBundleProfile ? appBundleProvisioningFilePath : provisioningFile!){
                         if let entitlements = profile.getEntitlementsPlist() {
-                            if (try? entitlements.writeToFile(entitlementsPlist, atomically: false, encoding: NSUTF8StringEncoding)) == nil {
-                                setStatus("Error writing entitlements.plist")
+                            NSLog("-----------------------")
+                            NSLog("\(entitlements)")
+                            NSLog("-----------------------")
+                            do {
+                                try entitlements.writeToFile(entitlementsPlist, atomically: false, encoding: NSUTF8StringEncoding)
+                                setStatus("Saved entitlements to \(entitlementsPlist)")
+                            } catch let error as NSError {
+                                setStatus("Error writing entitlements.plist, \(error.localizedDescription)")
                             }
                         } else {
                             setStatus("Unable to read entitlements from provisioning profile")
