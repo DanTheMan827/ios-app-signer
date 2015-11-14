@@ -34,6 +34,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
     //MARK: Constants
     let defaults = NSUserDefaults()
     let fileManager = NSFileManager.defaultManager()
+    let bundleID = NSBundle.mainBundle().bundleIdentifier
     let arPath = "/usr/bin/ar"
     let mktempPath = "/usr/bin/mktemp"
     let tarPath = "/usr/bin/tar"
@@ -185,8 +186,11 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
     }
     
     func cleanup(tempFolder: String){
-        if (try? fileManager.removeItemAtPath(tempFolder)) == nil {
+        do {
+            try fileManager.removeItemAtPath(tempFolder)
+        } catch let error as NSError {
             setStatus("Unable to delete temp folder")
+            NSLog(error.localizedDescription)
         }
         controlsEnabled(true)
     }
@@ -210,7 +214,12 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
     func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didFinishDownloadingToURL location: NSURL) {
         downloadError = downloadTask.error
         if downloadError == nil {
-            try? fileManager.moveItemAtURL(location, toURL: NSURL(fileURLWithPath: downloadPath))
+            do {
+                try fileManager.moveItemAtURL(location, toURL: NSURL(fileURLWithPath: downloadPath))
+            } catch let error as NSError {
+                setStatus("Unable to move downloaded file")
+                NSLog(error.localizedDescription)
+            }
         }
         downloading = false
         downloadProgress.doubleValue = 0.0
@@ -273,7 +282,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
         }
         
         //MARK: Create working temp folder
-        let tempTask = NSTask().execute(mktempPath, workingDirectory: nil, arguments: ["-d","-t","com.DanTheMan827.AppSigner"])
+        let tempTask = NSTask().execute(mktempPath, workingDirectory: nil, arguments: ["-d","-t",bundleID!])
         if tempTask.status != 0 {
             setStatus("Error creating temp folder")
             return
@@ -439,7 +448,8 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
         }
         
         // Loop through app bundles in payload directory
-        if let files = try? fileManager.contentsOfDirectoryAtPath(payloadDirectory) {
+        do {
+            let files = try fileManager.contentsOfDirectoryAtPath(payloadDirectory)
             var isDirectory: ObjCBool = true
             
             for file in files {
@@ -460,14 +470,20 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
                 if provisioningFile != nil {
                     if fileManager.fileExistsAtPath(appBundleProvisioningFilePath) {
                         setStatus("Deleting embedded.mobileprovision")
-                        if (try? fileManager.removeItemAtPath(appBundleProvisioningFilePath)) == nil {
+                        do {
+                            try fileManager.removeItemAtPath(appBundleProvisioningFilePath)
+                        } catch let error as NSError {
                             setStatus("Error deleting embedded.mobileprovision")
+                            NSLog(error.localizedDescription)
                             cleanup(tempFolder); return
                         }
                     }
                     setStatus("Copying provisioning profile to app bundle")
-                    if (try? fileManager.copyItemAtPath(provisioningFile!, toPath: appBundleProvisioningFilePath)) == nil {
+                    do {
+                        try fileManager.copyItemAtPath(provisioningFile!, toPath: appBundleProvisioningFilePath)
+                    } catch let error as NSError {
                         setStatus("Error copying provisioning profile")
+                        NSLog(error.localizedDescription)
                         cleanup(tempFolder); return
                     }
                 }
@@ -531,13 +547,20 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
                 recursiveDirectorySearch(appBundlePath, extensions: signableExtensions, found: signingFunction)
                 signingFunction(file: appBundlePath)
             }
+        } catch let error as NSError {
+            setStatus("Error listing files in payload directory")
+            NSLog(error.localizedDescription)
+            cleanup(tempFolder); return
         }
         
         //MARK: Packaging
         //Check if output already exists and delete if so
         if fileManager.fileExistsAtPath(outputFile!) {
-            if (try? fileManager.removeItemAtPath(outputFile!)) == nil {
+            do {
+                try fileManager.removeItemAtPath(outputFile!)
+            } catch let error as NSError {
                 setStatus("Error deleting output file")
+                NSLog(error.localizedDescription)
                 cleanup(tempFolder); return
             }
         }
