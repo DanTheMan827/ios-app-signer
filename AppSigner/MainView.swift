@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSessionDownloadDelegate {
+class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSessionDownloadDelegate {
     
     //MARK: IBOutlets
     @IBOutlet var ProvisioningProfilesPopup: NSPopUpButton!
@@ -19,7 +19,8 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
     @IBOutlet var StartButton: NSButton!
     @IBOutlet var NewApplicationIDTextField: NSTextField!
     @IBOutlet var downloadProgress: NSProgressIndicator!
-    @IBOutlet var appDisplayName: NSTextFieldCell!
+    @IBOutlet var appDisplayName: NSTextField!
+    
     
     //MARK: Variables
     var provisioningProfiles:[ProvisioningProfile] = []
@@ -44,12 +45,102 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
     let defaultsPath = "/usr/bin/defaults"
     let codesignPath = "/usr/bin/codesign"
     
+    //MARK: Drag / Drop
+    var fileTypes: [String] = ["ipa","deb","app","xcarchive","mobileprovision"]
+    var urlFileTypes: [String] = ["ipa","deb"]
+    var fileTypeIsOk = false
+    
+    func fileDropped(filename: String){
+        switch(filename.pathExtension.lowercaseString){
+        case "ipa", "deb", "app", "xcarchive":
+            InputFileText.stringValue = filename
+            break
+            
+        case "mobileprovision":
+            ProvisioningProfilesPopup.selectItemAtIndex(1)
+            checkProfileID(ProvisioningProfile(filename: filename))
+            break
+        default: break
+            
+        }
+    }
+    
+    func urlDropped(url: NSURL){
+        InputFileText.stringValue = url.absoluteString
+    }
+    
+    override func draggingEntered(sender: NSDraggingInfo) -> NSDragOperation {
+        if checkExtension(sender) == true {
+            self.fileTypeIsOk = true
+            return .Copy
+        } else {
+            self.fileTypeIsOk = false
+            return .None
+        }
+    }
+    
+    override func draggingUpdated(sender: NSDraggingInfo) -> NSDragOperation {
+        if self.fileTypeIsOk {
+            return .Copy
+        } else {
+            return .None
+        }
+    }
+    
+    override func performDragOperation(sender: NSDraggingInfo) -> Bool {
+        let pasteboard = sender.draggingPasteboard()
+        if let board = pasteboard.propertyListForType("NSFilenamesPboardType") as? NSArray {
+            if let filePath = board[0] as? String {
+                
+                fileDropped(filePath)
+                return true
+            }
+        }
+        if let types = pasteboard.types {
+            if types.contains(NSURLPboardType) {
+                if let url = NSURL(fromPasteboard: pasteboard) {
+                    urlDropped(url)
+                }
+            }
+        }
+        return false
+    }
+    
+    func checkExtension(drag: NSDraggingInfo) -> Bool {
+        if let board = drag.draggingPasteboard().propertyListForType("NSFilenamesPboardType") as? NSArray,
+            let path = board[0] as? String {
+                return self.fileTypes.contains(path.pathExtension.lowercaseString)
+        }
+        if let types = drag.draggingPasteboard().types {
+            if types.contains(NSURLPboardType) {
+                if let url = NSURL(fromPasteboard: drag.draggingPasteboard()),
+                    suffix = url.pathExtension {
+                        return self.urlFileTypes.contains(suffix.lowercaseString)
+                }
+            }
+        }
+        return false
+    }
+    
     //MARK: Functions
+    
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        registerForDraggedTypes([NSFilenamesPboardType, NSURLPboardType])
+    }
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        registerForDraggedTypes([NSFilenamesPboardType, NSURLPboardType])
+    }
     override func awakeFromNib() {
         super.awakeFromNib()
         
         if NibLoaded == false {
             NibLoaded = true
+            
+            // drag / drop
+            
+            
             // Do any additional setup after loading the view.
             populateProvisioningProfiles()
             populateCodesigningCerts()
@@ -507,9 +598,8 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
                     
                     if let profile = ProvisioningProfile(filename: useAppBundleProfile ? appBundleProvisioningFilePath : provisioningFile!){
                         if let entitlements = profile.getEntitlementsPlist() {
-                            Log.write("-----------------------")
-                            Log.write("\(entitlements)")
-                            Log.write("-----------------------")
+                            Log.write("–––––––––––––––––––––––\n\(entitlements)")
+                            Log.write("–––––––––––––––––––––––")
                             do {
                                 try entitlements.writeToFile(entitlementsPlist, atomically: false, encoding: NSUTF8StringEncoding)
                                 setStatus("Saved entitlements to \(entitlementsPlist)")

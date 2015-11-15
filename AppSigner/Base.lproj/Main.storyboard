@@ -125,8 +125,8 @@
         <!--View Controller-->
         <scene sceneID="hIz-AP-VOD">
             <objects>
-                <viewController id="XfG-lQ-9wD" customClass="ViewController" customModule="iOS_App_Signer" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="m2S-Jp-Qdl">
+                <viewController id="XfG-lQ-9wD" sceneMemberID="viewController">
+                    <view key="view" id="m2S-Jp-Qdl" customClass="MainView" customModule="iOS_App_Signer" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="480" height="184"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
@@ -142,7 +142,7 @@
                             <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="KTg-r5-W7c">
                                 <rect key="frame" x="148" y="63" width="312" height="22"/>
                                 <animations/>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="This is where you would change the application bundle identifier" drawsBackground="YES" id="wif-kS-mMp">
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="This is where you would change the application identifier" drawsBackground="YES" id="wif-kS-mMp">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -183,7 +183,7 @@
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="doSign:" target="XfG-lQ-9wD" id="Hwq-l0-aDD"/>
+                                    <action selector="doSign:" target="m2S-Jp-Qdl" id="Lcg-yN-MIB"/>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nii-m3-xWa">
@@ -194,7 +194,7 @@
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="doBrowse:" target="XfG-lQ-9wD" id="HhV-K9-NxA"/>
+                                    <action selector="doBrowse:" target="m2S-Jp-Qdl" id="arv-yU-Se5"/>
                                 </connections>
                             </button>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fGR-1u-3Jp">
@@ -212,7 +212,7 @@
                                     </menu>
                                 </popUpButtonCell>
                                 <connections>
-                                    <action selector="chooseSigningCertificate:" target="XfG-lQ-9wD" id="wYW-SE-Gg8"/>
+                                    <action selector="chooseSigningCertificate:" target="m2S-Jp-Qdl" id="jfx-R0-0ra"/>
                                 </connections>
                             </popUpButton>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nPs-2D-0KB">
@@ -230,7 +230,7 @@
                                     </menu>
                                 </popUpButtonCell>
                                 <connections>
-                                    <action selector="chooseProvisioningProfile:" target="XfG-lQ-9wD" id="xgI-P8-rx3"/>
+                                    <action selector="chooseProvisioningProfile:" target="m2S-Jp-Qdl" id="3vN-rS-tCg"/>
                                 </connections>
                             </popUpButton>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8rx-0O-jlW">
@@ -245,7 +245,7 @@
                             <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="D48-nz-Ybw">
                                 <rect key="frame" x="148" y="151" width="231" height="22"/>
                                 <animations/>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" continuous="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="File path or URL accepted" drawsBackground="YES" id="fpm-7k-Wjj">
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" continuous="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="File path or URL accepted" drawsBackground="YES" usesSingleLineMode="YES" id="fpm-7k-Wjj">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -284,7 +284,7 @@
                                     <font key="font" metaFont="smallSystemBold"/>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="statusLabelClick:" target="XfG-lQ-9wD" id="n3g-oU-h8t"/>
+                                    <action selector="statusLabelClick:" target="m2S-Jp-Qdl" id="Lot-FE-dNg"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -331,18 +331,18 @@
                             <constraint firstItem="fGR-1u-3Jp" firstAttribute="leading" secondItem="Fwu-oH-Waq" secondAttribute="trailing" constant="8" id="zrC-rt-5wW"/>
                         </constraints>
                         <animations/>
+                        <connections>
+                            <outlet property="BrowseButton" destination="nii-m3-xWa" id="9Gg-Bm-lTQ"/>
+                            <outlet property="CodesigningCertsPopup" destination="fGR-1u-3Jp" id="QFA-M2-jOZ"/>
+                            <outlet property="InputFileText" destination="D48-nz-Ybw" id="9Nq-GO-U2D"/>
+                            <outlet property="NewApplicationIDTextField" destination="KTg-r5-W7c" id="u0E-Di-PHm"/>
+                            <outlet property="ProvisioningProfilesPopup" destination="nPs-2D-0KB" id="up6-MH-pbL"/>
+                            <outlet property="StartButton" destination="D77-ma-cRk" id="0mg-cd-gV3"/>
+                            <outlet property="StatusLabel" destination="6PG-wk-Y7j" id="ubC-x4-D0u"/>
+                            <outlet property="appDisplayName" destination="qFX-XS-pud" id="vBF-5C-riZ"/>
+                            <outlet property="downloadProgress" destination="HWJ-Of-bu5" id="mnd-SP-Zf0"/>
+                        </connections>
                     </view>
-                    <connections>
-                        <outlet property="BrowseButton" destination="nii-m3-xWa" id="8ju-Sg-z7D"/>
-                        <outlet property="CodesigningCertsPopup" destination="fGR-1u-3Jp" id="pBf-iO-xWd"/>
-                        <outlet property="InputFileText" destination="D48-nz-Ybw" id="wRj-Lu-wgf"/>
-                        <outlet property="NewApplicationIDTextField" destination="KTg-r5-W7c" id="PtA-oy-XF9"/>
-                        <outlet property="ProvisioningProfilesPopup" destination="nPs-2D-0KB" id="er1-tf-RbB"/>
-                        <outlet property="StartButton" destination="D77-ma-cRk" id="Bal-BQ-GGF"/>
-                        <outlet property="StatusLabel" destination="6PG-wk-Y7j" id="vn9-Yl-isC"/>
-                        <outlet property="appDisplayName" destination="IAw-oV-ifP" id="dv8-Xt-X8Y"/>
-                        <outlet property="downloadProgress" destination="HWJ-Of-bu5" id="URD-8D-7Lf"/>
-                    </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>

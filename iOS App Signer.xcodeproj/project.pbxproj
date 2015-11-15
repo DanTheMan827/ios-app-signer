@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		6514F9CD1BF6F3020060EC17 /* app-sign.sh in Resources */ = {isa = PBXBuildFile; fileRef = 6514F9CC1BF6F3020060EC17 /* app-sign.sh */; };
 		652408CC1BE743D4006FA4C6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652408CB1BE743D4006FA4C6 /* AppDelegate.swift */; };
-		652408CE1BE743D4006FA4C6 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652408CD1BE743D4006FA4C6 /* ViewController.swift */; };
+		652408CE1BE743D4006FA4C6 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652408CD1BE743D4006FA4C6 /* MainView.swift */; };
 		652408D01BE743D4006FA4C6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 652408CF1BE743D4006FA4C6 /* Assets.xcassets */; };
 		652408D31BE743D4006FA4C6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 652408D11BE743D4006FA4C6 /* Main.storyboard */; };
 		652408DE1BE743D4006FA4C6 /* AppSignerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652408DD1BE743D4006FA4C6 /* AppSignerTests.swift */; };
@@ -42,7 +42,7 @@
 		6514F9CC1BF6F3020060EC17 /* app-sign.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "app-sign.sh"; sourceTree = "<group>"; };
 		652408C81BE743D4006FA4C6 /* iOS App Signer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "iOS App Signer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		652408CB1BE743D4006FA4C6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		652408CD1BE743D4006FA4C6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		652408CD1BE743D4006FA4C6 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		652408CF1BE743D4006FA4C6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		652408D21BE743D4006FA4C6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		652408D41BE743D4006FA4C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -115,7 +115,7 @@
 			children = (
 				65B24E0D1BECB30D005D2068 /* AppSigner.entitlements */,
 				652408CB1BE743D4006FA4C6 /* AppDelegate.swift */,
-				652408CD1BE743D4006FA4C6 /* ViewController.swift */,
+				652408CD1BE743D4006FA4C6 /* MainView.swift */,
 				652408CF1BE743D4006FA4C6 /* Assets.xcassets */,
 				652408D11BE743D4006FA4C6 /* Main.storyboard */,
 				652408D41BE743D4006FA4C6 /* Info.plist */,
@@ -294,7 +294,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				652408CE1BE743D4006FA4C6 /* ViewController.swift in Sources */,
+				652408CE1BE743D4006FA4C6 /* MainView.swift in Sources */,
 				65311EB01BF835F100516EFD /* Log.swift in Sources */,
 				655FFF9F1BE9BA9D00D43AD8 /* StringByAppendingPathComponent.swift in Sources */,
 				652408CC1BE743D4006FA4C6 /* AppDelegate.swift in Sources */,
