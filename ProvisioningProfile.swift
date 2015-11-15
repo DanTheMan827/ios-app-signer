@@ -7,12 +7,14 @@
 //
 
 import Foundation
+import AppKit
 struct ProvisioningProfile {
     var filename: String,
         expires: NSDate,
         appID: String,
         teamID: String,
         entitlements: AnyObject?
+    private let delegate = NSApplication.sharedApplication().delegate as! AppDelegate
     
     static func getProfiles() -> [ProvisioningProfile] {
         var output: [ProvisioningProfile] = []
@@ -54,15 +56,15 @@ struct ProvisioningProfile {
                         self.teamID = teamIdentifier
                         self.entitlements = entitlements
                 } else {
-                    NSLog("Error processing \(filename.lastPathComponent)")
+                    Log.write("Error processing \(filename.lastPathComponent)")
                     return nil
                 }
             } else {
-                NSLog("Error parsing \(filename.lastPathComponent)")
+                Log.write("Error parsing \(filename.lastPathComponent)")
                 return nil
             }
         } else {
-            NSLog("Error reading \(filename.lastPathComponent)")
+            Log.write("Error reading \(filename.lastPathComponent)")
             return nil
         }
     }
@@ -72,8 +74,8 @@ struct ProvisioningProfile {
         let plistData = try NSPropertyListSerialization.dataWithPropertyList(self.entitlements!, format: .XMLFormat_v1_0, options: 0)
         return NSString(data: plistData, encoding: NSUTF8StringEncoding)
         } catch let error as NSError {
-            NSLog("Error reading entitlements from \(filename.lastPathComponent)")
-            NSLog(error.localizedDescription)
+            Log.write("Error reading entitlements from \(filename.lastPathComponent)")
+            Log.write(error.localizedDescription)
             return nil
         }
     }

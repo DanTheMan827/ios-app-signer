@@ -35,6 +35,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
     let defaults = NSUserDefaults()
     let fileManager = NSFileManager.defaultManager()
     let bundleID = NSBundle.mainBundle().bundleIdentifier
+    let delegate = NSApplication.sharedApplication().delegate as! AppDelegate
     let arPath = "/usr/bin/ar"
     let mktempPath = "/usr/bin/mktemp"
     let tarPath = "/usr/bin/tar"
@@ -54,7 +55,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
             populateCodesigningCerts()
             if let defaultCert = defaults.stringForKey("signingCertificate") {
                 if codesigningCerts.contains(defaultCert) {
-                    NSLog("Loaded Codesigning Certificate from Defaults: \(defaultCert)")
+                    Log.write("Loaded Codesigning Certificate from Defaults: \(defaultCert)")
                     CodesigningCertsPopup.selectItemWithTitle(defaultCert)
                 }
             }
@@ -63,7 +64,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
     }
     
     func setStatus(status: String){
-        NSLog(status)
+        Log.write(status)
         StatusLabel.stringValue = status
     }
     
@@ -190,7 +191,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
             try fileManager.removeItemAtPath(tempFolder)
         } catch let error as NSError {
             setStatus("Unable to delete temp folder")
-            NSLog(error.localizedDescription)
+            Log.write(error.localizedDescription)
         }
         controlsEnabled(true)
     }
@@ -218,7 +219,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
                 try fileManager.moveItemAtURL(location, toURL: NSURL(fileURLWithPath: downloadPath))
             } catch let error as NSError {
                 setStatus("Unable to move downloaded file")
-                NSLog(error.localizedDescription)
+                Log.write(error.localizedDescription)
             }
         }
         downloading = false
@@ -251,6 +252,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
     }
     
     func signingThread(){
+        
         
         //MARK: Set up variables
         var warnings = 0
@@ -292,9 +294,9 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
         let payloadDirectory = workingDirectory.stringByAppendingPathComponent("Payload/")
         let entitlementsPlist = tempFolder.stringByAppendingPathComponent("entitlements.plist")
         
-        NSLog("Temp folder: \(tempFolder)")
-        NSLog("Working directory: \(workingDirectory)")
-        NSLog("Payload directory: \(payloadDirectory)")
+        Log.write("Temp folder: \(tempFolder)")
+        Log.write("Working directory: \(workingDirectory)")
+        Log.write("Payload directory: \(payloadDirectory)")
         
         //MARK: Download file
         downloading = false
@@ -336,7 +338,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
                 try fileManager.createDirectoryAtPath(workingDirectory, withIntermediateDirectories: true, attributes: nil)
                 setStatus("Extracting deb file")
                 let debTask = NSTask().execute(arPath, workingDirectory: debPath, arguments: ["-x", inputFile])
-                NSLog(debTask.output)
+                Log.write(debTask.output)
                 if debTask.status != 0 {
                     setStatus("Error processing deb file")
                     cleanup(tempFolder); return
@@ -349,7 +351,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
                         
                         setStatus("Unpacking data.\(tarFormat)")
                         let tarTask = NSTask().execute(tarPath, workingDirectory: debPath, arguments: ["-xf",dataPath])
-                        NSLog(tarTask.output)
+                        Log.write(tarTask.output)
                         if tarTask.status == 0 {
                             tarUnpacked = true
                         }
@@ -441,7 +443,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
                 if codesignTask.status != 0 {
                     setStatus("Error codesigning \(shortName)")
                     warnings++
-                    NSLog(codesignTask.output)
+                    Log.write(codesignTask.output)
                 }
             }
             return output
@@ -464,7 +466,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
                 let useAppBundleProfile = (provisioningFile == nil && fileManager.fileExistsAtPath(appBundleProvisioningFilePath))
                 
                 //MARK: Delete CFBundleResourceSpecification from Info.plist
-                NSLog(NSTask().execute(defaultsPath, workingDirectory: nil, arguments: ["delete",appBundleInfoPlist,"CFBundleResourceSpecification"]).output)
+                Log.write(NSTask().execute(defaultsPath, workingDirectory: nil, arguments: ["delete",appBundleInfoPlist,"CFBundleResourceSpecification"]).output)
                 
                 //MARK: Copy Provisioning Profile
                 if provisioningFile != nil {
@@ -474,7 +476,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
                             try fileManager.removeItemAtPath(appBundleProvisioningFilePath)
                         } catch let error as NSError {
                             setStatus("Error deleting embedded.mobileprovision")
-                            NSLog(error.localizedDescription)
+                            Log.write(error.localizedDescription)
                             cleanup(tempFolder); return
                         }
                     }
@@ -483,7 +485,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
                         try fileManager.copyItemAtPath(provisioningFile!, toPath: appBundleProvisioningFilePath)
                     } catch let error as NSError {
                         setStatus("Error copying provisioning profile")
-                        NSLog(error.localizedDescription)
+                        Log.write(error.localizedDescription)
                         cleanup(tempFolder); return
                     }
                 }
@@ -494,9 +496,9 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
                     
                     if let profile = ProvisioningProfile(filename: useAppBundleProfile ? appBundleProvisioningFilePath : provisioningFile!){
                         if let entitlements = profile.getEntitlementsPlist() {
-                            NSLog("-----------------------")
-                            NSLog("\(entitlements)")
-                            NSLog("-----------------------")
+                            Log.write("-----------------------")
+                            Log.write("\(entitlements)")
+                            Log.write("-----------------------")
                             do {
                                 try entitlements.writeToFile(entitlementsPlist, atomically: false, encoding: NSUTF8StringEncoding)
                                 setStatus("Saved entitlements to \(entitlementsPlist)")
@@ -524,7 +526,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
                     let IDChangeTask = NSTask().execute(defaultsPath, workingDirectory: nil, arguments: ["write",appBundleInfoPlist,"CFBundleIdentifier", newApplicationID])
                     if IDChangeTask.status != 0 {
                         setStatus("Error changing App ID")
-                        NSLog(IDChangeTask.output)
+                        Log.write(IDChangeTask.output)
                         cleanup(tempFolder); return
                     }
                 }
@@ -535,7 +537,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
                     let displayNameChangeTask = NSTask().execute(defaultsPath, workingDirectory: nil, arguments: ["write",appBundleInfoPlist,"CFBundleDisplayName", newDisplayName])
                     if displayNameChangeTask.status != 0 {
                         setStatus("Error changing display name")
-                        NSLog(displayNameChangeTask.output)
+                        Log.write(displayNameChangeTask.output)
                         cleanup(tempFolder); return
                     }
                 }
@@ -549,7 +551,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
             }
         } catch let error as NSError {
             setStatus("Error listing files in payload directory")
-            NSLog(error.localizedDescription)
+            Log.write(error.localizedDescription)
             cleanup(tempFolder); return
         }
         
@@ -560,7 +562,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
                 try fileManager.removeItemAtPath(outputFile!)
             } catch let error as NSError {
                 setStatus("Error deleting output file")
-                NSLog(error.localizedDescription)
+                Log.write(error.localizedDescription)
                 cleanup(tempFolder); return
             }
         }
@@ -630,7 +632,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
         }
     }
     @IBAction func chooseSigningCertificate(sender: NSPopUpButton) {
-        NSLog("Set Codesigning Certificate Default to: \(sender.stringValue)")
+        Log.write("Set Codesigning Certificate Default to: \(sender.stringValue)")
         defaults.setValue(sender.selectedItem?.title, forKey: "signingCertificate")
     }
     
@@ -639,5 +641,14 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
         startSigning()
         //NSThread.detachNewThreadSelector(Selector("signingThread"), toTarget: self, withObject: nil)
     }
+    
+    @IBAction func statusLabelClick(sender: NSButton) {
+        if let outputFile = self.outputFile {
+            if fileManager.fileExistsAtPath(outputFile) {
+                NSWorkspace.sharedWorkspace().activateFileViewerSelectingURLs([NSURL(fileURLWithPath: outputFile)])
+            }
+        }
+    }
+    
 }
 

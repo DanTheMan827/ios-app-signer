@@ -14,6 +14,8 @@
 		652408D31BE743D4006FA4C6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 652408D11BE743D4006FA4C6 /* Main.storyboard */; };
 		652408DE1BE743D4006FA4C6 /* AppSignerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652408DD1BE743D4006FA4C6 /* AppSignerTests.swift */; };
 		652408E91BE743D4006FA4C6 /* AppSignerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652408E81BE743D4006FA4C6 /* AppSignerUITests.swift */; };
+		65311EAE1BF8259000516EFD /* NSMenuLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65311EAD1BF8259000516EFD /* NSMenuLink.swift */; };
+		65311EB01BF835F100516EFD /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65311EAF1BF835F100516EFD /* Log.swift */; };
 		655FFF9D1BE9B3E300D43AD8 /* NSTask-execute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655FFF9C1BE9B3E300D43AD8 /* NSTask-execute.swift */; };
 		655FFF9F1BE9BA9D00D43AD8 /* StringByAppendingPathComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655FFF9E1BE9BA9D00D43AD8 /* StringByAppendingPathComponent.swift */; };
 		655FFFA21BEAD93600D43AD8 /* ProvisioningProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655FFFA11BEAD93600D43AD8 /* ProvisioningProfile.swift */; };
@@ -50,6 +52,8 @@
 		652408E41BE743D4006FA4C6 /* iOS App Signer.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS App Signer.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		652408E81BE743D4006FA4C6 /* AppSignerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSignerUITests.swift; sourceTree = "<group>"; };
 		652408EA1BE743D4006FA4C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		65311EAD1BF8259000516EFD /* NSMenuLink.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSMenuLink.swift; sourceTree = "<group>"; };
+		65311EAF1BF835F100516EFD /* Log.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 		655FFF9C1BE9B3E300D43AD8 /* NSTask-execute.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSTask-execute.swift"; sourceTree = "<group>"; };
 		655FFF9E1BE9BA9D00D43AD8 /* StringByAppendingPathComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringByAppendingPathComponent.swift; sourceTree = "<group>"; };
 		655FFFA11BEAD93600D43AD8 /* ProvisioningProfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProvisioningProfile.swift; sourceTree = "<group>"; };
@@ -141,6 +145,8 @@
 			isa = PBXGroup;
 			children = (
 				655FFFA11BEAD93600D43AD8 /* ProvisioningProfile.swift */,
+				65311EAD1BF8259000516EFD /* NSMenuLink.swift */,
+				65311EAF1BF835F100516EFD /* Log.swift */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -289,8 +295,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				652408CE1BE743D4006FA4C6 /* ViewController.swift in Sources */,
+				65311EB01BF835F100516EFD /* Log.swift in Sources */,
 				655FFF9F1BE9BA9D00D43AD8 /* StringByAppendingPathComponent.swift in Sources */,
 				652408CC1BE743D4006FA4C6 /* AppDelegate.swift in Sources */,
+				65311EAE1BF8259000516EFD /* NSMenuLink.swift in Sources */,
 				655FFF9D1BE9B3E300D43AD8 /* NSTask-execute.swift in Sources */,
 				655FFFA21BEAD93600D43AD8 /* ProvisioningProfile.swift in Sources */,
 			);

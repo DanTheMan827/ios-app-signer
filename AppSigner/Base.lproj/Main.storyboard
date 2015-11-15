@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="9059" systemVersion="15B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="9060" systemVersion="15B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9059"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9060"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -21,13 +22,6 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="VOq-y0-SEH"/>
-                                        <menuItem title="Preferences…" keyEquivalent="," id="BOF-NM-1cW"/>
-                                        <menuItem isSeparatorItem="YES" id="wFC-TO-SCJ"/>
-                                        <menuItem title="Services" id="NMo-om-nkz">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <menu key="submenu" title="Services" systemMenu="services" id="hz9-B4-Xy5"/>
-                                        </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="4je-JR-u6R"/>
                                         <menuItem title="Hide iOS App Signer" keyEquivalent="h" id="Olw-nP-bQN">
                                             <connections>
                                                 <action selector="hide:" target="Ady-hI-5gd" id="PnN-Uc-m68"/>
@@ -54,12 +48,30 @@
                                     </items>
                                 </menu>
                             </menuItem>
-                            <menuItem title="View" id="aUF-d1-5bR">
+                            <menuItem title="View" id="Sk8-69-0Ob">
                                 <modifierMask key="keyEquivalentModifierMask"/>
-                                <menu key="submenu" title="View" systemMenu="window" id="Td7-aD-5lo">
+                                <menu key="submenu" title="View" id="lFV-V0-yOx">
                                     <items>
-                                        <menuItem title="Log" id="R4o-n2-Eq4">
+                                        <menuItem title="Application Log" keyEquivalent="l" id="R4o-n2-Eq4">
+                                            <connections>
+                                                <action selector="viewLog:" target="Voe-Tx-rLC" id="Ddo-WX-lXC"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem title="Donate" id="3h7-SY-Zse">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Donate" id="Vj1-Sh-v4i">
+                                    <items>
+                                        <menuItem title="Buy Me A Drink" id="f2X-hI-PLz" customClass="NSMenuLink" customModule="iOS_App_Signer" customModuleProvider="target">
                                             <modifierMask key="keyEquivalentModifierMask"/>
+                                            <userDefinedRuntimeAttributes>
+                                                <userDefinedRuntimeAttribute type="string" keyPath="url" value="https://paypal.me/DanTheMan827"/>
+                                            </userDefinedRuntimeAttributes>
+                                            <connections>
+                                                <action selector="nsMenuLinkClick:" target="Voe-Tx-rLC" id="553-tH-Zrd"/>
+                                            </connections>
                                         </menuItem>
                                     </items>
                                 </menu>
@@ -68,9 +80,12 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Help" systemMenu="help" id="F2S-fz-NVQ">
                                     <items>
-                                        <menuItem title="iOS App Signer Help" keyEquivalent="?" id="FKE-Sm-Kum">
+                                        <menuItem title="GitHub Project Page" keyEquivalent="?" id="FKE-Sm-Kum" customClass="NSMenuLink" customModule="iOS_App_Signer" customModuleProvider="target">
+                                            <userDefinedRuntimeAttributes>
+                                                <userDefinedRuntimeAttribute type="string" keyPath="url" value="https://github.com/DanTheMan827/ios-app-signer"/>
+                                            </userDefinedRuntimeAttributes>
                                             <connections>
-                                                <action selector="showHelp:" target="Ady-hI-5gd" id="y7X-2Q-9no"/>
+                                                <action selector="nsMenuLinkClick:" target="Voe-Tx-rLC" id="C2P-jE-sl1"/>
                                             </connections>
                                         </menuItem>
                                     </items>
@@ -82,7 +97,7 @@
                         <outlet property="delegate" destination="Voe-Tx-rLC" id="PrD-fu-P6m"/>
                     </connections>
                 </application>
-                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="iOS__App_Signer" customModuleProvider="target"/>
+                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="iOS_App_Signer" customModuleProvider="target"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="75" y="0.0"/>
@@ -110,7 +125,7 @@
         <!--View Controller-->
         <scene sceneID="hIz-AP-VOD">
             <objects>
-                <viewController id="XfG-lQ-9wD" customClass="ViewController" customModule="iOS__App_Signer" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="XfG-lQ-9wD" customClass="ViewController" customModule="iOS_App_Signer" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="m2S-Jp-Qdl">
                         <rect key="frame" x="0.0" y="0.0" width="480" height="184"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -127,7 +142,7 @@
                             <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="KTg-r5-W7c">
                                 <rect key="frame" x="148" y="63" width="312" height="22"/>
                                 <animations/>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="wif-kS-mMp">
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="This is where you would change the application bundle identifier" drawsBackground="YES" id="wif-kS-mMp">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -230,7 +245,7 @@
                             <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="D48-nz-Ybw">
                                 <rect key="frame" x="148" y="151" width="231" height="22"/>
                                 <animations/>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" continuous="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="fpm-7k-Wjj">
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" continuous="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="File path or URL accepted" drawsBackground="YES" id="fpm-7k-Wjj">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -243,7 +258,7 @@
                             <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qFX-XS-pud">
                                 <rect key="frame" x="148" y="33" width="246" height="22"/>
                                 <animations/>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="IAw-oV-ifP">
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="This changes the app title on the home screen" drawsBackground="YES" id="IAw-oV-ifP">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -258,10 +273,25 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wtQ-ah-j1N">
+                                <rect key="frame" x="0.0" y="-1" width="480" height="26"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="25" id="93m-ro-mAE"/>
+                                </constraints>
+                                <animations/>
+                                <buttonCell key="cell" type="inline" title="Button" bezelStyle="inline" alignment="center" borderStyle="border" transparent="YES" imageScaling="proportionallyDown" inset="2" id="6MO-2g-zzT">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystemBold"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="statusLabelClick:" target="XfG-lQ-9wD" id="n3g-oU-h8t"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <constraints>
                             <constraint firstItem="R7n-5x-Cdn" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="21" id="0bi-wg-h9s"/>
                             <constraint firstItem="fGR-1u-3Jp" firstAttribute="top" secondItem="D48-nz-Ybw" secondAttribute="bottom" constant="8" id="1uB-Ht-zZj"/>
+                            <constraint firstItem="wtQ-ah-j1N" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="2LX-IU-mid"/>
                             <constraint firstItem="D77-ma-cRk" firstAttribute="centerY" secondItem="qFX-XS-pud" secondAttribute="centerY" id="3Em-RN-pku"/>
                             <constraint firstItem="nPs-2D-0KB" firstAttribute="top" secondItem="fGR-1u-3Jp" secondAttribute="bottom" constant="8" id="3Ik-Ma-qgy"/>
                             <constraint firstAttribute="trailing" secondItem="HWJ-Of-bu5" secondAttribute="trailing" constant="6" id="3eJ-Xl-84g"/>
@@ -285,11 +315,13 @@
                             <constraint firstItem="8rx-0O-jlW" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="20" id="Uac-8T-jTw"/>
                             <constraint firstItem="nii-m3-xWa" firstAttribute="leading" secondItem="D48-nz-Ybw" secondAttribute="trailing" constant="8" id="XS2-C6-KFA"/>
                             <constraint firstItem="Ofh-tw-iFg" firstAttribute="centerY" secondItem="D48-nz-Ybw" secondAttribute="centerY" id="YkC-At-Dos"/>
+                            <constraint firstAttribute="bottom" secondItem="wtQ-ah-j1N" secondAttribute="bottom" id="aPo-Iw-Xmz"/>
                             <constraint firstItem="D48-nz-Ybw" firstAttribute="leading" secondItem="Ofh-tw-iFg" secondAttribute="trailing" constant="8" id="clS-H3-ecD"/>
                             <constraint firstItem="6PG-wk-Y7j" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="6" id="eXa-sG-uTD"/>
                             <constraint firstItem="8rx-0O-jlW" firstAttribute="centerY" secondItem="nPs-2D-0KB" secondAttribute="centerY" id="exv-LX-vOl"/>
                             <constraint firstAttribute="bottom" secondItem="HWJ-Of-bu5" secondAttribute="bottom" constant="3" id="fmo-Td-2OD"/>
                             <constraint firstAttribute="trailing" secondItem="KTg-r5-W7c" secondAttribute="trailing" constant="20" id="gEq-yf-WhP"/>
+                            <constraint firstAttribute="trailing" secondItem="wtQ-ah-j1N" secondAttribute="trailing" id="gjf-hD-eUJ"/>
                             <constraint firstItem="qFX-XS-pud" firstAttribute="top" secondItem="KTg-r5-W7c" secondAttribute="bottom" constant="8" id="hpd-o5-4L8"/>
                             <constraint firstItem="D48-nz-Ybw" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="11" id="kNX-Fb-JM3"/>
                             <constraint firstItem="qFX-XS-pud" firstAttribute="leading" secondItem="fW5-Xs-Bix" secondAttribute="trailing" constant="8" id="qjF-4V-rFL"/>
