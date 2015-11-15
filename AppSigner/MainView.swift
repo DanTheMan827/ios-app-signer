@@ -36,7 +36,6 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
     let defaults = NSUserDefaults()
     let fileManager = NSFileManager.defaultManager()
     let bundleID = NSBundle.mainBundle().bundleIdentifier
-    let delegate = NSApplication.sharedApplication().delegate as! AppDelegate
     let arPath = "/usr/bin/ar"
     let mktempPath = "/usr/bin/mktemp"
     let tarPath = "/usr/bin/tar"

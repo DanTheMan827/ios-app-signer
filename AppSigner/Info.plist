@@ -15,7 +15,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0b11</string>
+	<string>1.0b12</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
@@ -31,8 +31,8 @@
 	</dict>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2015 Daniel Radtke. All rights reserved.</string>
-	<key>NSMainStoryboardFile</key>
-	<string>Main</string>
+	<key>NSMainNibFile</key>
+	<string>Application</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 </dict>
