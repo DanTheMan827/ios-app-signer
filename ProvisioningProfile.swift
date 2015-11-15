@@ -49,11 +49,11 @@ struct ProvisioningProfile {
                 if let expirationDate = results.valueForKey("ExpirationDate") as? NSDate,
                     entitlements = results.valueForKey("Entitlements"),
                     applicationIdentifier = entitlements.valueForKey("application-identifier") as? String,
-                    teamIdentifier = entitlements.valueForKey("com.apple.developer.team-identifier") as? String {
+                    periodIndex = applicationIdentifier.characters.indexOf(".") {
                         self.filename = filename
                         self.expires = expirationDate
-                        self.appID = applicationIdentifier.substringFromIndex(("\(teamIdentifier).").endIndex)
-                        self.teamID = teamIdentifier
+                        self.appID = applicationIdentifier.substringFromIndex(periodIndex.advancedBy(1))
+                        self.teamID = applicationIdentifier.substringToIndex(periodIndex)
                         self.entitlements = entitlements
                 } else {
                     Log.write("Error processing \(filename.lastPathComponent)")

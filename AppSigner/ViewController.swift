@@ -69,7 +69,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
     }
     
     func populateProvisioningProfiles(){
-        provisioningProfiles = ProvisioningProfile.getProfiles().sort {
+        self.provisioningProfiles = ProvisioningProfile.getProfiles().sort {
             $0.appID < $1.appID
         }
         setStatus("Found \(provisioningProfiles.count) Provisioning Profile\(provisioningProfiles.count>1 || provisioningProfiles.count<1 ? "s":"")")
@@ -82,15 +82,17 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
         let formatter = NSDateFormatter()
         formatter.dateStyle = .ShortStyle
         formatter.timeStyle = .NoStyle
-        
+        var newProfiles: [ProvisioningProfile] = []
         for profile in provisioningProfiles {
             if profile.expires.timeIntervalSince1970 > NSDate().timeIntervalSince1970 {
+                newProfiles.append(profile)
                 ProvisioningProfilesPopup.addItemWithTitle("\(profile.appID) (\(profile.teamID))")
                 setStatus("Added profile \(profile.appID), expires (\(formatter.stringFromDate(profile.expires)))")
             } else {
                 setStatus("Skipped profile \(profile.appID), expired (\(formatter.stringFromDate(profile.expires)))")
             }
         }
+        self.provisioningProfiles = newProfiles
         chooseProvisioningProfile(ProvisioningProfilesPopup)
     }
     
@@ -125,11 +127,20 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
     }
     
     func checkProfileID(profile: ProvisioningProfile?){
-        if profile != nil {
-            if profile!.appID != "*" {
-                NewApplicationIDTextField.stringValue = profile!.appID
+        if let profile = profile {
+            self.profileFilename = profile.filename
+            setStatus("Selected provisioning profile \(profile.appID)")
+            if profile.expires.timeIntervalSince1970 < NSDate().timeIntervalSince1970 {
+                ProvisioningProfilesPopup.selectItemAtIndex(0)
+                setStatus("Provisioning profile expired")
+                chooseProvisioningProfile(ProvisioningProfilesPopup)
+            }
+            if profile.appID.characters.indexOf("*") == nil {
+                // Not a wildcard profile
+                NewApplicationIDTextField.stringValue = profile.appID
                 NewApplicationIDTextField.enabled = false
             } else {
+                // Wildcard profile
                 if NewApplicationIDTextField.enabled == false {
                     NewApplicationIDTextField.stringValue = ""
                     NewApplicationIDTextField.enabled = true
@@ -582,7 +593,7 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
         
         switch(sender.indexOfSelectedItem){
         case 0:
-            profileFilename = nil
+            self.profileFilename = nil
             if NewApplicationIDTextField.enabled == false {
                 NewApplicationIDTextField.enabled = true
                 NewApplicationIDTextField.stringValue = ""
@@ -597,8 +608,8 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
             openDialog.allowsOtherFileTypes = false
             openDialog.allowedFileTypes = ["mobileprovision"]
             openDialog.runModal()
-            if let filename = openDialog.URLs.first {
-                let profileFilename = filename.path!
+            if let filename = openDialog.URLs.first,
+                   profileFilename = filename.path {
                 checkProfileID(ProvisioningProfile(filename: profileFilename))
             } else {
                 sender.selectItemAtIndex(0)
@@ -614,7 +625,6 @@ class ViewController: NSViewController, NSURLSessionDataDelegate, NSURLSessionDe
         default:
             let profile = provisioningProfiles[sender.indexOfSelectedItem - 3]
             checkProfileID(profile)
-            profileFilename = profile.filename
             break
         }
         
