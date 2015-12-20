@@ -159,8 +159,9 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
     }
     
     func populateProvisioningProfiles(){
+        let zeroWidthSpace = "​"
         self.provisioningProfiles = ProvisioningProfile.getProfiles().sort {
-            $0.appID < $1.appID
+            $0.name < $1.name
         }
         setStatus("Found \(provisioningProfiles.count) Provisioning Profile\(provisioningProfiles.count>1 || provisioningProfiles.count<1 ? "s":"")")
         ProvisioningProfilesPopup.removeAllItems()
@@ -173,10 +174,12 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
         formatter.dateStyle = .ShortStyle
         formatter.timeStyle = .NoStyle
         var newProfiles: [ProvisioningProfile] = []
+        var zeroWidthPadding: String = ""
         for profile in provisioningProfiles {
+            zeroWidthPadding = "\(zeroWidthPadding)\(zeroWidthSpace)"
             if profile.expires.timeIntervalSince1970 > NSDate().timeIntervalSince1970 {
                 newProfiles.append(profile)
-                ProvisioningProfilesPopup.addItemWithTitle("\(profile.appID) (\(profile.teamID))")
+                ProvisioningProfilesPopup.addItemWithTitle("\(profile.name)\(zeroWidthPadding) (\(profile.teamID))")
                 setStatus("Added profile \(profile.appID), expires (\(formatter.stringFromDate(profile.expires)))")
             } else {
                 setStatus("Skipped profile \(profile.appID), expired (\(formatter.stringFromDate(profile.expires)))")
@@ -596,7 +599,7 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
                     setStatus("Parsing entitlements")
                     
                     if let profile = ProvisioningProfile(filename: useAppBundleProfile ? appBundleProvisioningFilePath : provisioningFile!){
-                        if let entitlements = profile.getEntitlementsPlist() {
+                        if let entitlements = profile.getEntitlementsPlist(tempFolder) {
                             Log.write("–––––––––––––––––––––––\n\(entitlements)")
                             Log.write("–––––––––––––––––––––––")
                             do {

@@ -10,9 +10,11 @@ import Foundation
 import AppKit
 struct ProvisioningProfile {
     var filename: String,
+        name: String,
         expires: NSDate,
         appID: String,
         teamID: String,
+        rawXML: String,
         entitlements: AnyObject?
     private let delegate = NSApplication.sharedApplication().delegate as! AppDelegate
     
@@ -45,8 +47,10 @@ struct ProvisioningProfile {
         
          let taskOutput = NSTask().execute("/usr/bin/security", workingDirectory: nil, arguments: securityArgs)
          if taskOutput.status == 0 {
+            self.rawXML = taskOutput.output
             if let results = try? NSPropertyListSerialization.propertyListWithData(taskOutput.output.dataUsingEncoding(NSUTF8StringEncoding)!, options: .Immutable, format: nil) {
                 if let expirationDate = results.valueForKey("ExpirationDate") as? NSDate,
+                    name = results.valueForKey("Name") as? String,
                     entitlements = results.valueForKey("Entitlements"),
                     applicationIdentifier = entitlements.valueForKey("application-identifier") as? String,
                     periodIndex = applicationIdentifier.characters.indexOf(".") {
@@ -54,6 +58,7 @@ struct ProvisioningProfile {
                         self.expires = expirationDate
                         self.appID = applicationIdentifier.substringFromIndex(periodIndex.advancedBy(1))
                         self.teamID = applicationIdentifier.substringToIndex(periodIndex)
+                        self.name = name
                         self.entitlements = entitlements
                 } else {
                     Log.write("Error processing \(filename.lastPathComponent)")
@@ -69,12 +74,20 @@ struct ProvisioningProfile {
         }
     }
     
-    func getEntitlementsPlist() -> NSString? {
+    func getEntitlementsPlist(tempFolder: String) -> NSString? {
+        let mobileProvisionPlist = tempFolder.stringByAppendingPathComponent("mobileprovision.plist")
         do {
-        let plistData = try NSPropertyListSerialization.dataWithPropertyList(self.entitlements!, format: .XMLFormat_v1_0, options: 0)
-        return NSString(data: plistData, encoding: NSUTF8StringEncoding)
+            try self.rawXML.writeToFile(mobileProvisionPlist, atomically: false, encoding: NSUTF8StringEncoding)
+            let plistBuddy = NSTask().execute("/usr/libexec/PlistBuddy", workingDirectory: nil, arguments: ["-c", "Print :Entitlements",mobileProvisionPlist, "-x"])
+            if plistBuddy.status == 0 {
+                return plistBuddy.output
+            } else {
+                Log.write("PlistBuddy Failed")
+                Log.write(plistBuddy.output)
+                return nil
+            }
         } catch let error as NSError {
-            Log.write("Error reading entitlements from \(filename.lastPathComponent)")
+            Log.write("Error writing mobileprovision.plist")
             Log.write(error.localizedDescription)
             return nil
         }
