@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		6514F9CD1BF6F3020060EC17 /* app-sign.sh in Resources */ = {isa = PBXBuildFile; fileRef = 6514F9CC1BF6F3020060EC17 /* app-sign.sh */; };
 		652408CC1BE743D4006FA4C6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652408CB1BE743D4006FA4C6 /* AppDelegate.swift */; };
 		652408CE1BE743D4006FA4C6 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652408CD1BE743D4006FA4C6 /* MainView.swift */; };
 		652408D01BE743D4006FA4C6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 652408CF1BE743D4006FA4C6 /* Assets.xcassets */; };
@@ -39,7 +38,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		6514F9CC1BF6F3020060EC17 /* app-sign.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = "app-sign.sh"; path = "../app-sign.sh"; sourceTree = "<group>"; };
 		652408C81BE743D4006FA4C6 /* iOS App Signer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "iOS App Signer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		652408CB1BE743D4006FA4C6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		652408CD1BE743D4006FA4C6 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
@@ -108,7 +106,6 @@
 		652408CA1BE743D4006FA4C6 /* AppSigner */ = {
 			isa = PBXGroup;
 			children = (
-				6514F9CC1BF6F3020060EC17 /* app-sign.sh */,
 				655FFFDF1BEB270200D43AD8 /* Extensions */,
 				655FFFA01BEAD90800D43AD8 /* Classes */,
 				65311EB51BF88EB800516EFD /* Application.xib */,
@@ -271,7 +268,6 @@
 			files = (
 				65311EB61BF88EB800516EFD /* Application.xib in Resources */,
 				652408D01BE743D4006FA4C6 /* Assets.xcassets in Resources */,
-				6514F9CD1BF6F3020060EC17 /* app-sign.sh in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

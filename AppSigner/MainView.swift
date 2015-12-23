@@ -290,6 +290,13 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
         }
     }
     
+    func unzip(inputFile: String, outputPath: String)->AppSignerTaskOutput {
+        return NSTask().execute(unzipPath, workingDirectory: nil, arguments: ["-q",inputFile,"-d",outputPath])
+    }
+    func zip(inputPath: String, outputFile: String)->AppSignerTaskOutput {
+        return NSTask().execute(zipPath, workingDirectory: inputPath, arguments: ["-qry", outputFile, "."])
+    }
+    
     func cleanup(tempFolder: String){
         do {
             try fileManager.removeItemAtPath(tempFolder)
@@ -366,6 +373,7 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
         let newApplicationID = self.NewApplicationIDTextField.stringValue.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
         let newDisplayName = self.appDisplayName.stringValue.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
         let inputStartsWithHTTP = inputFile.lowercaseString.substringToIndex(inputFile.startIndex.advancedBy(4)) == "http"
+        var eggCount: Int = 0
         
         //MARK: Sanity checks
         
@@ -395,12 +403,22 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
         }
         let tempFolder = tempTask.output.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
         let workingDirectory = tempFolder.stringByAppendingPathComponent("out")
+        let eggDirectory = tempFolder.stringByAppendingPathComponent("eggs")
         let payloadDirectory = workingDirectory.stringByAppendingPathComponent("Payload/")
         let entitlementsPlist = tempFolder.stringByAppendingPathComponent("entitlements.plist")
         
         Log.write("Temp folder: \(tempFolder)")
         Log.write("Working directory: \(workingDirectory)")
         Log.write("Payload directory: \(payloadDirectory)")
+        
+        //MARK: Create Egg Temp Directory
+        do {
+            try fileManager.createDirectoryAtPath(eggDirectory, withIntermediateDirectories: true, attributes: nil)
+        } catch let error as NSError {
+            setStatus("Error creating egg temp directory")
+            Log.write(error.localizedDescription)
+            cleanup(tempFolder); return
+        }
         
         //MARK: Download file
         downloading = false
@@ -479,7 +497,8 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
             do {
                 try fileManager.createDirectoryAtPath(workingDirectory, withIntermediateDirectories: true, attributes: nil)
                 setStatus("Extracting ipa file")
-                let unzipTask = NSTask().execute(unzipPath, workingDirectory: nil, arguments: ["-q",inputFile,"-d",workingDirectory])
+                
+                let unzipTask = self.unzip(inputFile, outputPath: workingDirectory)
                 if unzipTask.status != 0 {
                     setStatus("Error extracting ipa file")
                     cleanup(tempFolder); return
@@ -645,9 +664,31 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
                     }
                 }
                 
-                //MARK: Codesigning
-                let signingFunction = generateFileSignFunc(payloadDirectory, entitlementsPath: entitlementsPlist, signingCertificate: signingCertificate!)
+                //MARK: Codesigning - General
                 let signableExtensions = ["dylib","so","0","vis","pvr","framework"]
+                
+                //MARK: Codesigning - Eggs
+                let eggSigningFunction = generateFileSignFunc(eggDirectory, entitlementsPath: entitlementsPlist, signingCertificate: signingCertificate!)
+                func signEgg(eggFile: String){
+                    eggCount++
+                    
+                    let currentEggPath = eggDirectory.stringByAppendingPathComponent("egg\(eggCount)")
+                    let shortName = eggFile.substringFromIndex(payloadDirectory.endIndex)
+                    setStatus("Extracting \(shortName)")
+                    if self.unzip(eggFile, outputPath: currentEggPath).status != 0 {
+                        Log.write("Error extracting \(shortName)")
+                        return
+                    }
+                    recursiveDirectorySearch(currentEggPath, extensions: ["egg"], found: signEgg)
+                    recursiveDirectorySearch(currentEggPath, extensions: signableExtensions, found: eggSigningFunction)
+                    setStatus("Compressing \(shortName)")
+                    self.zip(currentEggPath, outputFile: eggFile)                    
+                }
+                recursiveDirectorySearch(appBundlePath, extensions: ["egg"], found: signEgg)
+                
+                //MARK: Codesigning - App
+                let signingFunction = generateFileSignFunc(payloadDirectory, entitlementsPath: entitlementsPlist, signingCertificate: signingCertificate!)
+                
                 
                 recursiveDirectorySearch(appBundlePath, extensions: signableExtensions, found: signingFunction)
                 signingFunction(file: appBundlePath)
@@ -670,7 +711,7 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
             }
         }
         setStatus("Packaging IPA")
-        let zipTask = NSTask().execute(zipPath, workingDirectory: workingDirectory, arguments: ["-qry", outputFile!, "."])
+        let zipTask = self.zip(workingDirectory, outputFile: outputFile!)
         if zipTask.status != 0 {
             setStatus("Error packaging IPA")
         }
