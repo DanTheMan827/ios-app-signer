@@ -22,13 +22,17 @@ extension NSTask {
         self.standardOutput = pipe
         self.standardError = pipe
         let pipeFile = pipe.fileHandleForReading
-        
         self.launch()
-        self.waitUntilExit()
-        let data = pipeFile.readDataToEndOfFile()
+        
+        let data = NSMutableData()
+        while self.running {
+            data.appendData(pipeFile.availableData)
+        }
+        
         let output = NSString(data: data, encoding: NSUTF8StringEncoding) as! String
         
         return AppSignerTaskOutput(status: self.terminationStatus, output: output)
+        
     }
     
     func execute(launchPath: String, workingDirectory: String?, arguments: [String]?)->AppSignerTaskOutput{
