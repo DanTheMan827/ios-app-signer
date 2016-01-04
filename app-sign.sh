@@ -1,6 +1,6 @@
 #!/bin/bash
 # This script was tested on 10.11.1 with Xcode 7.1 installed, your mileage may vary.
-echo "iOS App Signer rev. 35"
+echo "iOS App Signer rev. 36"
 if [[ "$#" -lt 2 ]]; then
   echo "Usage: "$(basename "$0")" (file name/url) (Developer Identity) [(.mobileprovision file)] [(new app id)]"
   echo ""
@@ -14,7 +14,7 @@ if [[ "$#" -lt 2 ]]; then
 fi
 
 LIST_BINARY_EXTENSIONS="dylib so 0 vis pvr framework"
-TEMP="$(mktemp -d)"
+TEMP="$(mktemp -d -t com.DanTheMan827.AppSigner)"
 OUTPUT="$TEMP/out"
 mkdir "$OUTPUT" 2>&1
 CURRENT_PATH="$(pwd)"
