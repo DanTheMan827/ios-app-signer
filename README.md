@@ -11,6 +11,8 @@ You need a provisioning profile and signing certificate, you can get these from 
 
 You can then open up iOS App Signer and select your input file, signing certificate, provisioning file, and optionally specify a new application ID and/or application display name.
 
+[Donations are gratefully accepted](https://paypal.me/dantheman827/)
+
 Thanks To
 ------
 [maciekish / iReSign](https://github.com/maciekish/iReSign): The basic process was gleaned from the source code of this project.
