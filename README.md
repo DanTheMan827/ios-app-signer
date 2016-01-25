@@ -11,7 +11,7 @@ You need a provisioning profile and signing certificate, you can get these from 
 
 You can then open up iOS App Signer and select your input file, signing certificate, provisioning file, and optionally specify a new application ID and/or application display name.
 
-[Donations are gratefully accepted](https://paypal.me/dantheman827/)
+<a href="https://paypal.me/DanTheMan827" class="donate"><img src="http://dantheman827.github.io/images/donate-button.svg" height="44" alt="Donate"></a>
 
 Thanks To
 ------
