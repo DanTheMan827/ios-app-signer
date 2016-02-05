@@ -318,6 +318,19 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
         }
         return "\(size)B"
     }
+    func getPlistKey(plist: String, keyName: String)->String? {
+        let currTask = NSTask().execute(defaultsPath, workingDirectory: nil, arguments: ["read", plist, keyName])
+        if currTask.status == 0 {
+            return String(currTask.output.characters.dropLast())
+        } else {
+            return nil
+        }
+    }
+    
+    func setPlistKey(plist: String, keyName: String, value: String)->AppSignerTaskOutput {
+        return NSTask().execute(defaultsPath, workingDirectory: nil, arguments: ["write", plist, keyName, value])
+    }
+    
     //MARK: NSURL Delegate
     var downloading = false
     var downloadError: NSError?
@@ -644,13 +657,32 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
                 
                 //MARK: Change Application ID
                 if newApplicationID != "" {
+                    
+                    if let oldAppID = getPlistKey(appBundleInfoPlist, keyName: "CFBundleIdentifier") {
+                        func changeAppexID(appexFile: String){
+                            let appexPlist = appexFile.stringByAppendingPathComponent("Info.plist")
+                            if let appexBundleID = getPlistKey(appexPlist, keyName: "CFBundleIdentifier"){
+                                let newAppexID = "\(newApplicationID)\(appexBundleID.substringFromIndex(oldAppID.endIndex))"
+                                setStatus("Changing \(appexFile) id to \(newAppexID)")
+                                setPlistKey(appexPlist, keyName: "CFBundleIdentifier", value: newAppexID)
+                            }
+                            if NSTask().execute(defaultsPath, workingDirectory: nil, arguments: ["read", appexPlist,"WKCompanionAppBundleIdentifier"]).status == 0 {
+                                setPlistKey(appexPlist, keyName: "WKCompanionAppBundleIdentifier", value: newApplicationID)
+                            }
+                            recursiveDirectorySearch(appexFile, extensions: ["app"], found: changeAppexID)
+                        }
+                        recursiveDirectorySearch(appBundlePath, extensions: ["appex"], found: changeAppexID)
+                    }
+                    
                     setStatus("Changing App ID to \(newApplicationID)")
-                    let IDChangeTask = NSTask().execute(defaultsPath, workingDirectory: nil, arguments: ["write",appBundleInfoPlist,"CFBundleIdentifier", newApplicationID])
+                    let IDChangeTask = setPlistKey(appBundleInfoPlist, keyName: "CFBundleIdentifier", value: newApplicationID)
                     if IDChangeTask.status != 0 {
                         setStatus("Error changing App ID")
                         Log.write(IDChangeTask.output)
                         cleanup(tempFolder); return
                     }
+                    
+                    
                 }
                 
                 //MARK: Change Display Name
@@ -665,7 +697,7 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
                 }
                 
                 //MARK: Codesigning - General
-                let signableExtensions = ["dylib","so","0","vis","pvr","framework"]
+                let signableExtensions = ["dylib","so","0","vis","pvr","framework","appex","app"]
                 
                 //MARK: Codesigning - Eggs
                 let eggSigningFunction = generateFileSignFunc(eggDirectory, entitlementsPath: entitlementsPlist, signingCertificate: signingCertificate!)
@@ -684,6 +716,7 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
                     setStatus("Compressing \(shortName)")
                     self.zip(currentEggPath, outputFile: eggFile)                    
                 }
+                
                 recursiveDirectorySearch(appBundlePath, extensions: ["egg"], found: signEgg)
                 
                 //MARK: Codesigning - App
