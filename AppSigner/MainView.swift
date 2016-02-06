@@ -31,6 +31,7 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
     var outputFile: String?
     var startSize: CGFloat?
     var NibLoaded = false
+    var updatesWindow: UpdatesController?
     
     //MARK: Constants
     let defaults = NSUserDefaults()
@@ -137,8 +138,7 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
         if NibLoaded == false {
             NibLoaded = true
             
-            // drag / drop
-            
+            updatesWindow = UpdatesController(windowNibName: "Updates")
             
             // Do any additional setup after loading the view.
             populateProvisioningProfiles()
@@ -150,6 +150,7 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
                 }
             }
             setStatus("Ready")
+            UpdatesController.checkForUpdate()
         }
     }
     

@@ -18,6 +18,12 @@
 		655FFF9D1BE9B3E300D43AD8 /* NSTask-execute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655FFF9C1BE9B3E300D43AD8 /* NSTask-execute.swift */; };
 		655FFF9F1BE9BA9D00D43AD8 /* StringByAppendingPathComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655FFF9E1BE9BA9D00D43AD8 /* StringByAppendingPathComponent.swift */; };
 		655FFFA21BEAD93600D43AD8 /* ProvisioningProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655FFFA11BEAD93600D43AD8 /* ProvisioningProfile.swift */; };
+		659734941C65A14300383D2D /* Updates.xib in Resources */ = {isa = PBXBuildFile; fileRef = 659734931C65A14300383D2D /* Updates.xib */; };
+		659734961C65A1E800383D2D /* UpdatesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659734951C65A1E800383D2D /* UpdatesController.swift */; };
+		659734A01C65B5F600383D2D /* MarkdownTokenizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 6597349A1C65B5F600383D2D /* MarkdownTokenizer.m */; };
+		659734A11C65B5F600383D2D /* MarkdownTokens.m in Sources */ = {isa = PBXBuildFile; fileRef = 6597349C1C65B5F600383D2D /* MarkdownTokens.m */; };
+		659734A21C65B5F600383D2D /* NSAttributedStringMarkdownParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 6597349F1C65B5F600383D2D /* NSAttributedStringMarkdownParser.m */; };
+		659734A71C65B94F00383D2D /* fmemopen.c in Sources */ = {isa = PBXBuildFile; fileRef = 659734A41C65B94F00383D2D /* fmemopen.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +61,18 @@
 		655FFF9C1BE9B3E300D43AD8 /* NSTask-execute.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSTask-execute.swift"; sourceTree = "<group>"; };
 		655FFF9E1BE9BA9D00D43AD8 /* StringByAppendingPathComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringByAppendingPathComponent.swift; sourceTree = "<group>"; };
 		655FFFA11BEAD93600D43AD8 /* ProvisioningProfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProvisioningProfile.swift; sourceTree = "<group>"; };
+		659734931C65A14300383D2D /* Updates.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Updates.xib; sourceTree = "<group>"; };
+		659734951C65A1E800383D2D /* UpdatesController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UpdatesController.swift; sourceTree = "<group>"; };
+		659734991C65B5F500383D2D /* iOS App Signer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "iOS App Signer-Bridging-Header.h"; sourceTree = "<group>"; };
+		6597349A1C65B5F600383D2D /* MarkdownTokenizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MarkdownTokenizer.m; path = NimbusKit/markdown/MarkdownTokenizer.m; sourceTree = "<group>"; };
+		6597349B1C65B5F600383D2D /* MarkdownTokens.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MarkdownTokens.h; path = NimbusKit/markdown/MarkdownTokens.h; sourceTree = "<group>"; };
+		6597349C1C65B5F600383D2D /* MarkdownTokens.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MarkdownTokens.m; path = NimbusKit/markdown/MarkdownTokens.m; sourceTree = "<group>"; };
+		6597349D1C65B5F600383D2D /* NimbusMarkdown.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NimbusMarkdown.h; path = NimbusKit/markdown/NimbusMarkdown.h; sourceTree = "<group>"; };
+		6597349E1C65B5F600383D2D /* NSAttributedStringMarkdownParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSAttributedStringMarkdownParser.h; path = NimbusKit/markdown/NSAttributedStringMarkdownParser.h; sourceTree = "<group>"; };
+		6597349F1C65B5F600383D2D /* NSAttributedStringMarkdownParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NSAttributedStringMarkdownParser.m; path = NimbusKit/markdown/NSAttributedStringMarkdownParser.m; sourceTree = "<group>"; };
+		659734A41C65B94F00383D2D /* fmemopen.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = fmemopen.c; path = NimbusKit/memorymapping/fmemopen.c; sourceTree = "<group>"; };
+		659734A51C65B94F00383D2D /* fmemopen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fmemopen.h; path = NimbusKit/memorymapping/fmemopen.h; sourceTree = "<group>"; };
+		659734A61C65B94F00383D2D /* NimbusMemoryMapping.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NimbusMemoryMapping.h; path = NimbusKit/memorymapping/NimbusMemoryMapping.h; sourceTree = "<group>"; };
 		65B24E0D1BECB30D005D2068 /* AppSigner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = AppSigner.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -86,9 +104,10 @@
 		652408BF1BE743D4006FA4C6 = {
 			isa = PBXGroup;
 			children = (
+				659734971C65B5B900383D2D /* NimbusKit */,
 				652408CA1BE743D4006FA4C6 /* AppSigner */,
-				652408DC1BE743D4006FA4C6 /* AppSignerTests */,
 				652408E71BE743D4006FA4C6 /* AppSignerUITests */,
+				652408DC1BE743D4006FA4C6 /* AppSignerTests */,
 				652408C91BE743D4006FA4C6 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -109,6 +128,8 @@
 				655FFFDF1BEB270200D43AD8 /* Extensions */,
 				655FFFA01BEAD90800D43AD8 /* Classes */,
 				65311EB51BF88EB800516EFD /* Application.xib */,
+				659734931C65A14300383D2D /* Updates.xib */,
+				659734951C65A1E800383D2D /* UpdatesController.swift */,
 				65B24E0D1BECB30D005D2068 /* AppSigner.entitlements */,
 				652408CB1BE743D4006FA4C6 /* AppDelegate.swift */,
 				652408CD1BE743D4006FA4C6 /* MainView.swift */,
@@ -125,7 +146,7 @@
 				652408DF1BE743D4006FA4C6 /* Info.plist */,
 			);
 			path = AppSignerTests;
-			sourceTree = "<group>";
+			sourceTree = SOURCE_ROOT;
 		};
 		652408E71BE743D4006FA4C6 /* AppSignerUITests */ = {
 			isa = PBXGroup;
@@ -155,6 +176,39 @@
 			);
 			name = Extensions;
 			path = ..;
+			sourceTree = "<group>";
+		};
+		659734971C65B5B900383D2D /* NimbusKit */ = {
+			isa = PBXGroup;
+			children = (
+				659734A31C65B93E00383D2D /* memorymapping */,
+				659734981C65B5C200383D2D /* markdown */,
+			);
+			name = NimbusKit;
+			sourceTree = "<group>";
+		};
+		659734981C65B5C200383D2D /* markdown */ = {
+			isa = PBXGroup;
+			children = (
+				6597349A1C65B5F600383D2D /* MarkdownTokenizer.m */,
+				6597349B1C65B5F600383D2D /* MarkdownTokens.h */,
+				6597349C1C65B5F600383D2D /* MarkdownTokens.m */,
+				6597349D1C65B5F600383D2D /* NimbusMarkdown.h */,
+				6597349E1C65B5F600383D2D /* NSAttributedStringMarkdownParser.h */,
+				6597349F1C65B5F600383D2D /* NSAttributedStringMarkdownParser.m */,
+				659734991C65B5F500383D2D /* iOS App Signer-Bridging-Header.h */,
+			);
+			name = markdown;
+			sourceTree = "<group>";
+		};
+		659734A31C65B93E00383D2D /* memorymapping */ = {
+			isa = PBXGroup;
+			children = (
+				659734A41C65B94F00383D2D /* fmemopen.c */,
+				659734A51C65B94F00383D2D /* fmemopen.h */,
+				659734A61C65B94F00383D2D /* NimbusMemoryMapping.h */,
+			);
+			name = memorymapping;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -219,7 +273,7 @@
 		652408C01BE743D4006FA4C6 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0710;
+				LastSwiftUpdateCheck = 0720;
 				LastUpgradeCheck = 0710;
 				ORGANIZATIONNAME = "Daniel Radtke";
 				TargetAttributes = {
@@ -268,6 +322,7 @@
 			files = (
 				65311EB61BF88EB800516EFD /* Application.xib in Resources */,
 				652408D01BE743D4006FA4C6 /* Assets.xcassets in Resources */,
+				659734941C65A14300383D2D /* Updates.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -292,12 +347,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				659734A01C65B5F600383D2D /* MarkdownTokenizer.m in Sources */,
 				652408CE1BE743D4006FA4C6 /* MainView.swift in Sources */,
+				659734A71C65B94F00383D2D /* fmemopen.c in Sources */,
 				65311EB01BF835F100516EFD /* Log.swift in Sources */,
 				655FFF9F1BE9BA9D00D43AD8 /* StringByAppendingPathComponent.swift in Sources */,
+				659734A11C65B5F600383D2D /* MarkdownTokens.m in Sources */,
 				652408CC1BE743D4006FA4C6 /* AppDelegate.swift in Sources */,
+				659734961C65A1E800383D2D /* UpdatesController.swift in Sources */,
 				65311EAE1BF8259000516EFD /* NSMenuLink.swift in Sources */,
 				655FFF9D1BE9B3E300D43AD8 /* NSTask-execute.swift in Sources */,
+				659734A21C65B5F600383D2D /* NSAttributedStringMarkdownParser.m in Sources */,
 				655FFFA21BEAD93600D43AD8 /* ProvisioningProfile.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -418,12 +478,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = AppSigner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_BUNDLE_IDENTIFIER = com.DanTheMan827.AppSigner;
 				PRODUCT_NAME = "iOS App Signer";
+				SWIFT_OBJC_BRIDGING_HEADER = "iOS App Signer-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
@@ -431,12 +494,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = AppSigner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_BUNDLE_IDENTIFIER = com.DanTheMan827.AppSigner;
 				PRODUCT_NAME = "iOS App Signer";
+				SWIFT_OBJC_BRIDGING_HEADER = "iOS App Signer-Bridging-Header.h";
 			};
 			name = Release;
 		};
