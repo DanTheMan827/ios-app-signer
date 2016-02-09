@@ -170,14 +170,24 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
         ])
         let formatter = NSDateFormatter()
         formatter.dateStyle = .ShortStyle
-        formatter.timeStyle = .NoStyle
+        formatter.timeStyle = .MediumStyle
         var newProfiles: [ProvisioningProfile] = []
         var zeroWidthPadding: String = ""
         for profile in provisioningProfiles {
             zeroWidthPadding = "\(zeroWidthPadding)\(zeroWidthSpace)"
             if profile.expires.timeIntervalSince1970 > NSDate().timeIntervalSince1970 {
                 newProfiles.append(profile)
-                ProvisioningProfilesPopup.addItemWithTitle("\(profile.name)\(zeroWidthPadding) (\(profile.teamID))")
+                
+                ProvisioningProfilesPopup.addItemWithTitle("\(profile.name)\(zeroWidthPadding) (\(profile.teamID), \(formatter.stringFromDate(profile.created)))")
+                
+                let toolTipItems = [
+                    "\(profile.name)",
+                    "",
+                    "Team ID: \(profile.teamID)",
+                    "Created: \(formatter.stringFromDate(profile.created))",
+                    "Expires: \(formatter.stringFromDate(profile.expires))"
+                ]
+                ProvisioningProfilesPopup.lastItem!.toolTip = toolTipItems.joinWithSeparator("\n")
                 setStatus("Added profile \(profile.appID), expires (\(formatter.stringFromDate(profile.expires)))")
             } else {
                 setStatus("Skipped profile \(profile.appID), expired (\(formatter.stringFromDate(profile.expires)))")
