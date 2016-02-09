@@ -215,14 +215,27 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
         return output
     }
     
+    func showCodesignCertsErrorAlert(){
+        let alert = NSAlert()
+        alert.addButtonWithTitle("OK")
+        alert.messageText = "No codesigning certificates found!"
+        alert.informativeText = "You won't be able to successfully sign anything."
+        alert.alertStyle = .CriticalAlertStyle
+        alert.runModal()
+    }
+    
     func populateCodesigningCerts() {
         CodesigningCertsPopup.removeAllItems()
         self.codesigningCerts = getCodesigningCerts()
         
         setStatus("Found \(self.codesigningCerts.count) Codesigning Certificate\(self.codesigningCerts.count>1 || self.codesigningCerts.count<1 ? "s":"")")
-        for cert in self.codesigningCerts {
-            CodesigningCertsPopup.addItemWithTitle(cert)
-            setStatus("Added signing certificate \"\(cert)\"")
+        if self.codesigningCerts.count > 0 {
+            for cert in self.codesigningCerts {
+                CodesigningCertsPopup.addItemWithTitle(cert)
+                setStatus("Added signing certificate \"\(cert)\"")
+            }
+        } else {
+            showCodesignCertsErrorAlert()
         }
         
     }
@@ -821,9 +834,15 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
     }
     
     @IBAction func doSign(sender: NSButton) {
-        NSApplication.sharedApplication().windows[0].makeFirstResponder(self)
-        startSigning()
-        //NSThread.detachNewThreadSelector(Selector("signingThread"), toTarget: self, withObject: nil)
+        switch(true){
+            case (codesigningCerts.count == 0):
+                showCodesignCertsErrorAlert()
+                break
+            
+            default:
+                NSApplication.sharedApplication().windows[0].makeFirstResponder(self)
+                startSigning()
+        }
     }
     
     @IBAction func statusLabelClick(sender: NSButton) {
