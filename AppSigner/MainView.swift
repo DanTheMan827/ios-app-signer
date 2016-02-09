@@ -178,7 +178,7 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
             if profile.expires.timeIntervalSince1970 > NSDate().timeIntervalSince1970 {
                 newProfiles.append(profile)
                 
-                ProvisioningProfilesPopup.addItemWithTitle("\(profile.name)\(zeroWidthPadding) (\(profile.teamID), \(formatter.stringFromDate(profile.created)))")
+                ProvisioningProfilesPopup.addItemWithTitle("\(profile.name)\(zeroWidthPadding) (\(profile.teamID))")
                 
                 let toolTipItems = [
                     "\(profile.name)",
