@@ -159,7 +159,7 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
     func populateProvisioningProfiles(){
         let zeroWidthSpace = "​"
         self.provisioningProfiles = ProvisioningProfile.getProfiles().sort {
-            $0.name < $1.name
+            ($0.name == $1.name && $0.created.timeIntervalSince1970 > $1.created.timeIntervalSince1970) || $0.name < $1.name
         }
         setStatus("Found \(provisioningProfiles.count) Provisioning Profile\(provisioningProfiles.count>1 || provisioningProfiles.count<1 ? "s":"")")
         ProvisioningProfilesPopup.removeAllItems()

@@ -11,6 +11,7 @@ import AppKit
 struct ProvisioningProfile {
     var filename: String,
         name: String,
+        created:NSDate,
         expires: NSDate,
         appID: String,
         teamID: String,
@@ -50,12 +51,14 @@ struct ProvisioningProfile {
             self.rawXML = taskOutput.output
             if let results = try? NSPropertyListSerialization.propertyListWithData(taskOutput.output.dataUsingEncoding(NSUTF8StringEncoding)!, options: .Immutable, format: nil) {
                 if let expirationDate = results.valueForKey("ExpirationDate") as? NSDate,
+                    creationDate = results.valueForKey("CreationDate") as? NSDate,
                     name = results.valueForKey("Name") as? String,
                     entitlements = results.valueForKey("Entitlements"),
                     applicationIdentifier = entitlements.valueForKey("application-identifier") as? String,
                     periodIndex = applicationIdentifier.characters.indexOf(".") {
                         self.filename = filename
                         self.expires = expirationDate
+                        self.created = creationDate
                         self.appID = applicationIdentifier.substringFromIndex(periodIndex.advancedBy(1))
                         self.teamID = applicationIdentifier.substringToIndex(periodIndex)
                         self.name = name
