@@ -43,6 +43,7 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
     let zipPath = "/usr/bin/zip"
     let defaultsPath = "/usr/bin/defaults"
     let codesignPath = "/usr/bin/codesign"
+    let securityPath = "/usr/bin/security"
     
     //MARK: Drag / Drop
     var fileTypes: [String] = ["ipa","deb","app","xcarchive","mobileprovision"]
@@ -151,6 +152,14 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
         }
     }
     
+    func makeTempFolder()->String?{
+        let tempTask = NSTask().execute(mktempPath, workingDirectory: nil, arguments: ["-d","-t",bundleID!])
+        if tempTask.status != 0 {
+            return nil
+        }
+        return tempTask.output.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+    }
+    
     func setStatus(status: String){
         Log.write(status)
         StatusLabel.stringValue = status
@@ -199,7 +208,7 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
     
     func getCodesigningCerts() -> [String] {
         var output: [String] = []
-        let securityResult = NSTask().execute("/usr/bin/security", workingDirectory: nil, arguments: ["find-identity","-v","-p","codesigning"])
+        let securityResult = NSTask().execute(securityPath, workingDirectory: nil, arguments: ["find-identity","-v","-p","codesigning"])
         if securityResult.output.characters.count < 1 {
             return output
         }
@@ -217,11 +226,17 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
     
     func showCodesignCertsErrorAlert(){
         let alert = NSAlert()
-        alert.addButtonWithTitle("OK")
-        alert.messageText = "No codesigning certificates found!"
-        alert.informativeText = "You won't be able to successfully sign anything."
-        alert.alertStyle = .CriticalAlertStyle
-        alert.runModal()
+        alert.messageText = "No codesigning certificates found"
+        alert.informativeText = "I can attempt to fix this automatically, would you like me to try?"
+        alert.addButtonWithTitle("Yes")
+        alert.addButtonWithTitle("No")
+        if alert.runModal() == NSAlertFirstButtonReturn {
+            if let tempFolder = makeTempFolder() {
+                fixSigning(tempFolder)
+                try? fileManager.removeItemAtPath(tempFolder)
+                populateCodesigningCerts()
+            }
+        }
     }
     
     func populateCodesigningCerts() {
@@ -320,6 +335,7 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
     
     func cleanup(tempFolder: String){
         do {
+            Log.write("Deleting: \(tempFolder)")
             try fileManager.removeItemAtPath(tempFolder)
         } catch let error as NSError {
             setStatus("Unable to delete temp folder")
@@ -380,6 +396,60 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
     }
     
     //MARK: Codesigning
+    func codeSign(file: String, certificate: String, entitlements: String?,before:((file: String, certificate: String, entitlements: String?)->Void)?, after: ((file: String, certificate: String, entitlements: String?, codesignTask: AppSignerTaskOutput)->Void)?)->AppSignerTaskOutput{
+        
+        let useEntitlements: Bool = ({
+            if entitlements == nil {
+                return false
+            } else {
+                if fileManager.fileExistsAtPath(entitlements!) {
+                    return true
+                } else {
+                    return false
+                }
+            }
+        })()
+        
+        if let beforeFunc = before {
+            beforeFunc(file: file, certificate: certificate, entitlements: entitlements)
+        }
+        var arguments = ["-vvv","-fs",certificate,"--no-strict"]
+        if useEntitlements {
+            arguments.append("--entitlements=\(entitlements!)")
+        }
+        arguments.append(file)
+        let codesignTask = NSTask().execute(codesignPath, workingDirectory: nil, arguments: arguments)
+        if let afterFunc = after {
+            afterFunc(file: file, certificate: certificate, entitlements: entitlements, codesignTask: codesignTask)
+        }
+        return codesignTask
+    }
+    func testSigning(certificate: String, tempFolder: String )->Bool? {
+        let codesignTempFile = tempFolder.stringByAppendingPathComponent("test-sign")
+        
+        // Copy our binary to the temp folder to use for testing.
+        let path = NSProcessInfo.processInfo().arguments[0]
+        if (try? fileManager.copyItemAtPath(path, toPath: codesignTempFile)) != nil {
+            codeSign(codesignTempFile, certificate: certificate, entitlements: nil, before: nil, after: nil)
+            
+            let verificationTask = NSTask().execute(codesignPath, workingDirectory: nil, arguments: ["-v",codesignTempFile])
+            try? fileManager.removeItemAtPath(codesignTempFile)
+            if verificationTask.status == 0 {
+                return true
+            } else {
+                return false
+            }
+        } else {
+            setStatus("Error testing codesign")
+        }
+        return nil
+    }
+    func fixSigning(tempFolder: String){
+        let script = "do shell script \"/bin/bash \\\"\(NSBundle.mainBundle().pathForResource("fix-wwdr", ofType: "sh")!)\\\"\" with administrator privileges"
+        NSAppleScript(source: script)?.executeAndReturnError(nil)
+        //https://developer.apple.com/certificationauthority/AppleWWDRCA.cer
+        return
+    }
     func startSigning() {
         controlsEnabled(false)
         
@@ -408,6 +478,7 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
         let newDisplayName = self.appDisplayName.stringValue.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
         let inputStartsWithHTTP = inputFile.lowercaseString.substringToIndex(inputFile.startIndex.advancedBy(4)) == "http"
         var eggCount: Int = 0
+        var continueSigning: Bool? = nil
         
         //MARK: Sanity checks
         
@@ -430,12 +501,13 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
         }
         
         //MARK: Create working temp folder
-        let tempTask = NSTask().execute(mktempPath, workingDirectory: nil, arguments: ["-d","-t",bundleID!])
-        if tempTask.status != 0 {
+        var tempFolder: String! = nil
+        if let tmpFolder = makeTempFolder() {
+            tempFolder = tmpFolder
+        } else {
             setStatus("Error creating temp folder")
             return
         }
-        let tempFolder = tempTask.output.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
         let workingDirectory = tempFolder.stringByAppendingPathComponent("out")
         let eggDirectory = tempFolder.stringByAppendingPathComponent("eggs")
         let payloadDirectory = workingDirectory.stringByAppendingPathComponent("Payload/")
@@ -444,6 +516,49 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
         Log.write("Temp folder: \(tempFolder)")
         Log.write("Working directory: \(workingDirectory)")
         Log.write("Payload directory: \(payloadDirectory)")
+        
+        //MARK: Codesign Test
+        
+        dispatch_async(dispatch_get_main_queue(), {
+            if let codesignResult = self.testSigning(signingCertificate!, tempFolder: tempFolder) {
+                if codesignResult == false {
+                    let alert = NSAlert()
+                    alert.messageText = "Codesigning error"
+                    alert.addButtonWithTitle("Yes")
+                    alert.addButtonWithTitle("No")
+                    alert.informativeText = "You appear to have a error with your codesigning certificate, do you want me to try and fix the problem?"
+                    let response = alert.runModal()
+                    if response == NSAlertFirstButtonReturn {
+                        self.fixSigning(tempFolder)
+                        if self.testSigning(signingCertificate!, tempFolder: tempFolder) == false {
+                            let errorAlert = NSAlert()
+                            errorAlert.messageText = "Unable to Fix"
+                            errorAlert.addButtonWithTitle("OK")
+                            errorAlert.informativeText = "I was unable to automatically resolve your codesigning issue ☹\n\nIf you have previously trusted your certificate using Keychain, please set the Trust setting back to the system default."
+                            errorAlert.runModal()
+                            continueSigning = false
+                            return
+                        }
+                    } else {
+                        continueSigning = false
+                        return
+                    }
+                }
+            }
+            continueSigning = true
+        })
+        
+        
+        while true {
+            if continueSigning != nil {
+                if continueSigning! == false {
+                    continueSigning = nil
+                    cleanup(tempFolder); return
+                }
+                break
+            }
+            usleep(100)
+        }
         
         //MARK: Create Egg Temp Directory
         do {
@@ -585,27 +700,6 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
             cleanup(tempFolder); return
         }
         
-        func generateFileSignFunc(payloadDirectory:String, entitlementsPath: String, signingCertificate: String)->((file:String)->Void){
-            let useEntitlements = fileManager.fileExistsAtPath(entitlementsPath)
-            func output(file:String){
-                let shortName = file.substringFromIndex(payloadDirectory.endIndex)
-                setStatus("Codesigning \(shortName)\(useEntitlements ? " with entitlements":"")")
-                var arguments = ["-vvv","-fs",signingCertificate,"--no-strict"]
-                if useEntitlements {
-                    arguments.append("--entitlements=\(entitlementsPath)")
-                }
-                arguments.append(file)
-                let codesignTask = NSTask().execute(codesignPath, workingDirectory: nil, arguments: arguments)
-                
-                if codesignTask.status != 0 {
-                    setStatus("Error codesigning \(shortName)")
-                    warnings++
-                    Log.write(codesignTask.output)
-                }
-            }
-            return output
-        }
-        
         // Loop through app bundles in payload directory
         do {
             let files = try fileManager.contentsOfDirectoryAtPath(payloadDirectory)
@@ -717,6 +811,39 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
                     }
                 }
                 
+                
+                func generateFileSignFunc(payloadDirectory:String, entitlementsPath: String, signingCertificate: String)->((file:String)->Void){
+                    
+                    
+                    let useEntitlements: Bool = ({
+                        if fileManager.fileExistsAtPath(entitlementsPath) {
+                            return true
+                        }
+                        return false
+                    })()
+                    
+                    func shortName(file: String, payloadDirectory: String)->String{
+                        return file.substringFromIndex(payloadDirectory.endIndex)
+                    }
+                    
+                    func beforeFunc(file: String, certificate: String, entitlements: String?){
+                            setStatus("Codesigning \(shortName(file, payloadDirectory: payloadDirectory))\(useEntitlements ? " with entitlements":"")")
+                    }
+                    
+                    func afterFunc(file: String, certificate: String, entitlements: String?, codesignOutput: AppSignerTaskOutput){
+                        if codesignOutput.status != 0 {
+                            setStatus("Error codesigning \(shortName(file, payloadDirectory: payloadDirectory))")
+                            Log.write(codesignOutput.output)
+                            warnings++
+                        }
+                    }
+                    
+                    func output(file:String){
+                        codeSign(file, certificate: signingCertificate, entitlements: entitlementsPath, before: beforeFunc, after: afterFunc)
+                    }
+                    return output
+                }
+                
                 //MARK: Codesigning - General
                 let signableExtensions = ["dylib","so","0","vis","pvr","framework","appex","app"]
                 
@@ -746,6 +873,20 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
                 
                 recursiveDirectorySearch(appBundlePath, extensions: signableExtensions, found: signingFunction)
                 signingFunction(file: appBundlePath)
+                
+                //MARK: Codesigning - Verification
+                let verificationTask = NSTask().execute(codesignPath, workingDirectory: nil, arguments: ["-v",appBundlePath])
+                if verificationTask.status != 0 {
+                    let alert = NSAlert()
+                    alert.addButtonWithTitle("OK")
+                    alert.messageText = "Error verifying code signature!"
+                    alert.informativeText = verificationTask.output
+                    alert.alertStyle = .CriticalAlertStyle
+                    alert.runModal()
+                    setStatus("Error verifying code signature")
+                    Log.write(verificationTask.output)
+                    cleanup(tempFolder); return
+                }
             }
         } catch let error as NSError {
             setStatus("Error listing files in payload directory")

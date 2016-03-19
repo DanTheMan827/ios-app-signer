@@ -10,8 +10,6 @@
 		652408CC1BE743D4006FA4C6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652408CB1BE743D4006FA4C6 /* AppDelegate.swift */; };
 		652408CE1BE743D4006FA4C6 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652408CD1BE743D4006FA4C6 /* MainView.swift */; };
 		652408D01BE743D4006FA4C6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 652408CF1BE743D4006FA4C6 /* Assets.xcassets */; };
-		652408DE1BE743D4006FA4C6 /* AppSignerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652408DD1BE743D4006FA4C6 /* AppSignerTests.swift */; };
-		652408E91BE743D4006FA4C6 /* AppSignerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652408E81BE743D4006FA4C6 /* AppSignerUITests.swift */; };
 		65311EAE1BF8259000516EFD /* NSMenuLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65311EAD1BF8259000516EFD /* NSMenuLink.swift */; };
 		65311EB01BF835F100516EFD /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65311EAF1BF835F100516EFD /* Log.swift */; };
 		65311EB61BF88EB800516EFD /* Application.xib in Resources */ = {isa = PBXBuildFile; fileRef = 65311EB51BF88EB800516EFD /* Application.xib */; };
@@ -24,24 +22,8 @@
 		659734A11C65B5F600383D2D /* MarkdownTokens.m in Sources */ = {isa = PBXBuildFile; fileRef = 6597349C1C65B5F600383D2D /* MarkdownTokens.m */; };
 		659734A21C65B5F600383D2D /* NSAttributedStringMarkdownParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 6597349F1C65B5F600383D2D /* NSAttributedStringMarkdownParser.m */; };
 		659734A71C65B94F00383D2D /* fmemopen.c in Sources */ = {isa = PBXBuildFile; fileRef = 659734A41C65B94F00383D2D /* fmemopen.c */; };
+		65CED3A32D8B6F3E00E9185B /* fix-wwdr.sh in Resources */ = {isa = PBXBuildFile; fileRef = 65CED3A22D8B6F3E00E9185B /* fix-wwdr.sh */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		652408DA1BE743D4006FA4C6 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 652408C01BE743D4006FA4C6 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 652408C71BE743D4006FA4C6;
-			remoteInfo = AppSigner;
-		};
-		652408E51BE743D4006FA4C6 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 652408C01BE743D4006FA4C6 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 652408C71BE743D4006FA4C6;
-			remoteInfo = AppSigner;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		652408C81BE743D4006FA4C6 /* iOS App Signer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "iOS App Signer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -49,12 +31,6 @@
 		652408CD1BE743D4006FA4C6 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		652408CF1BE743D4006FA4C6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		652408D41BE743D4006FA4C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		652408D91BE743D4006FA4C6 /* iOS App Signer.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS App Signer.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		652408DD1BE743D4006FA4C6 /* AppSignerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSignerTests.swift; sourceTree = "<group>"; };
-		652408DF1BE743D4006FA4C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		652408E41BE743D4006FA4C6 /* iOS App Signer.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS App Signer.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		652408E81BE743D4006FA4C6 /* AppSignerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSignerUITests.swift; sourceTree = "<group>"; };
-		652408EA1BE743D4006FA4C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		65311EAD1BF8259000516EFD /* NSMenuLink.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSMenuLink.swift; sourceTree = "<group>"; };
 		65311EAF1BF835F100516EFD /* Log.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 		65311EB51BF88EB800516EFD /* Application.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Application.xib; sourceTree = "<group>"; };
@@ -74,24 +50,11 @@
 		659734A51C65B94F00383D2D /* fmemopen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fmemopen.h; path = NimbusKit/memorymapping/fmemopen.h; sourceTree = "<group>"; };
 		659734A61C65B94F00383D2D /* NimbusMemoryMapping.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NimbusMemoryMapping.h; path = NimbusKit/memorymapping/NimbusMemoryMapping.h; sourceTree = "<group>"; };
 		65B24E0D1BECB30D005D2068 /* AppSigner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = AppSigner.entitlements; sourceTree = "<group>"; };
+		65CED3A22D8B6F3E00E9185B /* fix-wwdr.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = "fix-wwdr.sh"; path = "Resources/fix-wwdr.sh"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		652408C51BE743D4006FA4C6 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		652408D61BE743D4006FA4C6 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		652408E11BE743D4006FA4C6 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -106,8 +69,6 @@
 			children = (
 				659734971C65B5B900383D2D /* NimbusKit */,
 				652408CA1BE743D4006FA4C6 /* AppSigner */,
-				652408E71BE743D4006FA4C6 /* AppSignerUITests */,
-				652408DC1BE743D4006FA4C6 /* AppSignerTests */,
 				652408C91BE743D4006FA4C6 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -116,8 +77,6 @@
 			isa = PBXGroup;
 			children = (
 				652408C81BE743D4006FA4C6 /* iOS App Signer.app */,
-				652408D91BE743D4006FA4C6 /* iOS App Signer.xctest */,
-				652408E41BE743D4006FA4C6 /* iOS App Signer.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -125,6 +84,7 @@
 		652408CA1BE743D4006FA4C6 /* AppSigner */ = {
 			isa = PBXGroup;
 			children = (
+				65CED3A12D8B6F1B00E9185B /* Resources */,
 				655FFFDF1BEB270200D43AD8 /* Extensions */,
 				655FFFA01BEAD90800D43AD8 /* Classes */,
 				65311EB51BF88EB800516EFD /* Application.xib */,
@@ -137,24 +97,6 @@
 				652408D41BE743D4006FA4C6 /* Info.plist */,
 			);
 			path = AppSigner;
-			sourceTree = "<group>";
-		};
-		652408DC1BE743D4006FA4C6 /* AppSignerTests */ = {
-			isa = PBXGroup;
-			children = (
-				652408DD1BE743D4006FA4C6 /* AppSignerTests.swift */,
-				652408DF1BE743D4006FA4C6 /* Info.plist */,
-			);
-			path = AppSignerTests;
-			sourceTree = SOURCE_ROOT;
-		};
-		652408E71BE743D4006FA4C6 /* AppSignerUITests */ = {
-			isa = PBXGroup;
-			children = (
-				652408E81BE743D4006FA4C6 /* AppSignerUITests.swift */,
-				652408EA1BE743D4006FA4C6 /* Info.plist */,
-			);
-			path = AppSignerUITests;
 			sourceTree = "<group>";
 		};
 		655FFFA01BEAD90800D43AD8 /* Classes */ = {
@@ -211,6 +153,14 @@
 			name = memorymapping;
 			sourceTree = "<group>";
 		};
+		65CED3A12D8B6F1B00E9185B /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				65CED3A22D8B6F3E00E9185B /* fix-wwdr.sh */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -231,42 +181,6 @@
 			productReference = 652408C81BE743D4006FA4C6 /* iOS App Signer.app */;
 			productType = "com.apple.product-type.application";
 		};
-		652408D81BE743D4006FA4C6 /* iOS App SignerTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 652408F01BE743D4006FA4C6 /* Build configuration list for PBXNativeTarget "iOS App SignerTests" */;
-			buildPhases = (
-				652408D51BE743D4006FA4C6 /* Sources */,
-				652408D61BE743D4006FA4C6 /* Frameworks */,
-				652408D71BE743D4006FA4C6 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				652408DB1BE743D4006FA4C6 /* PBXTargetDependency */,
-			);
-			name = "iOS App SignerTests";
-			productName = AppSignerTests;
-			productReference = 652408D91BE743D4006FA4C6 /* iOS App Signer.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		652408E31BE743D4006FA4C6 /* iOS App SignerUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 652408F31BE743D4006FA4C6 /* Build configuration list for PBXNativeTarget "iOS App SignerUITests" */;
-			buildPhases = (
-				652408E01BE743D4006FA4C6 /* Sources */,
-				652408E11BE743D4006FA4C6 /* Frameworks */,
-				652408E21BE743D4006FA4C6 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				652408E61BE743D4006FA4C6 /* PBXTargetDependency */,
-			);
-			name = "iOS App SignerUITests";
-			productName = AppSignerUITests;
-			productReference = 652408E41BE743D4006FA4C6 /* iOS App Signer.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -279,19 +193,12 @@
 				TargetAttributes = {
 					652408C71BE743D4006FA4C6 = {
 						CreatedOnToolsVersion = 7.1;
+						DevelopmentTeam = 7PM929Z8M2;
 						SystemCapabilities = {
 							com.apple.Sandbox = {
 								enabled = 0;
 							};
 						};
-					};
-					652408D81BE743D4006FA4C6 = {
-						CreatedOnToolsVersion = 7.1;
-						TestTargetID = 652408C71BE743D4006FA4C6;
-					};
-					652408E31BE743D4006FA4C6 = {
-						CreatedOnToolsVersion = 7.1;
-						TestTargetID = 652408C71BE743D4006FA4C6;
 					};
 				};
 			};
@@ -309,8 +216,6 @@
 			projectRoot = "";
 			targets = (
 				652408C71BE743D4006FA4C6 /* iOS App Signer */,
-				652408D81BE743D4006FA4C6 /* iOS App SignerTests */,
-				652408E31BE743D4006FA4C6 /* iOS App SignerUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -320,23 +225,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65CED3A32D8B6F3E00E9185B /* fix-wwdr.sh in Resources */,
 				65311EB61BF88EB800516EFD /* Application.xib in Resources */,
 				652408D01BE743D4006FA4C6 /* Assets.xcassets in Resources */,
 				659734941C65A14300383D2D /* Updates.xib in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		652408D71BE743D4006FA4C6 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		652408E21BE743D4006FA4C6 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -362,36 +254,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		652408D51BE743D4006FA4C6 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				652408DE1BE743D4006FA4C6 /* AppSignerTests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		652408E01BE743D4006FA4C6 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				652408E91BE743D4006FA4C6 /* AppSignerUITests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		652408DB1BE743D4006FA4C6 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 652408C71BE743D4006FA4C6 /* iOS App Signer */;
-			targetProxy = 652408DA1BE743D4006FA4C6 /* PBXContainerItemProxy */;
-		};
-		652408E61BE743D4006FA4C6 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 652408C71BE743D4006FA4C6 /* iOS App Signer */;
-			targetProxy = 652408E51BE743D4006FA4C6 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		652408EB1BE743D4006FA4C6 /* Debug */ = {
@@ -430,7 +293,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -468,7 +331,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 			};
@@ -505,58 +368,6 @@
 			};
 			name = Release;
 		};
-		652408F11BE743D4006FA4C6 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				COMBINE_HIDPI_IMAGES = YES;
-				INFOPLIST_FILE = AppSignerTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.DanTheMan827.AppSignerTests;
-				PRODUCT_NAME = "iOS App Signer";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/iOS App Signer.app/Contents/MacOS/iOS App Signer";
-			};
-			name = Debug;
-		};
-		652408F21BE743D4006FA4C6 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				COMBINE_HIDPI_IMAGES = YES;
-				INFOPLIST_FILE = AppSignerTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.DanTheMan827.AppSignerTests;
-				PRODUCT_NAME = "iOS App Signer";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/iOS App Signer.app/Contents/MacOS/iOS App Signer";
-			};
-			name = Release;
-		};
-		652408F41BE743D4006FA4C6 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COMBINE_HIDPI_IMAGES = YES;
-				INFOPLIST_FILE = AppSignerUITests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.DanTheMan827.AppSignerUITests;
-				PRODUCT_NAME = "iOS App Signer";
-				TEST_TARGET_NAME = AppSigner;
-				USES_XCTRUNNER = YES;
-			};
-			name = Debug;
-		};
-		652408F51BE743D4006FA4C6 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COMBINE_HIDPI_IMAGES = YES;
-				INFOPLIST_FILE = AppSignerUITests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.DanTheMan827.AppSignerUITests;
-				PRODUCT_NAME = "iOS App Signer";
-				TEST_TARGET_NAME = AppSigner;
-				USES_XCTRUNNER = YES;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -574,24 +385,6 @@
 			buildConfigurations = (
 				652408EE1BE743D4006FA4C6 /* Debug */,
 				652408EF1BE743D4006FA4C6 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		652408F01BE743D4006FA4C6 /* Build configuration list for PBXNativeTarget "iOS App SignerTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				652408F11BE743D4006FA4C6 /* Debug */,
-				652408F21BE743D4006FA4C6 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		652408F31BE743D4006FA4C6 /* Build configuration list for PBXNativeTarget "iOS App SignerUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				652408F41BE743D4006FA4C6 /* Debug */,
-				652408F51BE743D4006FA4C6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
