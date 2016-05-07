@@ -102,11 +102,12 @@ class UpdatesController: NSWindowController {
         super.showWindow(sender)
         appIcon.image = NSWorkspace.sharedWorkspace().iconForFile(NSBundle.mainBundle().bundlePath)
         var releaseOutput: [String] = []
-        if let releases = sender![1] as? [[String: AnyObject]],
-            currentVersion = sender![0] as? String {
-            for release in releases {
-                if let name = release["name"] as? String,
-                    body = release["body"] as? String {
+        if let senderArray = sender as? [AnyObject] {
+            if let releases = senderArray[1] as? [[String: AnyObject]],
+                currentVersion = senderArray[0] as? String {
+                for release in releases {
+                    if let name = release["name"] as? String,
+                        body = release["body"] as? String {
                         if latestVersion == nil {
                             latestVersion = name
                         }
@@ -114,12 +115,13 @@ class UpdatesController: NSWindowController {
                             break
                         }
                         releaseOutput.append("**Version \(name)**\n\(body)")
+                    }
                 }
+                versionLabel.stringValue = "Version \(latestVersion!) is now available, you have \(currentVersion)."
             }
-            versionLabel.stringValue = "Version \(latestVersion!) is now available, you have \(currentVersion)."
+            setChangelog(releaseOutput.joinWithSeparator("\n\n"))
         }
         
-        setChangelog(releaseOutput.joinWithSeparator("\n\n"))
     }
     func setChangelog(text: String){
         changelogText.editable = true

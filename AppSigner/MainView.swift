@@ -44,6 +44,7 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
     let defaultsPath = "/usr/bin/defaults"
     let codesignPath = "/usr/bin/codesign"
     let securityPath = "/usr/bin/security"
+    let chmodPath = "/bin/chmod"
     
     //MARK: Drag / Drop
     var fileTypes: [String] = ["ipa","deb","app","xcarchive","mobileprovision"]
@@ -216,7 +217,7 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
         
         var index: Int
         
-        for index = 0; index <= rawResult.count - 2; index+=2 {
+        for index in 0.stride(through: rawResult.count - 2, by: 2) {
             if !(rawResult.count - 1 < index + 1) {
                 output.append(rawResult[index+1])
             }
@@ -232,7 +233,7 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
         alert.addButtonWithTitle("No")
         if alert.runModal() == NSAlertFirstButtonReturn {
             if let tempFolder = makeTempFolder() {
-                fixSigning(tempFolder)
+                iASShared.fixSigning(tempFolder)
                 try? fileManager.removeItemAtPath(tempFolder)
                 populateCodesigningCerts()
             }
@@ -444,12 +445,7 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
         }
         return nil
     }
-    func fixSigning(tempFolder: String){
-        let script = "do shell script \"/bin/bash \\\"\(NSBundle.mainBundle().pathForResource("fix-wwdr", ofType: "sh")!)\\\"\" with administrator privileges"
-        NSAppleScript(source: script)?.executeAndReturnError(nil)
-        //https://developer.apple.com/certificationauthority/AppleWWDRCA.cer
-        return
-    }
+    
     func startSigning() {
         controlsEnabled(false)
         
@@ -459,7 +455,7 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
         saveDialog.nameFieldStringValue = InputFileText.stringValue.lastPathComponent.stringByDeletingPathExtension
         if saveDialog.runModal() == NSFileHandlingPanelOKButton {
             outputFile = saveDialog.URL!.path
-            NSThread.detachNewThreadSelector(Selector("signingThread"), toTarget: self, withObject: nil)
+            NSThread.detachNewThreadSelector(#selector(self.signingThread), toTarget: self, withObject: nil)
         } else {
             outputFile = nil
             controlsEnabled(true)
@@ -529,7 +525,7 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
                     alert.informativeText = "You appear to have a error with your codesigning certificate, do you want me to try and fix the problem?"
                     let response = alert.runModal()
                     if response == NSAlertFirstButtonReturn {
-                        self.fixSigning(tempFolder)
+                        iASShared.fixSigning(tempFolder)
                         if self.testSigning(signingCertificate!, tempFolder: tempFolder) == false {
                             let errorAlert = NSAlert()
                             errorAlert.messageText = "Unable to Fix"
@@ -757,7 +753,7 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
                             }
                         } else {
                             setStatus("Unable to read entitlements from provisioning profile")
-                            warnings++
+                            warnings += 1
                         }
                         if profile.appID != "*" && (newApplicationID != "" && newApplicationID != profile.appID) {
                             setStatus("Unable to change App ID to \(newApplicationID), provisioning profile won't allow it")
@@ -765,9 +761,14 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
                         }
                     } else {
                         setStatus("Unable to parse provisioning profile, it may be corrupt")
-                        warnings++
+                        warnings += 1
                     }
                     
+                }
+                
+                //MARK: Make sure that the executable is well... executable.
+                if let bundleExecutable = getPlistKey(appBundleInfoPlist, keyName: "CFBundleExecutable"){
+                    NSTask().execute(chmodPath, workingDirectory: nil, arguments: ["755", appBundlePath.stringByAppendingPathComponent(bundleExecutable)])
                 }
                 
                 //MARK: Change Application ID
@@ -834,7 +835,7 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
                         if codesignOutput.status != 0 {
                             setStatus("Error codesigning \(shortName(file, payloadDirectory: payloadDirectory))")
                             Log.write(codesignOutput.output)
-                            warnings++
+                            warnings += 1
                         }
                     }
                     
@@ -850,7 +851,7 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
                 //MARK: Codesigning - Eggs
                 let eggSigningFunction = generateFileSignFunc(eggDirectory, entitlementsPath: entitlementsPlist, signingCertificate: signingCertificate!)
                 func signEgg(eggFile: String){
-                    eggCount++
+                    eggCount += 1
                     
                     let currentEggPath = eggDirectory.stringByAppendingPathComponent("egg\(eggCount)")
                     let shortName = eggFile.substringFromIndex(payloadDirectory.endIndex)

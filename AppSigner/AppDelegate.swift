@@ -11,6 +11,7 @@ import Cocoa
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
+    @IBOutlet weak var mainView: MainView!
     let fileManager = NSFileManager.defaultManager()
     
     
@@ -25,6 +26,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func applicationShouldTerminateAfterLastWindowClosed(sender: NSApplication) -> Bool {
         return true
+    }
+    @IBAction func fixSigning(sender: NSMenuItem) {
+        if let tempFolder = mainView.makeTempFolder() {
+            iASShared.fixSigning(tempFolder)
+            try? fileManager.removeItemAtPath(tempFolder)
+            mainView.populateCodesigningCerts()
+        }
     }
 
     @IBAction func nsMenuLinkClick(sender: NSMenuLink) {
