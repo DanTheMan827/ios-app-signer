@@ -48,8 +48,14 @@ struct ProvisioningProfile {
         
          let taskOutput = NSTask().execute("/usr/bin/security", workingDirectory: nil, arguments: securityArgs)
          if taskOutput.status == 0 {
-            self.rawXML = taskOutput.output
-            if let results = try? NSPropertyListSerialization.propertyListWithData(taskOutput.output.dataUsingEncoding(NSUTF8StringEncoding)!, options: .Immutable, format: nil) {
+            var xmlNoError = taskOutput.output
+            if xmlNoError.containsString("SecPolicySetValue") {
+                var linesInOutput = xmlNoError.componentsSeparatedByString("\n") as [String]
+                linesInOutput.removeAtIndex(0)
+                xmlNoError = linesInOutput.joinWithSeparator("\n")
+            }
+            self.rawXML = xmlNoError
+            if let results = try? NSPropertyListSerialization.propertyListWithData(xmlNoError.dataUsingEncoding(NSUTF8StringEncoding)!, options: .Immutable, format: nil) {
                 if let expirationDate = results.valueForKey("ExpirationDate") as? NSDate,
                     creationDate = results.valueForKey("CreationDate") as? NSDate,
                     name = results.valueForKey("Name") as? String,
