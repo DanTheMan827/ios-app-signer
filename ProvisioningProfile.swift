@@ -48,14 +48,14 @@ struct ProvisioningProfile {
         
          let taskOutput = NSTask().execute("/usr/bin/security", workingDirectory: nil, arguments: securityArgs)
          if taskOutput.status == 0 {
-            var xmlNoError = taskOutput.output
-            if xmlNoError.containsString("SecPolicySetValue") {
-                var linesInOutput = xmlNoError.componentsSeparatedByString("\n") as [String]
-                linesInOutput.removeAtIndex(0)
-                xmlNoError = linesInOutput.joinWithSeparator("\n")
+            if let xmlIndex = taskOutput.output.rangeOfString("<?xml") {
+                self.rawXML = taskOutput.output.substringFromIndex(xmlIndex.startIndex)
+            } else {
+                Log.write("Unable to find xml start tag in profile")
+                self.rawXML = taskOutput.output
             }
-            self.rawXML = xmlNoError
-            if let results = try? NSPropertyListSerialization.propertyListWithData(xmlNoError.dataUsingEncoding(NSUTF8StringEncoding)!, options: .Immutable, format: nil) {
+            
+            if let results = try? NSPropertyListSerialization.propertyListWithData(self.rawXML.dataUsingEncoding(NSUTF8StringEncoding)!, options: .Immutable, format: nil) {
                 if let expirationDate = results.valueForKey("ExpirationDate") as? NSDate,
                     creationDate = results.valueForKey("CreationDate") as? NSDate,
                     name = results.valueForKey("Name") as? String,
