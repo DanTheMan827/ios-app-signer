@@ -20,6 +20,8 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
     @IBOutlet var NewApplicationIDTextField: NSTextField!
     @IBOutlet var downloadProgress: NSProgressIndicator!
     @IBOutlet var appDisplayName: NSTextField!
+    @IBOutlet var appShortVersion: NSTextField!
+    @IBOutlet var appVersion: NSTextField!
     
     
     //MARK: Variables
@@ -472,6 +474,8 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
         let signingCertificate = self.CodesigningCertsPopup.selectedItem?.title
         let newApplicationID = self.NewApplicationIDTextField.stringValue.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
         let newDisplayName = self.appDisplayName.stringValue.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+        let newShortVersion = self.appShortVersion.stringValue.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+        let newVersion = self.appVersion.stringValue.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
         let inputStartsWithHTTP = inputFile.lowercaseString.substringToIndex(inputFile.startIndex.advancedBy(4)) == "http"
         var eggCount: Int = 0
         var continueSigning: Bool? = nil
@@ -797,8 +801,6 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
                         Log.write(IDChangeTask.output)
                         cleanup(tempFolder); return
                     }
-                    
-                    
                 }
                 
                 //MARK: Change Display Name
@@ -808,6 +810,28 @@ class MainView: NSView, NSURLSessionDataDelegate, NSURLSessionDelegate, NSURLSes
                     if displayNameChangeTask.status != 0 {
                         setStatus("Error changing display name")
                         Log.write(displayNameChangeTask.output)
+                        cleanup(tempFolder); return
+                    }
+                }
+                
+                //MARK: Change Version
+                if newVersion != "" {
+                    setStatus("Changing Version to \(newVersion))")
+                    let versionChangeTask = NSTask().execute(defaultsPath, workingDirectory: nil, arguments: ["write",appBundleInfoPlist,"CFBundleVersion", newVersion])
+                    if versionChangeTask.status != 0 {
+                        setStatus("Error changing version")
+                        Log.write(versionChangeTask.output)
+                        cleanup(tempFolder); return
+                    }
+                }
+                
+                //MARK: Change Short Version
+                if newShortVersion != "" {
+                    setStatus("Changing Short Version to \(newShortVersion))")
+                    let shortVersionChangeTask = NSTask().execute(defaultsPath, workingDirectory: nil, arguments: ["write",appBundleInfoPlist,"CFBundleShortVersionString", newShortVersion])
+                    if shortVersionChangeTask.status != 0 {
+                        setStatus("Error changing short version")
+                        Log.write(shortVersionChangeTask.output)
                         cleanup(tempFolder); return
                     }
                 }
