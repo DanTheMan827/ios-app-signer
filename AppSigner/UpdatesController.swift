@@ -12,7 +12,7 @@ class UpdatesController: NSWindowController {
     //MARK: Variables
     let markdownParser = NSAttributedStringMarkdownParser()
     var latestVersion: String?
-    let prefs = NSUserDefaults.standardUserDefaults()
+    let prefs = UserDefaults.standard
     static var updatesWindow: UpdatesController?
     
     //MARK: IBOutlets
@@ -23,39 +23,39 @@ class UpdatesController: NSWindowController {
     
     //MARK: Functions
     static func checkForUpdate(
-        currentVersion: String = NSBundle.mainBundle().infoDictionary!["CFBundleShortVersionString"] as! String,
+        _ currentVersion: String = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String,
         forceShow: Bool = false,
-        callbackFunc: ((status: Bool, data: NSData?, response: NSURLResponse?, error: NSError?)->Void)? = nil
+        callbackFunc: ((_ status: Bool, _ data: Data?, _ response: URLResponse?, _ error: Error?)->Void)? = nil
     ) {
-        let requestURL: NSURL = NSURL(string: "https://api.github.com/repos/DanTheMan827/ios-app-signer/releases")!
-        let urlRequest: NSMutableURLRequest = NSMutableURLRequest(URL: requestURL)
+        let requestURL: URL = URL(string: "https://api.github.com/repos/DanTheMan827/ios-app-signer/releases")!
+        let urlRequest = URLRequest(url: requestURL)
         
-        let configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
-        configuration.requestCachePolicy = .ReloadIgnoringLocalAndRemoteCacheData
-        let session = NSURLSession(configuration: configuration)
+        let configuration = URLSessionConfiguration.default
+        configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
+        let session = URLSession(configuration: configuration)
         
-        let task = session.dataTaskWithRequest(urlRequest) {
+        let task = session.dataTask(with: urlRequest, completionHandler: {
             (data, response, error) -> Void in
             
             if error == nil {
-                let httpResponse = response as! NSHTTPURLResponse
+                let httpResponse = response as! HTTPURLResponse
                 let statusCode = httpResponse.statusCode
                 
                 if (statusCode == 200) {
                     do{
                         
-                        let json = try NSJSONSerialization.JSONObjectWithData(data!, options:.AllowFragments)
+                        let json = try JSONSerialization.jsonObject(with: data!, options:.allowFragments)
                         if let releases = json as? [[String: AnyObject]],
-                            release = releases[0] as? [String: AnyObject],
-                            name = release["name"] as? String {
-                                let prefs = NSUserDefaults.standardUserDefaults()
-                                if let skipVersion = prefs.stringForKey("skipVersion"){
+                            let release = releases[0] as? [String: AnyObject],
+                            let name = release["name"] as? String {
+                                let prefs = UserDefaults.standard
+                                if let skipVersion = prefs.string(forKey: "skipVersion"){
                                     if skipVersion == name && forceShow == false {
                                         return
                                     }
                                 }
                                 if name != currentVersion {
-                                    dispatch_async(dispatch_get_main_queue()) {
+                                    DispatchQueue.main.async {
                                         // update some UI
                                         if updatesWindow == nil {
                                             updatesWindow = UpdatesController(windowNibName: "Updates")
@@ -63,11 +63,11 @@ class UpdatesController: NSWindowController {
                                         updatesWindow!.showWindow([currentVersion,releases])
                                     }
                                     if let statusFunc = callbackFunc {
-                                        statusFunc(status: true, data: data, response: response, error: error)
+                                        statusFunc(true, data, response, error)
                                     }
                                 } else {
                                     if let statusFunc = callbackFunc {
-                                        statusFunc(status: false, data: data, response: response, error: error)
+                                        statusFunc(false, data, response, error)
                                     }
                                 }
                         }
@@ -76,15 +76,15 @@ class UpdatesController: NSWindowController {
                     }
                 } else {
                     if let statusFunc = callbackFunc {
-                        statusFunc(status: false, data: data, response: response, error: error)
+                        statusFunc(false, data, response, error)
                     }
                 }
             } else {
                 if let statusFunc = callbackFunc {
-                    statusFunc(status: false, data: data, response: response, error: error)
+                    statusFunc(false, data, response, error)
                 }
             }
-        }
+        }) 
         
         
         task.resume()
@@ -98,16 +98,16 @@ class UpdatesController: NSWindowController {
     required init?(coder: NSCoder) {
         super.init(coder: coder)
     }
-    override func showWindow(sender: AnyObject?) {
+    override func showWindow(_ sender: Any?) {
         super.showWindow(sender)
-        appIcon.image = NSWorkspace.sharedWorkspace().iconForFile(NSBundle.mainBundle().bundlePath)
+        appIcon.image = NSWorkspace.shared().icon(forFile: Bundle.main.bundlePath)
         var releaseOutput: [String] = []
         if let senderArray = sender as? [AnyObject] {
             if let releases = senderArray[1] as? [[String: AnyObject]],
-                currentVersion = senderArray[0] as? String {
+                let currentVersion = senderArray[0] as? String {
                 for release in releases {
                     if let name = release["name"] as? String,
-                        body = release["body"] as? String {
+                        let body = release["body"] as? String {
                         if latestVersion == nil {
                             latestVersion = name
                         }
@@ -119,28 +119,28 @@ class UpdatesController: NSWindowController {
                 }
                 versionLabel.stringValue = "Version \(latestVersion!) is now available, you have \(currentVersion)."
             }
-            setChangelog(releaseOutput.joinWithSeparator("\n\n"))
+            setChangelog(releaseOutput.joined(separator: "\n\n"))
         }
         
     }
-    func setChangelog(text: String){
-        changelogText.editable = true
+    func setChangelog(_ text: String){
+        changelogText.isEditable = true
         changelogText.string = ""
-        changelogText.insertText(markdownParser.attributedStringFromMarkdownString(text))
-        changelogText.editable = false
+        changelogText.insertText(markdownParser.attributedString(fromMarkdownString: text))
+        changelogText.isEditable = false
     }
     
     //MARK: IBActions
-    @IBAction func skipVersion(sender: NSButton) {
+    @IBAction func skipVersion(_ sender: NSButton) {
         prefs.setValue(latestVersion, forKey: "skipVersion")
         updateWindow.close()
     }
-    @IBAction func remindMeLater(sender: NSButton) {
+    @IBAction func remindMeLater(_ sender: NSButton) {
         prefs.setValue(nil, forKey: "skipVersion")
         updateWindow.close()
     }
-    @IBAction func visitProjectPage(sender: NSButton) {
-        NSWorkspace.sharedWorkspace().openURL(NSURL(string: "http://dantheman827.github.io/ios-app-signer/")!)
+    @IBAction func visitProjectPage(_ sender: NSButton) {
+        NSWorkspace.shared().open(URL(string: "http://dantheman827.github.io/ios-app-signer/")!)
         updateWindow.close()
     }
 }

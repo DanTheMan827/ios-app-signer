@@ -12,40 +12,40 @@ import Cocoa
 class AppDelegate: NSObject, NSApplicationDelegate {
 
     @IBOutlet weak var mainView: MainView!
-    let fileManager = NSFileManager.defaultManager()
+    let fileManager = FileManager.default
     
     
-    func applicationDidFinishLaunching(aNotification: NSNotification) {
+    func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Insert code here to initialize your application
     }
 
-    func applicationWillTerminate(aNotification: NSNotification) {
+    func applicationWillTerminate(_ aNotification: Notification) {
         // Insert code here to tear down your application
-        try? fileManager.removeItemAtPath(Log.logName)
+        try? fileManager.removeItem(atPath: Log.logName)
     }
     
-    func applicationShouldTerminateAfterLastWindowClosed(sender: NSApplication) -> Bool {
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         return true
     }
-    @IBAction func fixSigning(sender: NSMenuItem) {
+    @IBAction func fixSigning(_ sender: NSMenuItem) {
         if let tempFolder = mainView.makeTempFolder() {
             iASShared.fixSigning(tempFolder)
-            try? fileManager.removeItemAtPath(tempFolder)
+            try? fileManager.removeItem(atPath: tempFolder)
             mainView.populateCodesigningCerts()
         }
     }
 
-    @IBAction func nsMenuLinkClick(sender: NSMenuLink) {
-        NSWorkspace.sharedWorkspace().openURL(NSURL(string: sender.url!)!)
+    @IBAction func nsMenuLinkClick(_ sender: NSMenuLink) {
+        NSWorkspace.shared().open(URL(string: sender.url!)!)
     }
-    @IBAction func viewLog(sender: AnyObject) {
-        NSWorkspace.sharedWorkspace().openFile(Log.logName)
+    @IBAction func viewLog(_ sender: AnyObject) {
+        NSWorkspace.shared().openFile(Log.logName)
     }
-    @IBAction func checkForUpdates(sender: NSMenuItem) {
+    @IBAction func checkForUpdates(_ sender: NSMenuItem) {
         UpdatesController.checkForUpdate(forceShow: true)
-        func updateCheckStatus(status: Bool, data: NSData?, response: NSURLResponse?, error: NSError?){
+        func updateCheckStatus(_ status: Bool, data: Data?, response: URLResponse?, error: Error?){
             if status == false {
-                dispatch_async(dispatch_get_main_queue()) {
+                DispatchQueue.main.async {
                     let alert = NSAlert()
                     
                     
