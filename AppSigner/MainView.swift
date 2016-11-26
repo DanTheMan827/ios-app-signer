@@ -489,12 +489,14 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         // Check if input file exists
         var inputIsDirectory: ObjCBool = false
         if !inputStartsWithHTTP && !fileManager.fileExists(atPath: inputFile, isDirectory: &inputIsDirectory){
-            let alert = NSAlert()
-            alert.messageText = "Input file not found"
-            alert.addButton(withTitle: "OK")
-            alert.informativeText = "The file \(inputFile) could not be found"
-            alert.runModal()
-            controlsEnabled(true)
+            DispatchQueue.main.async(execute: {
+                let alert = NSAlert()
+                alert.messageText = "Input file not found"
+                alert.addButton(withTitle: "OK")
+                alert.informativeText = "The file \(inputFile) could not be found"
+                alert.runModal()
+                self.controlsEnabled(true)
+            })
             return
         }
         
@@ -880,15 +882,17 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 //MARK: Codesigning - Verification
                 let verificationTask = Process().execute(codesignPath, workingDirectory: nil, arguments: ["-v",appBundlePath])
                 if verificationTask.status != 0 {
-                    let alert = NSAlert()
-                    alert.addButton(withTitle: "OK")
-                    alert.messageText = "Error verifying code signature!"
-                    alert.informativeText = verificationTask.output
-                    alert.alertStyle = .critical
-                    alert.runModal()
-                    setStatus("Error verifying code signature")
-                    Log.write(verificationTask.output)
-                    cleanup(tempFolder); return
+                    DispatchQueue.main.async(execute: {
+                        let alert = NSAlert()
+                        alert.addButton(withTitle: "OK")
+                        alert.messageText = "Error verifying code signature!"
+                        alert.informativeText = verificationTask.output
+                        alert.alertStyle = .critical
+                        alert.runModal()
+                        self.setStatus("Error verifying code signature")
+                        Log.write(verificationTask.output)
+                        self.cleanup(tempFolder); return
+                    })
                 }
             }
         } catch let error as NSError {
