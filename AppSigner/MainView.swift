@@ -151,8 +151,38 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 }
             }
             setStatus("Ready")
+            if checkXcodeCLI() == false {
+                if #available(OSX 10.10, *) {
+                    let _ = installXcodeCLI()
+                } else {
+                    let alert = NSAlert()
+                    alert.messageText = "Please install the Xcode command line tools and re-launch this application."
+                    alert.runModal()
+                }
+                
+                NSApplication.shared().terminate(self)
+            }
             UpdatesController.checkForUpdate()
         }
+    }
+    
+    func installXcodeCLI() -> AppSignerTaskOutput {
+        return Process().execute("/usr/bin/xcode-select", workingDirectory: nil, arguments: ["--install"])
+    }
+    
+    func checkXcodeCLI() -> Bool {
+        if #available(OSX 10.10, *) {
+            if Process().execute("/usr/bin/xcode-select", workingDirectory: nil, arguments: ["-p"]).status   != 0 {
+                return false
+            }
+        } else {
+            if Process().execute("/usr/sbin/pkgutil", workingDirectory: nil, arguments: ["--pkg-info=com.apple.pkg.DeveloperToolsCLI"]).status != 0 {
+                // Command line tools not available
+                return false
+            }
+        }
+        
+        return true
     }
     
     func makeTempFolder()->String?{
