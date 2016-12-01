@@ -26,14 +26,14 @@ extension String {
         
         get {
             
-            return (self as NSString).stringByDeletingLastPathComponent
+            return (self as NSString).deletingLastPathComponent
         }
     }
     var stringByDeletingPathExtension: String {
         
         get {
             
-            return (self as NSString).stringByDeletingPathExtension
+            return (self as NSString).deletingPathExtension
         }
     }
     var pathComponents: [String] {
@@ -44,17 +44,17 @@ extension String {
         }
     }
     
-    func stringByAppendingPathComponent(path: String) -> String {
+    func stringByAppendingPathComponent(_ path: String) -> String {
         
         let nsSt = self as NSString
         
-        return nsSt.stringByAppendingPathComponent(path)
+        return nsSt.appendingPathComponent(path)
     }
     
-    func stringByAppendingPathExtension(ext: String) -> String? {
+    func stringByAppendingPathExtension(_ ext: String) -> String? {
         
         let nsSt = self as NSString
         
-        return nsSt.stringByAppendingPathExtension(ext)
+        return nsSt.appendingPathExtension(ext)
     }
 }
