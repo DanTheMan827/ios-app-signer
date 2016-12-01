@@ -8,8 +8,8 @@
 
 import Foundation
 class iASShared {
-    static func fixSigning(tempFolder: String){
-        let script = "do shell script \"/bin/bash \\\"\(NSBundle.mainBundle().pathForResource("fix-wwdr", ofType: "sh")!)\\\"\" with administrator privileges"
+    static func fixSigning(_ tempFolder: String){
+        let script = "do shell script \"/bin/bash \\\"\(Bundle.main.path(forResource: "fix-wwdr", ofType: "sh")!)\\\"\" with administrator privileges"
         NSAppleScript(source: script)?.executeAndReturnError(nil)
         //https://developer.apple.com/certificationauthority/AppleWWDRCA.cer
         return

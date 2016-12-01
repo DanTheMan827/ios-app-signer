@@ -15,27 +15,27 @@ struct AppSignerTaskOutput {
         self.output = output
     }
 }
-extension NSTask {
+extension Process {
     func launchSyncronous() -> AppSignerTaskOutput {
-        self.standardInput = NSFileHandle.fileHandleWithNullDevice()
-        let pipe = NSPipe()
+        self.standardInput = FileHandle.nullDevice
+        let pipe = Pipe()
         self.standardOutput = pipe
         self.standardError = pipe
         let pipeFile = pipe.fileHandleForReading
         self.launch()
         
         let data = NSMutableData()
-        while self.running {
-            data.appendData(pipeFile.availableData)
+        while self.isRunning {
+            data.append(pipeFile.availableData)
         }
         
-        let output = NSString(data: data, encoding: NSUTF8StringEncoding) as! String
+        let output = NSString(data: data as Data, encoding: String.Encoding.utf8.rawValue) as! String
         
         return AppSignerTaskOutput(status: self.terminationStatus, output: output)
         
     }
     
-    func execute(launchPath: String, workingDirectory: String?, arguments: [String]?)->AppSignerTaskOutput{
+    func execute(_ launchPath: String, workingDirectory: String?, arguments: [String]?)->AppSignerTaskOutput{
         self.launchPath = launchPath
         if arguments != nil {
             self.arguments = arguments
