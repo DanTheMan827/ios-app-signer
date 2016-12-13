@@ -34,7 +34,7 @@ class UpdatesController: NSWindowController {
         configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
         let session = URLSession(configuration: configuration)
 
-        let task = session.dataTask(with: urlRequest as! URLRequest, completionHandler: {
+        let task = session.dataTask(with: urlRequest as URLRequest, completionHandler: {
             (data, response, error) -> Void in
 
             if error == nil {
@@ -63,11 +63,11 @@ class UpdatesController: NSWindowController {
                                         updatesWindow!.showWindow([currentVersion,releases])
                                     }
                                     if let statusFunc = callbackFunc {
-                                        statusFunc(true, data, response, error as! NSError)
+                                        statusFunc(true, data, response, error as? NSError)
                                     }
                                 } else {
                                     if let statusFunc = callbackFunc {
-                                        statusFunc(false, data, response, error as! NSError)
+                                        statusFunc(false, data, response, error as? NSError)
                                     }
                                 }
                         }
@@ -76,12 +76,12 @@ class UpdatesController: NSWindowController {
                     }
                 } else {
                     if let statusFunc = callbackFunc {
-                        statusFunc(false, data, response, error as! NSError)
+                        statusFunc(false, data, response, error as? NSError)
                     }
                 }
             } else {
                 if let statusFunc = callbackFunc {
-                    statusFunc(false, data, response, error as! NSError)
+                    statusFunc(false, data, response, error as? NSError)
                 }
             }
         })

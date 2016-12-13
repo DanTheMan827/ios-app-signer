@@ -20,6 +20,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     @IBOutlet var NewApplicationIDTextField: NSTextField!
     @IBOutlet var downloadProgress: NSProgressIndicator!
     @IBOutlet var appDisplayName: NSTextField!
+    @IBOutlet var DeviceSupportCheck: NSButton!
     
     
     //MARK: Variables
@@ -213,9 +214,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
             return output
         }
         let rawResult = securityResult.output.components(separatedBy: "\"")
-        
-        var index: Int
-        
+
         for index in stride(from: 0, through: rawResult.count - 2, by: 2) {
             if !(rawResult.count - 1 < index + 1) {
                 output.append(rawResult[index+1])
@@ -472,6 +471,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         let signingCertificate = self.CodesigningCertsPopup.selectedItem?.title
         let newApplicationID = self.NewApplicationIDTextField.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
         let newDisplayName = self.appDisplayName.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+        let removeDeviceSupportConstraints = self.DeviceSupportCheck.state == NSOnState;
         let inputStartsWithHTTP = inputFile.lowercased().substring(to: inputFile.characters.index(inputFile.startIndex, offsetBy: 4)) == "http"
         var eggCount: Int = 0
         var continueSigning: Bool? = nil
@@ -811,6 +811,16 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                         cleanup(tempFolder); return
                     }
                 }
+
+                //MARK: Remove Specific Device Support Information
+                if removeDeviceSupportConstraints{
+                    setStatus("Removing UISupportedDevices key")
+                    let displayNameChangeTask = Process().execute(defaultsPath, workingDirectory: nil, arguments: ["delete",appBundleInfoPlist,"UISupportedDevices"])
+                    if displayNameChangeTask.status != 0 {
+                        setStatus("Error removing UISupportedDevices key, it may not exist.")
+                        Log.write(displayNameChangeTask.output)
+                    }
+                }
                 
                 
                 func generateFileSignFunc(_ payloadDirectory:String, entitlementsPath: String, signingCertificate: String)->((_ file:String)->Void){
@@ -904,6 +914,10 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
             } catch let error as NSError {
                 setStatus("Error deleting output file")
                 Log.write(error.localizedDescription)
+                cleanup(tempFolder); return
+            } catch {
+                setStatus("Error deleting output file")
+                Log.write("An unknown error has occurred.")
                 cleanup(tempFolder); return
             }
         }
