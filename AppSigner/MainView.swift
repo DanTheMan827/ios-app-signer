@@ -196,7 +196,14 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     
     func setStatus(_ status: String){
         Log.write(status)
-        StatusLabel.stringValue = status
+        if (!Thread.isMainThread){
+            DispatchQueue.main.sync{
+                setStatus(status)
+            }
+        }
+        else{
+            StatusLabel.stringValue = status
+        }
     }
     
     func populateProvisioningProfiles(){
@@ -317,27 +324,35 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     }
     
     func controlsEnabled(_ enabled: Bool){
-        if(enabled){
-            InputFileText.isEnabled = true
-            BrowseButton.isEnabled = true
-            ProvisioningProfilesPopup.isEnabled = true
-            CodesigningCertsPopup.isEnabled = true
-            NewApplicationIDTextField.isEnabled = ReEnableNewApplicationID
-            NewApplicationIDTextField.stringValue = PreviousNewApplicationID
-            StartButton.isEnabled = true
-            appDisplayName.isEnabled = true
-        } else {
-            // Backup previous values
-            PreviousNewApplicationID = NewApplicationIDTextField.stringValue
-            ReEnableNewApplicationID = NewApplicationIDTextField.isEnabled
-            
-            InputFileText.isEnabled = false
-            BrowseButton.isEnabled = false
-            ProvisioningProfilesPopup.isEnabled = false
-            CodesigningCertsPopup.isEnabled = false
-            NewApplicationIDTextField.isEnabled = false
-            StartButton.isEnabled = false
-            appDisplayName.isEnabled = false
+        
+        if (!Thread.isMainThread){
+            DispatchQueue.main.sync{
+                controlsEnabled(enabled)
+            }
+        }
+        else{
+            if(enabled){
+                InputFileText.isEnabled = true
+                BrowseButton.isEnabled = true
+                ProvisioningProfilesPopup.isEnabled = true
+                CodesigningCertsPopup.isEnabled = true
+                NewApplicationIDTextField.isEnabled = ReEnableNewApplicationID
+                NewApplicationIDTextField.stringValue = PreviousNewApplicationID
+                StartButton.isEnabled = true
+                appDisplayName.isEnabled = true
+            } else {
+                // Backup previous values
+                PreviousNewApplicationID = NewApplicationIDTextField.stringValue
+                ReEnableNewApplicationID = NewApplicationIDTextField.isEnabled
+                
+                InputFileText.isEnabled = false
+                BrowseButton.isEnabled = false
+                ProvisioningProfilesPopup.isEnabled = false
+                CodesigningCertsPopup.isEnabled = false
+                NewApplicationIDTextField.isEnabled = false
+                StartButton.isEnabled = false
+                appDisplayName.isEnabled = false
+            }
         }
     }
     
@@ -500,13 +515,23 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         
         //MARK: Set up variables
         var warnings = 0
-        var inputFile = InputFileText.stringValue
+        var inputFile : String = ""
+        var signingCertificate : String?
+        var newApplicationID : String = ""
+        var newDisplayName : String = ""
+        var newShortVersion : String = ""
+        var newVersion : String = ""
+
+        DispatchQueue.main.sync {
+            inputFile = self.InputFileText.stringValue
+            signingCertificate = self.CodesigningCertsPopup.selectedItem?.title
+            newApplicationID = self.NewApplicationIDTextField.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+            newDisplayName = self.appDisplayName.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+            newShortVersion = self.appShortVersion.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+            newVersion = self.appVersion.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+        }
+
         var provisioningFile = self.profileFilename
-        let signingCertificate = self.CodesigningCertsPopup.selectedItem?.title
-        let newApplicationID = self.NewApplicationIDTextField.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-        let newDisplayName = self.appDisplayName.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-        let newShortVersion = self.appShortVersion.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-        let newVersion = self.appVersion.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
         let inputStartsWithHTTP = inputFile.lowercased().substring(to: inputFile.characters.index(inputFile.startIndex, offsetBy: 4)) == "http"
         var eggCount: Int = 0
         var continueSigning: Bool? = nil
