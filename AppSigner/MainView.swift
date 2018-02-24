@@ -694,10 +694,10 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
               
               var sourcePath = debPath.stringByAppendingPathComponent("Applications")
               if fileManager.fileExists(atPath: debPath.stringByAppendingPathComponent("var/mobile/Applications")){
-                sourcePath = debPath.stringByAppendingPathComponent("var/mobile/Applications")
+                  sourcePath = debPath.stringByAppendingPathComponent("var/mobile/Applications")
               }
               
-                try fileManager.moveItem(atPath: sourcePath, toPath: payloadDirectory)
+              try fileManager.moveItem(atPath: sourcePath, toPath: payloadDirectory)
                 
             } catch {
                 setStatus("Error processing deb file")
