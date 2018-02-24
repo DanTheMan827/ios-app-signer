@@ -691,7 +691,13 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                     setStatus("Error unpacking data.tar")
                     cleanup(tempFolder); return
                 }
-                try fileManager.moveItem(atPath: debPath.stringByAppendingPathComponent("Applications"), toPath: payloadDirectory)
+              
+              var sourcePath = debPath.stringByAppendingPathComponent("Applications")
+              if fileManager.fileExists(atPath: debPath.stringByAppendingPathComponent("var/mobile/Applications")){
+                sourcePath = debPath.stringByAppendingPathComponent("var/mobile/Applications")
+              }
+              
+                try fileManager.moveItem(atPath: sourcePath, toPath: payloadDirectory)
                 
             } catch {
                 setStatus("Error processing deb file")
