@@ -810,7 +810,10 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                     setStatus("Parsing entitlements")
                     
                     if let profile = ProvisioningProfile(filename: useAppBundleProfile ? appBundleProvisioningFilePath : provisioningFile!){
-                        if let entitlements = profile.getEntitlementsPlist(tempFolder) {
+                        if var entitlements = profile.getEntitlementsPlist(tempFolder) {
+                            if let oldAppID = getPlistKey(appBundleInfoPlist, keyName: "CFBundleIdentifier"){
+                                entitlements = entitlements.replacingOccurrences(of: "*", with: oldAppID) as NSString
+                            }
                             Log.write("–––––––––––––––––––––––\n\(entitlements)")
                             Log.write("–––––––––––––––––––––––")
                             do {
