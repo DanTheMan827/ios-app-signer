@@ -46,6 +46,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     let codesignPath = "/usr/bin/codesign"
     let securityPath = "/usr/bin/security"
     let chmodPath = "/bin/chmod"
+//    let plistbuddyPath = "/usr/libexec/plistbuddy"
     
     //MARK: Drag / Drop
     var fileTypes: [String] = ["ipa","deb","app","xcarchive","mobileprovision"]
@@ -855,6 +856,15 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                             }
                             if Process().execute(defaultsPath, workingDirectory: nil, arguments: ["read", appexPlist,"WKCompanionAppBundleIdentifier"]).status == 0 {
                                 setPlistKey(appexPlist, keyName: "WKCompanionAppBundleIdentifier", value: newApplicationID)
+                            }
+                            // 修复微信改bundleid后安装失败问题
+                            let pluginInfoPlist = NSMutableDictionary(contentsOfFile: appexPlist)
+                            if let dictionaryArray = pluginInfoPlist?["NSExtension"] as? [String:AnyObject],
+                                let attributes : NSMutableDictionary = dictionaryArray["NSExtensionAttributes"] as? NSMutableDictionary,
+                                let wkAppBundleIdentifier = attributes["WKAppBundleIdentifier"] as? String{
+                                let newAppesID = wkAppBundleIdentifier.replacingOccurrences(of:oldAppID, with:newApplicationID);
+                                attributes["WKAppBundleIdentifier"] = newAppesID;
+                                pluginInfoPlist!.write(toFile: appexPlist, atomically: true);
                             }
                             recursiveDirectorySearch(appexFile, extensions: ["app"], found: changeAppexID)
                         }
