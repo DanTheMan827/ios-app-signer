@@ -369,7 +369,11 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                     recursiveDirectorySearch(currentFile, extensions: extensions, found: found)
                 }
                 if extensions.contains(file.pathExtension) {
-                    found(currentFile)
+                    if file.pathExtension != "" || file == "IpaSecurityRestriction" {
+                        found(currentFile)
+                    } else {
+                        //NSLog("couldnt find: %@", file)
+                    }
                 }
                 
             }
@@ -949,7 +953,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 }
                 
                 //MARK: Codesigning - General
-                let signableExtensions = ["dylib","so","0","vis","pvr","framework","appex","app"]
+                let signableExtensions = ["dylib","so","0","vis","pvr","framework","appex","app", ""]
                 
                 //MARK: Codesigning - Eggs
                 let eggSigningFunction = generateFileSignFunc(eggDirectory, entitlementsPath: entitlementsPlist, signingCertificate: signingCertificate!)
