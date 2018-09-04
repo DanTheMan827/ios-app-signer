@@ -447,7 +447,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     //MARK: Codesigning
     func codeSign(_ file: String, certificate: String, entitlements: String?,before:((_ file: String, _ certificate: String, _ entitlements: String?)->Void)?, after: ((_ file: String, _ certificate: String, _ entitlements: String?, _ codesignTask: AppSignerTaskOutput)->Void)?)->AppSignerTaskOutput{
         
-        let useEntitlements: Bool = ({
+        let hasEntitlements: Bool = ({
             if entitlements == nil {
                 return false
             } else {
@@ -459,14 +459,36 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
             }
         })()
         
+        var needEntitlements: Bool = false
+        var filePath = file
+        let fileExtension = file.lastPathComponent.pathExtension
+        if fileExtension == "framework" {
+            // appene execute file in framework
+            let fileName = file.lastPathComponent.stringByDeletingPathExtension
+            filePath = file.stringByAppendingPathComponent(fileName)
+        } else if fileExtension == "app" {
+            // appene execute file in app
+            let fileName = file.lastPathComponent.stringByDeletingPathExtension
+            filePath = file.stringByAppendingPathComponent(fileName)
+            needEntitlements = hasEntitlements
+        } else if fileExtension == "dylib"  {
+            //
+        } else {
+            //
+        }
+        
         if let beforeFunc = before {
             beforeFunc(file, certificate, entitlements)
         }
-        var arguments = ["-vvv","-fs",certificate,"--no-strict"]
-        if useEntitlements {
-            arguments.append("--entitlements=\(entitlements!)")
+        var arguments = [String]()
+        
+        if needEntitlements {
+            arguments.append("--entitlements")
+            arguments.append(entitlements!)
         }
-        arguments.append(file)
+        arguments.append(contentsOf: ["-f", "-s", certificate])
+        arguments.append(filePath)
+        
         let codesignTask = Process().execute(codesignPath, workingDirectory: nil, arguments: arguments)
         if let afterFunc = after {
             afterFunc(file, certificate, entitlements, codesignTask)
