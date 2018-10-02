@@ -22,6 +22,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     @IBOutlet var appDisplayName: NSTextField!
     @IBOutlet var appShortVersion: NSTextField!
     @IBOutlet var appVersion: NSTextField!
+    @IBOutlet var extraSigingFiles: NSTextView!
     
     //MARK: Variables
     var provisioningProfiles:[ProvisioningProfile] = []
@@ -341,6 +342,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 NewApplicationIDTextField.stringValue = PreviousNewApplicationID
                 StartButton.isEnabled = true
                 appDisplayName.isEnabled = true
+                extraSigingFiles.isEditable = true
             } else {
                 // Backup previous values
                 PreviousNewApplicationID = NewApplicationIDTextField.stringValue
@@ -353,11 +355,12 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 NewApplicationIDTextField.isEnabled = false
                 StartButton.isEnabled = false
                 appDisplayName.isEnabled = false
+                extraSigingFiles.isEditable = false
             }
         }
     }
     
-    func recursiveDirectorySearch(_ path: String, extensions: [String], found: ((_ file: String) -> Void)){
+    func recursiveDirectorySearch(_ path: String, extensions: [String], specificFiles: [String]?, found: ((_ file: String) -> Void)){
         
         if let files = try? fileManager.contentsOfDirectory(atPath: path) {
             var isDirectory: ObjCBool = true
@@ -366,12 +369,15 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 let currentFile = path.stringByAppendingPathComponent(file)
                 fileManager.fileExists(atPath: currentFile, isDirectory: &isDirectory)
                 if isDirectory.boolValue {
-                    recursiveDirectorySearch(currentFile, extensions: extensions, found: found)
+                    recursiveDirectorySearch(currentFile, extensions: extensions,specificFiles:specificFiles, found: found)
                 }
                 if extensions.contains(file.pathExtension) {
                     found(currentFile)
                 }
-                
+                else if specificFiles != nil && specificFiles!.contains(file)
+                {
+                    found(currentFile)
+                }
             }
         }
     }
@@ -501,7 +507,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         //MARK: Get output filename
         let saveDialog = NSSavePanel()
         saveDialog.allowedFileTypes = ["ipa"]
-        saveDialog.nameFieldStringValue = InputFileText.stringValue.lastPathComponent.stringByDeletingPathExtension
+        saveDialog.nameFieldStringValue = InputFileText.stringValue.lastPathComponent.stringByDeletingPathExtension + "_resign"
         if saveDialog.runModal() == NSFileHandlingPanelOKButton {
             outputFile = saveDialog.url!.path
             Thread.detachNewThreadSelector(#selector(self.signingThread), toTarget: self, with: nil)
@@ -536,6 +542,11 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         let inputStartsWithHTTP = inputFile.lowercased().substring(to: inputFile.characters.index(inputFile.startIndex, offsetBy: 4)) == "http"
         var eggCount: Int = 0
         var continueSigning: Bool? = nil
+        var specificFiles: [String]? = nil
+        
+        if self.extraSigingFiles.textStorage?.string != "" {
+            specificFiles = self.extraSigingFiles.textStorage?.string .components(separatedBy: .newlines)
+        }
         
         //MARK: Sanity checks
         
@@ -864,9 +875,9 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                                 attributes["WKAppBundleIdentifier"] = newAppesID;
                                 pluginInfoPlist!.write(toFile: appexPlist, atomically: true);
                             }
-                            recursiveDirectorySearch(appexFile, extensions: ["app"], found: changeAppexID)
+                            recursiveDirectorySearch(appexFile, extensions: ["app"], specificFiles: specificFiles, found: changeAppexID)
                         }
-                        recursiveDirectorySearch(appBundlePath, extensions: ["appex"], found: changeAppexID)
+                        recursiveDirectorySearch(appBundlePath, extensions: ["appex"], specificFiles: specificFiles, found: changeAppexID)
                     }
                     
                     setStatus("Changing App ID to \(newApplicationID)")
@@ -961,19 +972,19 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                         Log.write("Error extracting \(shortName)")
                         return
                     }
-                    recursiveDirectorySearch(currentEggPath, extensions: ["egg"], found: signEgg)
-                    recursiveDirectorySearch(currentEggPath, extensions: signableExtensions, found: eggSigningFunction)
+                    recursiveDirectorySearch(currentEggPath, extensions: ["egg"], specificFiles: nil, found: signEgg)
+                    recursiveDirectorySearch(currentEggPath, extensions: signableExtensions, specificFiles: specificFiles, found: eggSigningFunction)
                     setStatus("Compressing \(shortName)")
                     self.zip(currentEggPath, outputFile: eggFile)                    
                 }
                 
-                recursiveDirectorySearch(appBundlePath, extensions: ["egg"], found: signEgg)
+                recursiveDirectorySearch(appBundlePath, extensions: ["egg"], specificFiles: nil, found: signEgg)
                 
                 //MARK: Codesigning - App
                 let signingFunction = generateFileSignFunc(payloadDirectory, entitlementsPath: entitlementsPlist, signingCertificate: signingCertificate!)
                 
                 
-                recursiveDirectorySearch(appBundlePath, extensions: signableExtensions, found: signingFunction)
+                recursiveDirectorySearch(appBundlePath, extensions: signableExtensions, specificFiles: specificFiles, found: signingFunction)
                 signingFunction(appBundlePath)
                 
                 //MARK: Codesigning - Verification
