@@ -22,7 +22,8 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     @IBOutlet var appDisplayName: NSTextField!
     @IBOutlet var appShortVersion: NSTextField!
     @IBOutlet var appVersion: NSTextField!
-    @IBOutlet var extraSigingFiles: NSTextView!
+    @IBOutlet var extraSigingFiles: NSTextField!
+    @IBOutlet var findButton: NSButton!
     
     //MARK: Variables
     var provisioningProfiles:[ProvisioningProfile] = []
@@ -342,7 +343,8 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 NewApplicationIDTextField.stringValue = PreviousNewApplicationID
                 StartButton.isEnabled = true
                 appDisplayName.isEnabled = true
-                extraSigingFiles.isEditable = true
+                extraSigingFiles.isEnabled = true
+                findButton.isEnabled = true
             } else {
                 // Backup previous values
                 PreviousNewApplicationID = NewApplicationIDTextField.stringValue
@@ -355,7 +357,8 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 NewApplicationIDTextField.isEnabled = false
                 StartButton.isEnabled = false
                 appDisplayName.isEnabled = false
-                extraSigingFiles.isEditable = false
+                extraSigingFiles.isEnabled = false
+                findButton.isEnabled = false
             }
         }
     }
@@ -544,8 +547,8 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         var continueSigning: Bool? = nil
         var specificFiles: [String]? = nil
         
-        if self.extraSigingFiles.textStorage?.string != "" {
-            specificFiles = self.extraSigingFiles.textStorage?.string .components(separatedBy: .newlines)
+        if self.extraSigingFiles.stringValue != "" {
+            specificFiles = self.extraSigingFiles.stringValue .components(separatedBy: ",")
         }
         
         //MARK: Sanity checks
@@ -1097,6 +1100,13 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
             default:
                 NSApplication.shared().windows[0].makeFirstResponder(self)
                 startSigning()
+        }
+    }
+    
+    @IBAction func doFind(_ sender: NSButton) {
+        if self.outputFile != nil {
+            let fileURLs = [NSURL .fileURL(withPath: self.outputFile!)]
+            NSWorkspace.shared().activateFileViewerSelecting(fileURLs)
         }
     }
     
