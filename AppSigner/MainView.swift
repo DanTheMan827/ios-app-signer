@@ -307,9 +307,9 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 chooseProvisioningProfile(ProvisioningProfilesPopup)
             }
             if profile.appID.characters.index(of: "*") == nil {
-                // Not a wildcard profile
+                // Not a wildcard profile, who care?
                 NewApplicationIDTextField.stringValue = profile.appID
-                NewApplicationIDTextField.isEnabled = false
+                NewApplicationIDTextField.isEnabled = true
             } else {
                 // Wildcard profile
                 if NewApplicationIDTextField.isEnabled == false {
@@ -824,10 +824,11 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                             setStatus("Unable to read entitlements from provisioning profile")
                             warnings += 1
                         }
-                        if profile.appID != "*" && (newApplicationID != "" && newApplicationID != profile.appID) {
-                            setStatus("Unable to change App ID to \(newApplicationID), provisioning profile won't allow it")
-                            cleanup(tempFolder); return
-                        }
+                        // not a problem
+//                        if profile.appID != "*" && (newApplicationID != "" && newApplicationID != profile.appID) {
+//                            setStatus("Unable to change App ID to \(newApplicationID), provisioning profile won't allow it")
+//                            cleanup(tempFolder); return
+//                        }
                     } else {
                         setStatus("Unable to parse provisioning profile, it may be corrupt")
                         warnings += 1
