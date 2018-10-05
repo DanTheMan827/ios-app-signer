@@ -858,26 +858,28 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                     if let oldAppID = getPlistKey(appBundleInfoPlist, keyName: "CFBundleIdentifier") {
                         func changeAppexID(_ appexFile: String){
                             let appexPlist = appexFile.stringByAppendingPathComponent("Info.plist")
-                            if let appexBundleID = getPlistKey(appexPlist, keyName: "CFBundleIdentifier"){
-                                let newAppexID = "\(newApplicationID)\(appexBundleID.substring(from: oldAppID.endIndex))"
-                                setStatus("Changing \(appexFile) id to \(newAppexID)")
-                                setPlistKey(appexPlist, keyName: "CFBundleIdentifier", value: newAppexID)
-                            }
-                            if Process().execute(defaultsPath, workingDirectory: nil, arguments: ["read", appexPlist,"WKCompanionAppBundleIdentifier"]).status == 0 {
-                                setPlistKey(appexPlist, keyName: "WKCompanionAppBundleIdentifier", value: newApplicationID)
-                            }
                             // 修复微信改bundleid后安装失败问题
                             let pluginInfoPlist = NSMutableDictionary(contentsOfFile: appexPlist)
+                            if let appexBundleID = pluginInfoPlist?["CFBundleIdentifier"] as? String{
+                                let newAppexID = appexBundleID.replacingOccurrences(of:oldAppID, with:newApplicationID)
+                                setStatus("Changing \(appexFile) id to \(newAppexID)")
+                                pluginInfoPlist?["CFBundleIdentifier"] = newAppexID
+                            }
+                            if (pluginInfoPlist?["WKCompanionAppBundleIdentifier"] as? String) != nil {
+                                pluginInfoPlist?["WKCompanionAppBundleIdentifier"] = newApplicationID
+                            }
+                            
                             if let dictionaryArray = pluginInfoPlist?["NSExtension"] as? [String:AnyObject],
                                 let attributes : NSMutableDictionary = dictionaryArray["NSExtensionAttributes"] as? NSMutableDictionary,
                                 let wkAppBundleIdentifier = attributes["WKAppBundleIdentifier"] as? String{
-                                let newAppesID = wkAppBundleIdentifier.replacingOccurrences(of:oldAppID, with:newApplicationID);
-                                attributes["WKAppBundleIdentifier"] = newAppesID;
-                                pluginInfoPlist!.write(toFile: appexPlist, atomically: true);
+                                let newAppexID = wkAppBundleIdentifier.replacingOccurrences(of:oldAppID, with:newApplicationID)
+                                attributes["WKAppBundleIdentifier"] = newAppexID
                             }
-                            recursiveDirectorySearch(appexFile, extensions: ["app"], specificFiles: specificFiles, found: changeAppexID)
+                            
+                            pluginInfoPlist!.write(toFile: appexPlist, atomically: true)
                         }
-                        recursiveDirectorySearch(appBundlePath, extensions: ["appex"], specificFiles: specificFiles, found: changeAppexID)
+                        recursiveDirectorySearch(appBundlePath, extensions: ["app"], specificFiles: nil, found: changeAppexID)
+                        recursiveDirectorySearch(appBundlePath, extensions: ["appex"], specificFiles: nil, found: changeAppexID)
                     }
                     
                     setStatus("Changing App ID to \(newApplicationID)")
