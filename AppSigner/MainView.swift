@@ -250,7 +250,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     func getCodesigningCerts() -> [String] {
         var output: [String] = []
         let securityResult = Process().execute(securityPath, workingDirectory: nil, arguments: ["find-identity","-v","-p","codesigning"])
-        if securityResult.output.characters.count < 1 {
+        if securityResult.output.count < 1 {
             return output
         }
         let rawResult = securityResult.output.components(separatedBy: "\"")
@@ -305,7 +305,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 setStatus("Provisioning profile expired")
                 chooseProvisioningProfile(ProvisioningProfilesPopup)
             }
-            if profile.appID.characters.index(of: "*") == nil {
+            if profile.appID.index(of: "*") == nil {
                 // Not a wildcard profile
                 NewApplicationIDTextField.stringValue = profile.appID
                 NewApplicationIDTextField.isEnabled = false
@@ -356,6 +356,23 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         }
     }
     
+    func recursiveMachOSearch(_ path: String, found: ((_ file: String) -> Void)){
+        if let files = try? fileManager.contentsOfDirectory(atPath: path) {
+            var isDirectory: ObjCBool = true
+            
+            for file in files {
+                let currentFile = path.stringByAppendingPathComponent(file)
+                fileManager.fileExists(atPath: currentFile, isDirectory: &isDirectory)
+                if isDirectory.boolValue {
+                    recursiveMachOSearch(currentFile, found: found)
+                }
+                if checkMachOFile(path) {
+                    found(currentFile)
+                }
+            }
+        }
+    }
+    
     func recursiveDirectorySearch(_ path: String, extensions: [String], found: ((_ file: String) -> Void)){
         
         if let files = try? fileManager.contentsOfDirectory(atPath: path) {
@@ -373,6 +390,13 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 
             }
         }
+    }
+    
+    /// check if Mach-O文件
+    func checkMachOFile(_ path: String) -> Bool {
+        let task = Process().execute("/usr/bin/file", workingDirectory: nil, arguments: [path])
+        let fileContent = task.output.replacingOccurrences(of: "\(path): ", with: "")
+        return fileContent.starts(with: "Mach-O")
     }
     
     func unzip(_ inputFile: String, outputPath: String)->AppSignerTaskOutput {
@@ -407,7 +431,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     func getPlistKey(_ plist: String, keyName: String)->String? {
         let currTask = Process().execute(defaultsPath, workingDirectory: nil, arguments: ["read", plist, keyName])
         if currTask.status == 0 {
-            return String(currTask.output.characters.dropLast())
+            return String(currTask.output.dropLast())
         } else {
             return nil
         }
@@ -445,6 +469,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     }
     
     //MARK: Codesigning
+    @discardableResult
     func codeSign(_ file: String, certificate: String, entitlements: String?,before:((_ file: String, _ certificate: String, _ entitlements: String?)->Void)?, after: ((_ file: String, _ certificate: String, _ entitlements: String?, _ codesignTask: AppSignerTaskOutput)->Void)?)->AppSignerTaskOutput{
         
         let hasEntitlements: Bool = ({
@@ -471,8 +496,6 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
             let fileName = file.lastPathComponent.stringByDeletingPathExtension
             filePath = file.stringByAppendingPathComponent(fileName)
             needEntitlements = hasEntitlements
-        } else if fileExtension == "dylib"  {
-            //
         } else {
             //
         }
@@ -554,7 +577,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         }
 
         var provisioningFile = self.profileFilename
-        let inputStartsWithHTTP = inputFile.lowercased().substring(to: inputFile.characters.index(inputFile.startIndex, offsetBy: 4)) == "http"
+        let inputStartsWithHTTP = inputFile.lowercased().substring(to: inputFile.index(inputFile.startIndex, offsetBy: 4)) == "http"
         var eggCount: Int = 0
         var continueSigning: Bool? = nil
         
@@ -858,7 +881,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 
                 //MARK: Make sure that the executable is well... executable.
                 if let bundleExecutable = getPlistKey(appBundleInfoPlist, keyName: "CFBundleExecutable"){
-                    Process().execute(chmodPath, workingDirectory: nil, arguments: ["755", appBundlePath.stringByAppendingPathComponent(bundleExecutable)])
+                    _ = Process().execute(chmodPath, workingDirectory: nil, arguments: ["755", appBundlePath.stringByAppendingPathComponent(bundleExecutable)])
                 }
                 
                 //MARK: Change Application ID
@@ -870,10 +893,10 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                             if let appexBundleID = getPlistKey(appexPlist, keyName: "CFBundleIdentifier"){
                                 let newAppexID = "\(newApplicationID)\(appexBundleID.substring(from: oldAppID.endIndex))"
                                 setStatus("Changing \(appexFile) id to \(newAppexID)")
-                                setPlistKey(appexPlist, keyName: "CFBundleIdentifier", value: newAppexID)
+                                _ = setPlistKey(appexPlist, keyName: "CFBundleIdentifier", value: newAppexID)
                             }
                             if Process().execute(defaultsPath, workingDirectory: nil, arguments: ["read", appexPlist,"WKCompanionAppBundleIdentifier"]).status == 0 {
-                                setPlistKey(appexPlist, keyName: "WKCompanionAppBundleIdentifier", value: newApplicationID)
+                                _ = setPlistKey(appexPlist, keyName: "WKCompanionAppBundleIdentifier", value: newApplicationID)
                             }
                             recursiveDirectorySearch(appexFile, extensions: ["app"], found: changeAppexID)
                         }
@@ -887,8 +910,6 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                         Log.write(IDChangeTask.output)
                         cleanup(tempFolder); return
                     }
-                    
-                    
                 }
                 
                 //MARK: Change Display Name
@@ -957,9 +978,6 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                     return output
                 }
                 
-                //MARK: Codesigning - General
-                let signableExtensions = ["dylib","so","0","vis","pvr","framework","appex","app"]
-                
                 //MARK: Codesigning - Eggs
                 let eggSigningFunction = generateFileSignFunc(eggDirectory, entitlementsPath: entitlementsPlist, signingCertificate: signingCertificate!)
                 func signEgg(_ eggFile: String){
@@ -973,9 +991,9 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                         return
                     }
                     recursiveDirectorySearch(currentEggPath, extensions: ["egg"], found: signEgg)
-                    recursiveDirectorySearch(currentEggPath, extensions: signableExtensions, found: eggSigningFunction)
+                    recursiveMachOSearch(currentEggPath, found: eggSigningFunction)
                     setStatus("Compressing \(shortName)")
-                    self.zip(currentEggPath, outputFile: eggFile)                    
+                    _ = self.zip(currentEggPath, outputFile: eggFile)                    
                 }
                 
                 recursiveDirectorySearch(appBundlePath, extensions: ["egg"], found: signEgg)
@@ -984,7 +1002,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 let signingFunction = generateFileSignFunc(payloadDirectory, entitlementsPath: entitlementsPlist, signingCertificate: signingCertificate!)
                 
                 
-                recursiveDirectorySearch(appBundlePath, extensions: signableExtensions, found: signingFunction)
+                recursiveMachOSearch(appBundlePath, found: signingFunction)
                 signingFunction(appBundlePath)
                 
                 //MARK: Codesigning - Verification
@@ -1030,7 +1048,6 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         setStatus("Done, output at \(outputFile!)")
     }
 
-    
     //MARK: IBActions
     @IBAction func chooseProvisioningProfile(_ sender: NSPopUpButton) {
         
