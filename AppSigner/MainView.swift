@@ -366,7 +366,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 if isDirectory.boolValue {
                     recursiveMachOSearch(currentFile, found: found)
                 }
-                if checkMachOFile(path) {
+                if checkMachOFile(currentFile) {
                     found(currentFile)
                 }
             }
@@ -392,7 +392,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         }
     }
     
-    /// check if Mach-O文件
+    /// check if Mach-O file
     func checkMachOFile(_ path: String) -> Bool {
         let task = Process().execute("/usr/bin/file", workingDirectory: nil, arguments: [path])
         let fileContent = task.output.replacingOccurrences(of: "\(path): ", with: "")
