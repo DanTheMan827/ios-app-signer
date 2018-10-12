@@ -387,10 +387,10 @@ class AppSigner {
                 cleanup(tempFolder); return
             }
         }
-        Logger.log("Packaging IPA")
+        Logger.log("Packaging IPA: \(outputFile)")
         let zipTask = self.zip(workingDirectory, outputFile: outputFile!)
         if zipTask.status != 0 {
-            Logger.log("Error packaging IPA")
+            Logger.log("Error packaging IPA, \(zipTask.status) \(zipTask.output)")
         }
         //MARK: Cleanup
         cleanup(tempFolder)
