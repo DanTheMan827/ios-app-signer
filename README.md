@@ -3,6 +3,10 @@ This is an app for OS X that can (re)sign apps and bundle them into ipa files th
 
 Supported input types are: ipa, deb, app, xcarchive
 
+## Addition
+* fix framework sign bug
+* Command Line Target
+
 Usage
 ------
 This app requires Xcode to be installed, it has only been successfully tested on OS X 10.11 at this time.
