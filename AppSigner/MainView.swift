@@ -24,7 +24,8 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     @IBOutlet var appVersion: NSTextField!
     
     //MARK: Variables
-    var provisioningProfiles:[ProvisioningProfile] = []
+    var provisioningProfiles: [ProvisioningProfile] = []
+    var allProvisioningProfiles: [ProvisioningProfile] = []
     var codesigningCerts: [String] = []
     var profileFilename: String?
     var ReEnableNewApplicationID = false
@@ -149,6 +150,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 if codesigningCerts.contains(defaultCert) {
                     Log.write("Loaded Codesigning Certificate from Defaults: \(defaultCert)")
                     CodesigningCertsPopup.selectItem(withTitle: defaultCert)
+                    self.chooseSigningCertificate(self.CodesigningCertsPopup)
                 }
             }
             setStatus("Ready")
@@ -208,42 +210,33 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     
     func populateProvisioningProfiles(){
         let zeroWidthSpace = "​"
-        self.provisioningProfiles = ProvisioningProfile.getProfiles().sorted {
+        let profiles = ProvisioningProfile.getProfiles().sorted {
             ($0.name == $1.name && $0.created.timeIntervalSince1970 > $1.created.timeIntervalSince1970) || $0.name < $1.name
         }
-        setStatus("Found \(provisioningProfiles.count) Provisioning Profile\(provisioningProfiles.count>1 || provisioningProfiles.count<1 ? "s":"")")
-        ProvisioningProfilesPopup.removeAllItems()
-        ProvisioningProfilesPopup.addItems(withTitles: [
+        setStatus("Found \(profiles.count) Provisioning Profile\(profiles.count>1 || profiles.count<1 ? "s":"")")
+        self.ProvisioningProfilesPopup.removeAllItems()
+        
+        self.ProvisioningProfilesPopup.addItems(withTitles: [
             "Re-Sign Only",
             "Choose Custom File",
             "––––––––––––––––––––––"
-        ])
+            ])
+        
         let formatter = DateFormatter()
         formatter.dateStyle = .short
         formatter.timeStyle = .medium
         var newProfiles: [ProvisioningProfile] = []
         var zeroWidthPadding: String = ""
-        for profile in provisioningProfiles {
+        for profile in profiles {
             zeroWidthPadding = "\(zeroWidthPadding)\(zeroWidthSpace)"
             if profile.expires.timeIntervalSince1970 > Date().timeIntervalSince1970 {
                 newProfiles.append(profile)
-                
-                ProvisioningProfilesPopup.addItem(withTitle: "\(profile.name)\(zeroWidthPadding) (\(profile.teamID))")
-                
-                let toolTipItems = [
-                    "\(profile.name)",
-                    "",
-                    "Team ID: \(profile.teamID)",
-                    "Created: \(formatter.string(from: profile.created as Date))",
-                    "Expires: \(formatter.string(from: profile.expires as Date))"
-                ]
-                ProvisioningProfilesPopup.lastItem!.toolTip = toolTipItems.joined(separator: "\n")
                 setStatus("Added profile \(profile.appID), expires (\(formatter.string(from: profile.expires as Date)))")
             } else {
                 setStatus("Skipped profile \(profile.appID), expired (\(formatter.string(from: profile.expires as Date)))")
             }
         }
-        self.provisioningProfiles = newProfiles
+        self.allProvisioningProfiles = newProfiles
         chooseProvisioningProfile(ProvisioningProfilesPopup)
     }
     
@@ -254,8 +247,6 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
             return output
         }
         let rawResult = securityResult.output.components(separatedBy: "\"")
-        
-        var index: Int
         
         for index in stride(from: 0, through: rawResult.count - 2, by: 2) {
             if !(rawResult.count - 1 < index + 1) {
@@ -1103,7 +1094,46 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     @IBAction func chooseSigningCertificate(_ sender: NSPopUpButton) {
         Log.write("Set Codesigning Certificate Default to: \(sender.stringValue)")
         defaults.setValue(sender.selectedItem?.title, forKey: "signingCertificate")
+        
+        if let teamId = sender.selectedItem!.title.regexGetSub(pattern: "\\([\\d\\w]+\\)$").first {
+            let codeSignTeamId = teamId.trimmingCharacters(in: CharacterSet(charactersIn: "()"))
+            
+            let formatter = DateFormatter()
+            formatter.dateStyle = .short
+            formatter.timeStyle = .medium
+            
+            let zeroWidthSpace = ""
+            var zeroWidthPadding: String = ""
+            self.ProvisioningProfilesPopup.removeAllItems()
+            
+            self.ProvisioningProfilesPopup.addItems(withTitles: [
+                "Re-Sign Only",
+                "Choose Custom File",
+                "––––––––––––––––––––––"
+            ])
+            self.provisioningProfiles.removeAll()
+            self.allProvisioningProfiles.forEach { (profile) in
+                if codeSignTeamId == profile.teamID {
+                    zeroWidthPadding = "\(zeroWidthPadding)\(zeroWidthSpace)"
+                    if profile.expires.timeIntervalSince1970 > Date().timeIntervalSince1970 {
+                        self.provisioningProfiles.append(profile)
+                        self.ProvisioningProfilesPopup.addItem(withTitle: "\(profile.name)\(zeroWidthPadding) (\(profile.teamID))")
+
+                        let toolTipItems = [
+                            "\(profile.name)",
+                            "",
+                            "Team ID: \(profile.teamID)",
+                            "Created: \(formatter.string(from: profile.created as Date))",
+                            "Expires: \(formatter.string(from: profile.expires as Date))"
+                        ]
+                        ProvisioningProfilesPopup.lastItem!.toolTip = toolTipItems.joined(separator: "\n")
+                    }
+                }
+            }
+        }
     }
+    
+   
     
     @IBAction func doSign(_ sender: NSButton) {
         switch(true){
@@ -1127,3 +1157,16 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     
 }
 
+extension String {
+    func regexGetSub(pattern: String) -> [String] {
+        var subStr = [String]()
+        let regex = try! NSRegularExpression(pattern: pattern, options:[NSRegularExpression.Options.caseInsensitive])
+        let results = regex.matches(in: self, options: NSRegularExpression.MatchingOptions.init(rawValue: 0), range: NSMakeRange(0, self.characters.count))
+        //解析出子串
+        for  rst in results {
+            let nsStr = self as  NSString  //可以方便通过range获取子串
+            subStr.append(nsStr.substring(with: rst.range))
+        }
+        return subStr
+    }
+}
