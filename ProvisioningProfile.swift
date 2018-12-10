@@ -38,8 +38,22 @@ struct ProvisioningProfile {
                 }
         }
 
-        
-        return output;
+        // distinct
+        output = output.sorted(by: {
+            $0.created.timeIntervalSince1970 > $1.created.timeIntervalSince1970
+        })
+
+        var newProfiles = [ProvisioningProfile]()
+        var names = [String]()
+        for profile in output {
+            if !names.contains(profile.name) {
+                newProfiles.append(profile)
+                names.append(profile.name)
+                NSLog("\(profile.name), \(profile.created)")
+            }
+        }
+        return newProfiles;
+        return output
     }
     
     init?(filename: String){
