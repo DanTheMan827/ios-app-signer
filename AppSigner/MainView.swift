@@ -536,7 +536,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         //MARK: Get output filename
         let saveDialog = NSSavePanel()
         saveDialog.allowedFileTypes = ["ipa"]
-        saveDialog.nameFieldStringValue = InputFileText.stringValue.lastPathComponent.stringByDeletingPathExtension
+        saveDialog.nameFieldStringValue = "\(InputFileText.stringValue.lastPathComponent.stringByDeletingPathExtension)_resign"
         if saveDialog.runModal() == NSFileHandlingPanelOKButton {
             outputFile = saveDialog.url!.path
             Thread.detachNewThreadSelector(#selector(self.signingThread), toTarget: self, with: nil)
