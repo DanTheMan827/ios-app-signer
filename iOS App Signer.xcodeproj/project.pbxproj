@@ -1,0 +1,408 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		652408CC1BE743D4006FA4C6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652408CB1BE743D4006FA4C6 /* AppDelegate.swift */; };
+		652408CE1BE743D4006FA4C6 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652408CD1BE743D4006FA4C6 /* MainView.swift */; };
+		652408D01BE743D4006FA4C6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 652408CF1BE743D4006FA4C6 /* Assets.xcassets */; };
+		65311EAE1BF8259000516EFD /* NSMenuLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65311EAD1BF8259000516EFD /* NSMenuLink.swift */; };
+		65311EB01BF835F100516EFD /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65311EAF1BF835F100516EFD /* Log.swift */; };
+		65311EB61BF88EB800516EFD /* Application.xib in Resources */ = {isa = PBXBuildFile; fileRef = 65311EB51BF88EB800516EFD /* Application.xib */; };
+		655FFF9D1BE9B3E300D43AD8 /* NSTask-execute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655FFF9C1BE9B3E300D43AD8 /* NSTask-execute.swift */; };
+		655FFF9F1BE9BA9D00D43AD8 /* StringByAppendingPathComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655FFF9E1BE9BA9D00D43AD8 /* StringByAppendingPathComponent.swift */; };
+		655FFFA21BEAD93600D43AD8 /* ProvisioningProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655FFFA11BEAD93600D43AD8 /* ProvisioningProfile.swift */; };
+		659734941C65A14300383D2D /* Updates.xib in Resources */ = {isa = PBXBuildFile; fileRef = 659734931C65A14300383D2D /* Updates.xib */; };
+		659734961C65A1E800383D2D /* UpdatesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659734951C65A1E800383D2D /* UpdatesController.swift */; };
+		659734A01C65B5F600383D2D /* MarkdownTokenizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 6597349A1C65B5F600383D2D /* MarkdownTokenizer.m */; };
+		659734A11C65B5F600383D2D /* MarkdownTokens.m in Sources */ = {isa = PBXBuildFile; fileRef = 6597349C1C65B5F600383D2D /* MarkdownTokens.m */; };
+		659734A21C65B5F600383D2D /* NSAttributedStringMarkdownParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 6597349F1C65B5F600383D2D /* NSAttributedStringMarkdownParser.m */; };
+		659734A71C65B94F00383D2D /* fmemopen.c in Sources */ = {isa = PBXBuildFile; fileRef = 659734A41C65B94F00383D2D /* fmemopen.c */; };
+		65B2EAA21CDE981500D02053 /* iASShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B2EAA11CDE981500D02053 /* iASShared.swift */; };
+		65CED3A32D8B6F3E00E9185B /* fix-wwdr.sh in Resources */ = {isa = PBXBuildFile; fileRef = 65CED3A22D8B6F3E00E9185B /* fix-wwdr.sh */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		652408C81BE743D4006FA4C6 /* iOS App Signer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "iOS App Signer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		652408CB1BE743D4006FA4C6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		652408CD1BE743D4006FA4C6 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		652408CF1BE743D4006FA4C6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		652408D41BE743D4006FA4C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		65311EAD1BF8259000516EFD /* NSMenuLink.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSMenuLink.swift; sourceTree = "<group>"; };
+		65311EAF1BF835F100516EFD /* Log.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
+		65311EB51BF88EB800516EFD /* Application.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Application.xib; sourceTree = "<group>"; };
+		655FFF9C1BE9B3E300D43AD8 /* NSTask-execute.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSTask-execute.swift"; sourceTree = "<group>"; };
+		655FFF9E1BE9BA9D00D43AD8 /* StringByAppendingPathComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringByAppendingPathComponent.swift; sourceTree = "<group>"; };
+		655FFFA11BEAD93600D43AD8 /* ProvisioningProfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProvisioningProfile.swift; sourceTree = "<group>"; };
+		659734931C65A14300383D2D /* Updates.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Updates.xib; sourceTree = "<group>"; };
+		659734951C65A1E800383D2D /* UpdatesController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UpdatesController.swift; sourceTree = "<group>"; };
+		659734991C65B5F500383D2D /* iOS App Signer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "iOS App Signer-Bridging-Header.h"; sourceTree = "<group>"; };
+		6597349A1C65B5F600383D2D /* MarkdownTokenizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MarkdownTokenizer.m; path = NimbusKit/markdown/MarkdownTokenizer.m; sourceTree = "<group>"; };
+		6597349B1C65B5F600383D2D /* MarkdownTokens.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MarkdownTokens.h; path = NimbusKit/markdown/MarkdownTokens.h; sourceTree = "<group>"; };
+		6597349C1C65B5F600383D2D /* MarkdownTokens.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MarkdownTokens.m; path = NimbusKit/markdown/MarkdownTokens.m; sourceTree = "<group>"; };
+		6597349D1C65B5F600383D2D /* NimbusMarkdown.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NimbusMarkdown.h; path = NimbusKit/markdown/NimbusMarkdown.h; sourceTree = "<group>"; };
+		6597349E1C65B5F600383D2D /* NSAttributedStringMarkdownParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSAttributedStringMarkdownParser.h; path = NimbusKit/markdown/NSAttributedStringMarkdownParser.h; sourceTree = "<group>"; };
+		6597349F1C65B5F600383D2D /* NSAttributedStringMarkdownParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NSAttributedStringMarkdownParser.m; path = NimbusKit/markdown/NSAttributedStringMarkdownParser.m; sourceTree = "<group>"; };
+		659734A41C65B94F00383D2D /* fmemopen.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = fmemopen.c; path = NimbusKit/memorymapping/fmemopen.c; sourceTree = "<group>"; };
+		659734A51C65B94F00383D2D /* fmemopen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fmemopen.h; path = NimbusKit/memorymapping/fmemopen.h; sourceTree = "<group>"; };
+		659734A61C65B94F00383D2D /* NimbusMemoryMapping.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NimbusMemoryMapping.h; path = NimbusKit/memorymapping/NimbusMemoryMapping.h; sourceTree = "<group>"; };
+		65B24E0D1BECB30D005D2068 /* AppSigner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = AppSigner.entitlements; sourceTree = "<group>"; };
+		65B2EAA11CDE981500D02053 /* iASShared.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = iASShared.swift; path = AppSigner/Classes/iASShared.swift; sourceTree = "<group>"; };
+		65CED3A22D8B6F3E00E9185B /* fix-wwdr.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = "fix-wwdr.sh"; path = "Resources/fix-wwdr.sh"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		652408C51BE743D4006FA4C6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		652408BF1BE743D4006FA4C6 = {
+			isa = PBXGroup;
+			children = (
+				659734971C65B5B900383D2D /* NimbusKit */,
+				652408CA1BE743D4006FA4C6 /* AppSigner */,
+				652408C91BE743D4006FA4C6 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		652408C91BE743D4006FA4C6 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				652408C81BE743D4006FA4C6 /* iOS App Signer.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		652408CA1BE743D4006FA4C6 /* AppSigner */ = {
+			isa = PBXGroup;
+			children = (
+				65CED3A12D8B6F1B00E9185B /* Resources */,
+				655FFFDF1BEB270200D43AD8 /* Extensions */,
+				655FFFA01BEAD90800D43AD8 /* Classes */,
+				65311EB51BF88EB800516EFD /* Application.xib */,
+				659734931C65A14300383D2D /* Updates.xib */,
+				659734951C65A1E800383D2D /* UpdatesController.swift */,
+				65B24E0D1BECB30D005D2068 /* AppSigner.entitlements */,
+				652408CB1BE743D4006FA4C6 /* AppDelegate.swift */,
+				652408CD1BE743D4006FA4C6 /* MainView.swift */,
+				652408CF1BE743D4006FA4C6 /* Assets.xcassets */,
+				652408D41BE743D4006FA4C6 /* Info.plist */,
+			);
+			path = AppSigner;
+			sourceTree = "<group>";
+		};
+		655FFFA01BEAD90800D43AD8 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				655FFFA11BEAD93600D43AD8 /* ProvisioningProfile.swift */,
+				65311EAF1BF835F100516EFD /* Log.swift */,
+				65311EAD1BF8259000516EFD /* NSMenuLink.swift */,
+				65B2EAA11CDE981500D02053 /* iASShared.swift */,
+			);
+			name = Classes;
+			path = ..;
+			sourceTree = "<group>";
+		};
+		655FFFDF1BEB270200D43AD8 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				655FFF9C1BE9B3E300D43AD8 /* NSTask-execute.swift */,
+				655FFF9E1BE9BA9D00D43AD8 /* StringByAppendingPathComponent.swift */,
+			);
+			name = Extensions;
+			path = ..;
+			sourceTree = "<group>";
+		};
+		659734971C65B5B900383D2D /* NimbusKit */ = {
+			isa = PBXGroup;
+			children = (
+				659734A31C65B93E00383D2D /* memorymapping */,
+				659734981C65B5C200383D2D /* markdown */,
+			);
+			name = NimbusKit;
+			sourceTree = "<group>";
+		};
+		659734981C65B5C200383D2D /* markdown */ = {
+			isa = PBXGroup;
+			children = (
+				6597349A1C65B5F600383D2D /* MarkdownTokenizer.m */,
+				6597349B1C65B5F600383D2D /* MarkdownTokens.h */,
+				6597349C1C65B5F600383D2D /* MarkdownTokens.m */,
+				6597349D1C65B5F600383D2D /* NimbusMarkdown.h */,
+				6597349E1C65B5F600383D2D /* NSAttributedStringMarkdownParser.h */,
+				6597349F1C65B5F600383D2D /* NSAttributedStringMarkdownParser.m */,
+				659734991C65B5F500383D2D /* iOS App Signer-Bridging-Header.h */,
+			);
+			name = markdown;
+			sourceTree = "<group>";
+		};
+		659734A31C65B93E00383D2D /* memorymapping */ = {
+			isa = PBXGroup;
+			children = (
+				659734A41C65B94F00383D2D /* fmemopen.c */,
+				659734A51C65B94F00383D2D /* fmemopen.h */,
+				659734A61C65B94F00383D2D /* NimbusMemoryMapping.h */,
+			);
+			name = memorymapping;
+			sourceTree = "<group>";
+		};
+		65CED3A12D8B6F1B00E9185B /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				65CED3A22D8B6F3E00E9185B /* fix-wwdr.sh */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		652408C71BE743D4006FA4C6 /* iOS App Signer */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 652408ED1BE743D4006FA4C6 /* Build configuration list for PBXNativeTarget "iOS App Signer" */;
+			buildPhases = (
+				652408C41BE743D4006FA4C6 /* Sources */,
+				652408C51BE743D4006FA4C6 /* Frameworks */,
+				652408C61BE743D4006FA4C6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "iOS App Signer";
+			productName = AppSigner;
+			productReference = 652408C81BE743D4006FA4C6 /* iOS App Signer.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		652408C01BE743D4006FA4C6 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0720;
+				LastUpgradeCheck = 0810;
+				ORGANIZATIONNAME = "Daniel Radtke";
+				TargetAttributes = {
+					652408C71BE743D4006FA4C6 = {
+						CreatedOnToolsVersion = 7.1;
+						DevelopmentTeam = 7PM929Z8M2;
+						LastSwiftMigration = 0810;
+						SystemCapabilities = {
+							com.apple.Sandbox = {
+								enabled = 0;
+							};
+						};
+					};
+				};
+			};
+			buildConfigurationList = 652408C31BE743D4006FA4C6 /* Build configuration list for PBXProject "iOS App Signer" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				English,
+				en,
+				Base,
+			);
+			mainGroup = 652408BF1BE743D4006FA4C6;
+			productRefGroup = 652408C91BE743D4006FA4C6 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				652408C71BE743D4006FA4C6 /* iOS App Signer */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		652408C61BE743D4006FA4C6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				65CED3A32D8B6F3E00E9185B /* fix-wwdr.sh in Resources */,
+				65311EB61BF88EB800516EFD /* Application.xib in Resources */,
+				652408D01BE743D4006FA4C6 /* Assets.xcassets in Resources */,
+				659734941C65A14300383D2D /* Updates.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		652408C41BE743D4006FA4C6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				659734A01C65B5F600383D2D /* MarkdownTokenizer.m in Sources */,
+				652408CE1BE743D4006FA4C6 /* MainView.swift in Sources */,
+				659734A71C65B94F00383D2D /* fmemopen.c in Sources */,
+				65311EB01BF835F100516EFD /* Log.swift in Sources */,
+				655FFF9F1BE9BA9D00D43AD8 /* StringByAppendingPathComponent.swift in Sources */,
+				659734A11C65B5F600383D2D /* MarkdownTokens.m in Sources */,
+				652408CC1BE743D4006FA4C6 /* AppDelegate.swift in Sources */,
+				659734961C65A1E800383D2D /* UpdatesController.swift in Sources */,
+				65311EAE1BF8259000516EFD /* NSMenuLink.swift in Sources */,
+				655FFF9D1BE9B3E300D43AD8 /* NSTask-execute.swift in Sources */,
+				659734A21C65B5F600383D2D /* NSAttributedStringMarkdownParser.m in Sources */,
+				655FFFA21BEAD93600D43AD8 /* ProvisioningProfile.swift in Sources */,
+				65B2EAA21CDE981500D02053 /* iASShared.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		652408EB1BE743D4006FA4C6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		652408EC1BE743D4006FA4C6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+			};
+			name = Release;
+		};
+		652408EE1BE743D4006FA4C6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = AppSigner/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PRODUCT_BUNDLE_IDENTIFIER = com.DanTheMan827.AppSigner;
+				PRODUCT_NAME = "iOS App Signer";
+				SWIFT_OBJC_BRIDGING_HEADER = "iOS App Signer-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.0;
+			};
+			name = Debug;
+		};
+		652408EF1BE743D4006FA4C6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = AppSigner/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PRODUCT_BUNDLE_IDENTIFIER = com.DanTheMan827.AppSigner;
+				PRODUCT_NAME = "iOS App Signer";
+				SWIFT_OBJC_BRIDGING_HEADER = "iOS App Signer-Bridging-Header.h";
+				SWIFT_VERSION = 4.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		652408C31BE743D4006FA4C6 /* Build configuration list for PBXProject "iOS App Signer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				652408EB1BE743D4006FA4C6 /* Debug */,
+				652408EC1BE743D4006FA4C6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		652408ED1BE743D4006FA4C6 /* Build configuration list for PBXNativeTarget "iOS App Signer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				652408EE1BE743D4006FA4C6 /* Debug */,
+				652408EF1BE743D4006FA4C6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 652408C01BE743D4006FA4C6 /* Project object */;
+}
