@@ -24,7 +24,8 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     @IBOutlet var appVersion: NSTextField!
     
     //MARK: Variables
-    var provisioningProfiles:[ProvisioningProfile] = []
+    var provisioningProfiles: [ProvisioningProfile] = []
+    var allProvisioningProfiles: [ProvisioningProfile] = []
     var codesigningCerts: [String] = []
     var profileFilename: String?
     var ReEnableNewApplicationID = false
@@ -149,6 +150,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 if codesigningCerts.contains(defaultCert) {
                     Log.write("Loaded Codesigning Certificate from Defaults: \(defaultCert)")
                     CodesigningCertsPopup.selectItem(withTitle: defaultCert)
+                    self.chooseSigningCertificate(self.CodesigningCertsPopup)
                 }
             }
             setStatus("Ready")
@@ -208,54 +210,43 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     
     func populateProvisioningProfiles(){
         let zeroWidthSpace = "​"
-        self.provisioningProfiles = ProvisioningProfile.getProfiles().sorted {
+        let profiles = ProvisioningProfile.getProfiles().sorted {
             ($0.name == $1.name && $0.created.timeIntervalSince1970 > $1.created.timeIntervalSince1970) || $0.name < $1.name
         }
-        setStatus("Found \(provisioningProfiles.count) Provisioning Profile\(provisioningProfiles.count>1 || provisioningProfiles.count<1 ? "s":"")")
-        ProvisioningProfilesPopup.removeAllItems()
-        ProvisioningProfilesPopup.addItems(withTitles: [
+        setStatus("Found \(profiles.count) Provisioning Profile\(profiles.count>1 || profiles.count<1 ? "s":"")")
+        self.ProvisioningProfilesPopup.removeAllItems()
+        
+        self.ProvisioningProfilesPopup.addItems(withTitles: [
             "Re-Sign Only",
             "Choose Custom File",
             "––––––––––––––––––––––"
-        ])
+            ])
+        
         let formatter = DateFormatter()
         formatter.dateStyle = .short
         formatter.timeStyle = .medium
         var newProfiles: [ProvisioningProfile] = []
         var zeroWidthPadding: String = ""
-        for profile in provisioningProfiles {
+        for profile in profiles {
             zeroWidthPadding = "\(zeroWidthPadding)\(zeroWidthSpace)"
             if profile.expires.timeIntervalSince1970 > Date().timeIntervalSince1970 {
                 newProfiles.append(profile)
-                
-                ProvisioningProfilesPopup.addItem(withTitle: "\(profile.name)\(zeroWidthPadding) (\(profile.teamID))")
-                
-                let toolTipItems = [
-                    "\(profile.name)",
-                    "",
-                    "Team ID: \(profile.teamID)",
-                    "Created: \(formatter.string(from: profile.created as Date))",
-                    "Expires: \(formatter.string(from: profile.expires as Date))"
-                ]
-                ProvisioningProfilesPopup.lastItem!.toolTip = toolTipItems.joined(separator: "\n")
                 setStatus("Added profile \(profile.appID), expires (\(formatter.string(from: profile.expires as Date)))")
             } else {
                 setStatus("Skipped profile \(profile.appID), expired (\(formatter.string(from: profile.expires as Date)))")
             }
         }
-        self.provisioningProfiles = newProfiles
+        self.allProvisioningProfiles = newProfiles
         chooseProvisioningProfile(ProvisioningProfilesPopup)
     }
     
     func getCodesigningCerts() -> [String] {
         var output: [String] = []
         let securityResult = Process().execute(securityPath, workingDirectory: nil, arguments: ["find-identity","-v","-p","codesigning"])
-        if securityResult.output.characters.count < 1 {
+        if securityResult.output.count < 1 {
             return output
         }
         let rawResult = securityResult.output.components(separatedBy: "\"")
-        
-        var index: Int
         
         for index in stride(from: 0, through: rawResult.count - 2, by: 2) {
             if !(rawResult.count - 1 < index + 1) {
@@ -305,15 +296,15 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 setStatus("Provisioning profile expired")
                 chooseProvisioningProfile(ProvisioningProfilesPopup)
             }
-            if profile.appID.characters.index(of: "*") == nil {
+            if profile.appID.index(of: "*") == nil {
                 // Not a wildcard profile
                 NewApplicationIDTextField.stringValue = profile.appID
-                NewApplicationIDTextField.isEnabled = false
+//                NewApplicationIDTextField.isEnabled = false
             } else {
                 // Wildcard profile
                 if NewApplicationIDTextField.isEnabled == false {
                     NewApplicationIDTextField.stringValue = ""
-                    NewApplicationIDTextField.isEnabled = true
+//                    NewApplicationIDTextField.isEnabled = true
                 }
             }
         } else {
@@ -356,6 +347,23 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         }
     }
     
+    func recursiveMachOSearch(_ path: String, found: ((_ file: String) -> Void)){
+        if let files = try? fileManager.contentsOfDirectory(atPath: path) {
+            var isDirectory: ObjCBool = true
+            
+            for file in files {
+                let currentFile = path.stringByAppendingPathComponent(file)
+                fileManager.fileExists(atPath: currentFile, isDirectory: &isDirectory)
+                if isDirectory.boolValue {
+                    recursiveMachOSearch(currentFile, found: found)
+                }
+                if checkMachOFile(currentFile) {
+                    found(currentFile)
+                }
+            }
+        }
+    }
+    
     func recursiveDirectorySearch(_ path: String, extensions: [String], found: ((_ file: String) -> Void)){
         
         if let files = try? fileManager.contentsOfDirectory(atPath: path) {
@@ -373,6 +381,13 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 
             }
         }
+    }
+    
+    /// check if Mach-O file
+    func checkMachOFile(_ path: String) -> Bool {
+        let task = Process().execute("/usr/bin/file", workingDirectory: nil, arguments: [path])
+        let fileContent = task.output.replacingOccurrences(of: "\(path): ", with: "")
+        return fileContent.starts(with: "Mach-O")
     }
     
     func unzip(_ inputFile: String, outputPath: String)->AppSignerTaskOutput {
@@ -407,7 +422,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     func getPlistKey(_ plist: String, keyName: String)->String? {
         let currTask = Process().execute(defaultsPath, workingDirectory: nil, arguments: ["read", plist, keyName])
         if currTask.status == 0 {
-            return String(currTask.output.characters.dropLast())
+            return String(currTask.output.dropLast())
         } else {
             return nil
         }
@@ -445,9 +460,10 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     }
     
     //MARK: Codesigning
+    @discardableResult
     func codeSign(_ file: String, certificate: String, entitlements: String?,before:((_ file: String, _ certificate: String, _ entitlements: String?)->Void)?, after: ((_ file: String, _ certificate: String, _ entitlements: String?, _ codesignTask: AppSignerTaskOutput)->Void)?)->AppSignerTaskOutput{
         
-        let useEntitlements: Bool = ({
+        let hasEntitlements: Bool = ({
             if entitlements == nil {
                 return false
             } else {
@@ -459,14 +475,34 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
             }
         })()
         
+        var needEntitlements: Bool = false
+        var filePath = file
+        let fileExtension = file.lastPathComponent.pathExtension
+        if fileExtension == "framework" {
+            // appene execute file in framework
+            let fileName = file.lastPathComponent.stringByDeletingPathExtension
+            filePath = file.stringByAppendingPathComponent(fileName)
+        } else if fileExtension == "app" {
+            // appene execute file in app
+            let fileName = file.lastPathComponent.stringByDeletingPathExtension
+            filePath = file.stringByAppendingPathComponent(fileName)
+            needEntitlements = hasEntitlements
+        } else {
+            //
+        }
+        
         if let beforeFunc = before {
             beforeFunc(file, certificate, entitlements)
         }
-        var arguments = ["-vvv","-fs",certificate,"--no-strict"]
-        if useEntitlements {
-            arguments.append("--entitlements=\(entitlements!)")
+        var arguments = [String]()
+        
+        if needEntitlements {
+            arguments.append("--entitlements")
+            arguments.append(entitlements!)
         }
-        arguments.append(file)
+        arguments.append(contentsOf: ["-f", "-s", certificate])
+        arguments.append(filePath)
+        
         let codesignTask = Process().execute(codesignPath, workingDirectory: nil, arguments: arguments)
         if let afterFunc = after {
             afterFunc(file, certificate, entitlements, codesignTask)
@@ -500,7 +536,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         //MARK: Get output filename
         let saveDialog = NSSavePanel()
         saveDialog.allowedFileTypes = ["ipa"]
-        saveDialog.nameFieldStringValue = InputFileText.stringValue.lastPathComponent.stringByDeletingPathExtension
+        saveDialog.nameFieldStringValue = "\(InputFileText.stringValue.lastPathComponent.stringByDeletingPathExtension)_resign"
         if saveDialog.runModal() == NSFileHandlingPanelOKButton {
             outputFile = saveDialog.url!.path
             Thread.detachNewThreadSelector(#selector(self.signingThread), toTarget: self, with: nil)
@@ -532,7 +568,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         }
 
         var provisioningFile = self.profileFilename
-        let inputStartsWithHTTP = inputFile.lowercased().substring(to: inputFile.characters.index(inputFile.startIndex, offsetBy: 4)) == "http"
+        let inputStartsWithHTTP = inputFile.lowercased().substring(to: inputFile.index(inputFile.startIndex, offsetBy: 4)) == "http"
         var eggCount: Int = 0
         var continueSigning: Bool? = nil
         
@@ -836,7 +872,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 
                 //MARK: Make sure that the executable is well... executable.
                 if let bundleExecutable = getPlistKey(appBundleInfoPlist, keyName: "CFBundleExecutable"){
-                    Process().execute(chmodPath, workingDirectory: nil, arguments: ["755", appBundlePath.stringByAppendingPathComponent(bundleExecutable)])
+                    _ = Process().execute(chmodPath, workingDirectory: nil, arguments: ["755", appBundlePath.stringByAppendingPathComponent(bundleExecutable)])
                 }
                 
                 //MARK: Change Application ID
@@ -848,10 +884,10 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                             if let appexBundleID = getPlistKey(appexPlist, keyName: "CFBundleIdentifier"){
                                 let newAppexID = "\(newApplicationID)\(appexBundleID.substring(from: oldAppID.endIndex))"
                                 setStatus("Changing \(appexFile) id to \(newAppexID)")
-                                setPlistKey(appexPlist, keyName: "CFBundleIdentifier", value: newAppexID)
+                                _ = setPlistKey(appexPlist, keyName: "CFBundleIdentifier", value: newAppexID)
                             }
                             if Process().execute(defaultsPath, workingDirectory: nil, arguments: ["read", appexPlist,"WKCompanionAppBundleIdentifier"]).status == 0 {
-                                setPlistKey(appexPlist, keyName: "WKCompanionAppBundleIdentifier", value: newApplicationID)
+                                _ = setPlistKey(appexPlist, keyName: "WKCompanionAppBundleIdentifier", value: newApplicationID)
                             }
                             recursiveDirectorySearch(appexFile, extensions: ["app"], found: changeAppexID)
                         }
@@ -865,8 +901,6 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                         Log.write(IDChangeTask.output)
                         cleanup(tempFolder); return
                     }
-                    
-                    
                 }
                 
                 //MARK: Change Display Name
@@ -935,9 +969,6 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                     return output
                 }
                 
-                //MARK: Codesigning - General
-                let signableExtensions = ["dylib","so","0","vis","pvr","framework","appex","app"]
-                
                 //MARK: Codesigning - Eggs
                 let eggSigningFunction = generateFileSignFunc(eggDirectory, entitlementsPath: entitlementsPlist, signingCertificate: signingCertificate!)
                 func signEgg(_ eggFile: String){
@@ -951,9 +982,9 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                         return
                     }
                     recursiveDirectorySearch(currentEggPath, extensions: ["egg"], found: signEgg)
-                    recursiveDirectorySearch(currentEggPath, extensions: signableExtensions, found: eggSigningFunction)
+                    recursiveMachOSearch(currentEggPath, found: eggSigningFunction)
                     setStatus("Compressing \(shortName)")
-                    self.zip(currentEggPath, outputFile: eggFile)                    
+                    _ = self.zip(currentEggPath, outputFile: eggFile)                    
                 }
                 
                 recursiveDirectorySearch(appBundlePath, extensions: ["egg"], found: signEgg)
@@ -962,7 +993,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 let signingFunction = generateFileSignFunc(payloadDirectory, entitlementsPath: entitlementsPlist, signingCertificate: signingCertificate!)
                 
                 
-                recursiveDirectorySearch(appBundlePath, extensions: signableExtensions, found: signingFunction)
+                recursiveMachOSearch(appBundlePath, found: signingFunction)
                 signingFunction(appBundlePath)
                 
                 //MARK: Codesigning - Verification
@@ -1008,7 +1039,6 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         setStatus("Done, output at \(outputFile!)")
     }
 
-    
     //MARK: IBActions
     @IBAction func chooseProvisioningProfile(_ sender: NSPopUpButton) {
         
@@ -1064,7 +1094,46 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     @IBAction func chooseSigningCertificate(_ sender: NSPopUpButton) {
         Log.write("Set Codesigning Certificate Default to: \(sender.stringValue)")
         defaults.setValue(sender.selectedItem?.title, forKey: "signingCertificate")
+        
+        if let teamId = sender.selectedItem!.title.regexGetSub(pattern: "\\([\\d\\w]+\\)$").first {
+            let codeSignTeamId = teamId.trimmingCharacters(in: CharacterSet(charactersIn: "()"))
+            
+            let formatter = DateFormatter()
+            formatter.dateStyle = .short
+            formatter.timeStyle = .medium
+            
+            let zeroWidthSpace = ""
+            var zeroWidthPadding: String = ""
+            self.ProvisioningProfilesPopup.removeAllItems()
+            
+            self.ProvisioningProfilesPopup.addItems(withTitles: [
+                "Re-Sign Only",
+                "Choose Custom File",
+                "––––––––––––––––––––––"
+            ])
+            self.provisioningProfiles.removeAll()
+            self.allProvisioningProfiles.forEach { (profile) in
+                if codeSignTeamId == profile.teamID {
+                    zeroWidthPadding = "\(zeroWidthPadding)\(zeroWidthSpace)"
+                    if profile.expires.timeIntervalSince1970 > Date().timeIntervalSince1970 {
+                        self.provisioningProfiles.append(profile)
+                        self.ProvisioningProfilesPopup.addItem(withTitle: "\(profile.name)\(zeroWidthPadding) (\(profile.teamID))")
+
+                        let toolTipItems = [
+                            "\(profile.name)",
+                            "",
+                            "Team ID: \(profile.teamID)",
+                            "Created: \(formatter.string(from: profile.created as Date))",
+                            "Expires: \(formatter.string(from: profile.expires as Date))"
+                        ]
+                        ProvisioningProfilesPopup.lastItem!.toolTip = toolTipItems.joined(separator: "\n")
+                    }
+                }
+            }
+        }
     }
+    
+   
     
     @IBAction func doSign(_ sender: NSButton) {
         switch(true){
@@ -1088,3 +1157,16 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     
 }
 
+extension String {
+    func regexGetSub(pattern: String) -> [String] {
+        var subStr = [String]()
+        let regex = try! NSRegularExpression(pattern: pattern, options:[NSRegularExpression.Options.caseInsensitive])
+        let results = regex.matches(in: self, options: NSRegularExpression.MatchingOptions.init(rawValue: 0), range: NSMakeRange(0, self.characters.count))
+        //解析出子串
+        for  rst in results {
+            let nsStr = self as  NSString  //可以方便通过range获取子串
+            subStr.append(nsStr.substring(with: rst.range))
+        }
+        return subStr
+    }
+}

@@ -8,6 +8,13 @@
 
 import Foundation
 import AppKit
+
+class Logger {
+    static func log(_ msg: String) {
+        print(msg)
+    }
+}
+
 struct ProvisioningProfile {
     var filename: String,
         name: String,
@@ -17,7 +24,7 @@ struct ProvisioningProfile {
         teamID: String,
         rawXML: String,
         entitlements: AnyObject?
-    fileprivate let delegate = NSApplication.shared().delegate as! AppDelegate
+    
     
     static func getProfiles() -> [ProvisioningProfile] {
         var output: [ProvisioningProfile] = []
@@ -38,8 +45,22 @@ struct ProvisioningProfile {
                 }
         }
 
-        
-        return output;
+        // distinct
+        output = output.sorted(by: {
+            $0.created.timeIntervalSince1970 > $1.created.timeIntervalSince1970
+        })
+
+        var newProfiles = [ProvisioningProfile]()
+        var names = [String]()
+        for profile in output {
+            if !names.contains(profile.name) {
+                newProfiles.append(profile)
+                names.append(profile.name)
+                NSLog("\(profile.name), \(profile.created)")
+            }
+        }
+        return newProfiles;
+        return output
     }
     
     init?(filename: String){
@@ -50,7 +71,7 @@ struct ProvisioningProfile {
             if let xmlIndex = taskOutput.output.range(of: "<?xml") {
                 self.rawXML = taskOutput.output.substring(from: xmlIndex.lowerBound)
             } else {
-                Log.write("Unable to find xml start tag in profile")
+                Logger.log("Unable to find xml start tag in profile")
                 self.rawXML = taskOutput.output
             }
             
@@ -69,15 +90,15 @@ struct ProvisioningProfile {
                         self.name = name
                         self.entitlements = entitlements as AnyObject?
                 } else {
-                    Log.write("Error processing \(filename.lastPathComponent)")
+                    Logger.log("Error processing \(filename.lastPathComponent)")
                     return nil
                 }
             } else {
-                Log.write("Error parsing \(filename.lastPathComponent)")
+                Logger.log("Error parsing \(filename.lastPathComponent)")
                 return nil
             }
         } else {
-            Log.write("Error reading \(filename.lastPathComponent)")
+            Logger.log("Error reading \(filename.lastPathComponent)")
             return nil
         }
     }
@@ -90,13 +111,13 @@ struct ProvisioningProfile {
             if plistBuddy.status == 0 {
                 return plistBuddy.output as NSString?
             } else {
-                Log.write("PlistBuddy Failed")
-                Log.write(plistBuddy.output)
+                Logger.log("PlistBuddy Failed")
+                Logger.log(plistBuddy.output)
                 return nil
             }
         } catch let error as NSError {
-            Log.write("Error writing mobileprovision.plist")
-            Log.write(error.localizedDescription)
+            Logger.log("Error writing mobileprovision.plist")
+            Logger.log(error.localizedDescription)
             return nil
         }
     }
