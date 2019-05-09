@@ -12,7 +12,7 @@ import Cocoa
 class AppDelegate: NSObject, NSApplicationDelegate {
 
     @IBOutlet weak var mainView: MainView!
-    let fileManager = FileManager.default
+    @objc let fileManager = FileManager.default
     
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
@@ -36,10 +36,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @IBAction func nsMenuLinkClick(_ sender: NSMenuLink) {
-        NSWorkspace.shared().open(URL(string: sender.url!)!)
+        NSWorkspace.shared.open(URL(string: sender.url!)!)
     }
     @IBAction func viewLog(_ sender: AnyObject) {
-        NSWorkspace.shared().openFile(Log.logName)
+        NSWorkspace.shared.openFile(Log.logName)
     }
     @IBAction func checkForUpdates(_ sender: NSMenuItem) {
         UpdatesController.checkForUpdate(forceShow: true)

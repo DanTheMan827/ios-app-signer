@@ -10,10 +10,10 @@ import Foundation
 import AppKit
 class UpdatesController: NSWindowController {
     //MARK: Variables
-    let markdownParser = NSAttributedStringMarkdownParser()
-    var latestVersion: String?
-    let prefs = UserDefaults.standard
-    static var updatesWindow: UpdatesController?
+    @objc let markdownParser = NSAttributedStringMarkdownParser()
+    @objc var latestVersion: String?
+    @objc let prefs = UserDefaults.standard
+    @objc static var updatesWindow: UpdatesController?
     
     //MARK: IBOutlets
     @IBOutlet weak var appIcon: NSImageView!
@@ -22,7 +22,7 @@ class UpdatesController: NSWindowController {
     @IBOutlet weak var versionLabel: NSTextField!
     
     //MARK: Functions
-    static func checkForUpdate(
+    @objc static func checkForUpdate(
         _ currentVersion: String = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String,
         forceShow: Bool = false,
         callbackFunc: ((_ status: Bool, _ data: Data?, _ response: URLResponse?, _ error: Error?)->Void)? = nil
@@ -58,7 +58,7 @@ class UpdatesController: NSWindowController {
                                     DispatchQueue.main.async {
                                         // update some UI
                                         if updatesWindow == nil {
-                                            updatesWindow = UpdatesController(windowNibName: "Updates")
+                                            updatesWindow = UpdatesController(windowNibName: NSNib.Name(rawValue: "Updates"))
                                         }
                                         updatesWindow!.showWindow([currentVersion,releases])
                                     }
@@ -100,7 +100,7 @@ class UpdatesController: NSWindowController {
     }
     override func showWindow(_ sender: Any?) {
         super.showWindow(sender)
-        appIcon.image = NSWorkspace.shared().icon(forFile: Bundle.main.bundlePath)
+        appIcon.image = NSWorkspace.shared.icon(forFile: Bundle.main.bundlePath)
         var releaseOutput: [String] = []
         if let senderArray = sender as? [AnyObject] {
             if let releases = senderArray[1] as? [[String: AnyObject]],
@@ -123,7 +123,7 @@ class UpdatesController: NSWindowController {
         }
         
     }
-    func setChangelog(_ text: String){
+    @objc func setChangelog(_ text: String){
         changelogText.isEditable = true
         changelogText.string = ""
         changelogText.insertText(markdownParser.attributedString(fromMarkdownString: text))
@@ -140,7 +140,7 @@ class UpdatesController: NSWindowController {
         updateWindow.close()
     }
     @IBAction func visitProjectPage(_ sender: NSButton) {
-        NSWorkspace.shared().open(URL(string: "http://dantheman827.github.io/ios-app-signer/")!)
+        NSWorkspace.shared.open(URL(string: "http://dantheman827.github.io/ios-app-signer/")!)
         updateWindow.close()
     }
 }

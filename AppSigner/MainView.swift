@@ -26,35 +26,35 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     
     //MARK: Variables
     var provisioningProfiles:[ProvisioningProfile] = []
-    var codesigningCerts: [String] = []
-    var profileFilename: String?
-    var ReEnableNewApplicationID = false
-    var PreviousNewApplicationID = ""
-    var outputFile: String?
+    @objc var codesigningCerts: [String] = []
+    @objc var profileFilename: String?
+    @objc var ReEnableNewApplicationID = false
+    @objc var PreviousNewApplicationID = ""
+    @objc var outputFile: String?
     var startSize: CGFloat?
-    var NibLoaded = false
+    @objc var NibLoaded = false
     
     //MARK: Constants
-    let defaults = UserDefaults()
-    let fileManager = FileManager.default
-    let bundleID = Bundle.main.bundleIdentifier
-    let arPath = "/usr/bin/ar"
-    let mktempPath = "/usr/bin/mktemp"
-    let tarPath = "/usr/bin/tar"
-    let unzipPath = "/usr/bin/unzip"
-    let zipPath = "/usr/bin/zip"
-    let defaultsPath = "/usr/bin/defaults"
-    let codesignPath = "/usr/bin/codesign"
-    let securityPath = "/usr/bin/security"
-    let chmodPath = "/bin/chmod"
+    @objc let defaults = UserDefaults()
+    @objc let fileManager = FileManager.default
+    @objc let bundleID = Bundle.main.bundleIdentifier
+    @objc let arPath = "/usr/bin/ar"
+    @objc let mktempPath = "/usr/bin/mktemp"
+    @objc let tarPath = "/usr/bin/tar"
+    @objc let unzipPath = "/usr/bin/unzip"
+    @objc let zipPath = "/usr/bin/zip"
+    @objc let defaultsPath = "/usr/bin/defaults"
+    @objc let codesignPath = "/usr/bin/codesign"
+    @objc let securityPath = "/usr/bin/security"
+    @objc let chmodPath = "/bin/chmod"
 //    let plistbuddyPath = "/usr/libexec/plistbuddy"
     
     //MARK: Drag / Drop
-    var fileTypes: [String] = ["ipa","deb","app","xcarchive","mobileprovision"]
-    var urlFileTypes: [String] = ["ipa","deb"]
-    var fileTypeIsOk = false
+    @objc var fileTypes: [String] = ["ipa","deb","app","xcarchive","mobileprovision"]
+    @objc var urlFileTypes: [String] = ["ipa","deb"]
+    @objc var fileTypeIsOk = false
     
-    func fileDropped(_ filename: String){
+    @objc func fileDropped(_ filename: String){
         switch(filename.pathExtension.lowercased()){
         case "ipa", "deb", "app", "xcarchive":
             InputFileText.stringValue = filename
@@ -69,7 +69,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         }
     }
     
-    func urlDropped(_ url: NSURL){
+    @objc func urlDropped(_ url: NSURL){
         if let urlString = url.absoluteString {
             InputFileText.stringValue = urlString
         }
@@ -95,7 +95,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     
     override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
         let pasteboard = sender.draggingPasteboard()
-        if let board = pasteboard.propertyList(forType: "NSFilenamesPboardType") as? NSArray {
+        if let board = pasteboard.propertyList(forType: NSPasteboard.PasteboardType(rawValue: "NSFilenamesPboardType")) as? NSArray {
             if let filePath = board[0] as? String {
                 
                 fileDropped(filePath)
@@ -103,7 +103,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
             }
         }
         if let types = pasteboard.types {
-            if types.contains(NSURLPboardType) {
+            if types.contains(NSPasteboard.PasteboardType(rawValue: "NSURLPboardType")) {
                 if let url = NSURL(from: pasteboard) {
                     urlDropped(url)
                 }
@@ -112,13 +112,13 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         return false
     }
     
-    func checkExtension(_ drag: NSDraggingInfo) -> Bool {
-        if let board = drag.draggingPasteboard().propertyList(forType: "NSFilenamesPboardType") as? NSArray,
+    @objc func checkExtension(_ drag: NSDraggingInfo) -> Bool {
+        if let board = drag.draggingPasteboard().propertyList(forType: NSPasteboard.PasteboardType(rawValue: "NSFilenamesPboardType")) as? NSArray,
             let path = board[0] as? String {
                 return self.fileTypes.contains(path.pathExtension.lowercased())
         }
         if let types = drag.draggingPasteboard().types {
-            if types.contains(NSURLPboardType) {
+            if types.contains(NSPasteboard.PasteboardType(rawValue: "NSURLPboardType")) {
                 if let url = NSURL(from: drag.draggingPasteboard()),
                     let suffix = url.pathExtension {
                         return self.urlFileTypes.contains(suffix.lowercased())
@@ -132,11 +132,11 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
-        register(forDraggedTypes: [NSFilenamesPboardType, NSURLPboardType])
+        registerForDraggedTypes([NSPasteboard.PasteboardType(rawValue: "NSFilenamesPboardType"), NSPasteboard.PasteboardType(rawValue: "NSURLPboardType")])
     }
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        register(forDraggedTypes: [NSFilenamesPboardType, NSURLPboardType])
+        registerForDraggedTypes([NSPasteboard.PasteboardType(rawValue: "NSFilenamesPboardType"), NSPasteboard.PasteboardType(rawValue: "NSURLPboardType")])
     }
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -163,7 +163,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                     alert.runModal()
                 }
                 
-                NSApplication.shared().terminate(self)
+                NSApplication.shared.terminate(self)
             }
             UpdatesController.checkForUpdate()
         }
@@ -173,7 +173,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         return Process().execute("/usr/bin/xcode-select", workingDirectory: nil, arguments: ["--install"])
     }
     
-    func checkXcodeCLI() -> Bool {
+    @objc func checkXcodeCLI() -> Bool {
         if #available(OSX 10.10, *) {
             if Process().execute("/usr/bin/xcode-select", workingDirectory: nil, arguments: ["-p"]).status   != 0 {
                 return false
@@ -188,7 +188,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         return true
     }
     
-    func makeTempFolder()->String?{
+    @objc func makeTempFolder()->String?{
         let tempTask = Process().execute(mktempPath, workingDirectory: nil, arguments: ["-d","-t",bundleID!])
         if tempTask.status != 0 {
             return nil
@@ -196,7 +196,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         return tempTask.output.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
     }
     
-    func setStatus(_ status: String){
+    @objc func setStatus(_ status: String){
         if (!Thread.isMainThread){
             DispatchQueue.main.sync{
                 setStatus(status)
@@ -208,7 +208,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         }
     }
     
-    func populateProvisioningProfiles(){
+    @objc func populateProvisioningProfiles(){
         let zeroWidthSpace = "​"
         self.provisioningProfiles = ProvisioningProfile.getProfiles().sorted {
             ($0.name == $1.name && $0.created.timeIntervalSince1970 > $1.created.timeIntervalSince1970) || $0.name < $1.name
@@ -249,7 +249,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         chooseProvisioningProfile(ProvisioningProfilesPopup)
     }
     
-    func getCodesigningCerts() -> [String] {
+    @objc func getCodesigningCerts() -> [String] {
         var output: [String] = []
         let securityResult = Process().execute(securityPath, workingDirectory: nil, arguments: ["find-identity","-v","-p","codesigning"])
         if securityResult.output.count < 1 {
@@ -267,13 +267,13 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         return output
     }
     
-    func showCodesignCertsErrorAlert(){
+    @objc func showCodesignCertsErrorAlert(){
         let alert = NSAlert()
         alert.messageText = "No codesigning certificates found"
         alert.informativeText = "I can attempt to fix this automatically, would you like me to try?"
         alert.addButton(withTitle: "Yes")
         alert.addButton(withTitle: "No")
-        if alert.runModal() == NSAlertFirstButtonReturn {
+        if alert.runModal() == NSApplication.ModalResponse.alertFirstButtonReturn {
             if let tempFolder = makeTempFolder() {
                 iASShared.fixSigning(tempFolder)
                 try? fileManager.removeItem(atPath: tempFolder)
@@ -282,7 +282,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         }
     }
     
-    func populateCodesigningCerts() {
+    @objc func populateCodesigningCerts() {
         CodesigningCertsPopup.removeAllItems()
         self.codesigningCerts = getCodesigningCerts()
         
@@ -325,7 +325,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         }
     }
     
-    func controlsEnabled(_ enabled: Bool){
+    @objc func controlsEnabled(_ enabled: Bool){
         
         if (!Thread.isMainThread){
             DispatchQueue.main.sync{
@@ -358,7 +358,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         }
     }
     
-    func recursiveMachOSearch(_ path: String, found: ((_ file: String) -> Void)){
+    @objc func recursiveMachOSearch(_ path: String, found: ((_ file: String) -> Void)){
         if let files = try? fileManager.contentsOfDirectory(atPath: path) {
             var isDirectory: ObjCBool = true
             
@@ -375,7 +375,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         }
     }
     
-    func recursiveDirectorySearch(_ path: String, extensions: [String], found: ((_ file: String) -> Void)){
+    @objc func recursiveDirectorySearch(_ path: String, extensions: [String], found: ((_ file: String) -> Void)){
         
         if let files = try? fileManager.contentsOfDirectory(atPath: path) {
             var isDirectory: ObjCBool = true
@@ -399,7 +399,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     }
     
     /// check if Mach-O file
-    func checkMachOFile(_ path: String) -> Bool {
+    @objc func checkMachOFile(_ path: String) -> Bool {
         if let file = FileHandle(forReadingAtPath: path) {
             let data = file.readData(ofLength: 4)
             file.closeFile()
@@ -415,7 +415,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         return Process().execute(zipPath, workingDirectory: inputPath, arguments: ["-qry", outputFile, "."])
     }
     
-    func cleanup(_ tempFolder: String){
+    @objc func cleanup(_ tempFolder: String){
         do {
             Log.write("Deleting: \(tempFolder)")
             try fileManager.removeItem(atPath: tempFolder)
@@ -425,7 +425,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         }
         controlsEnabled(true)
     }
-    func bytesToSmallestSi(_ size: Double) -> String {
+    @objc func bytesToSmallestSi(_ size: Double) -> String {
         let prefixes = ["","K","M","G","T","P","E","Z","Y"]
         for i in 1...6 {
             let nextUnit = pow(1024.00, Double(i+1))
@@ -437,7 +437,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         }
         return "\(size)B"
     }
-    func getPlistKey(_ plist: String, keyName: String)->String? {
+    @objc func getPlistKey(_ plist: String, keyName: String)->String? {
         let currTask = Process().execute(defaultsPath, workingDirectory: nil, arguments: ["read", plist, keyName])
         if currTask.status == 0 {
             return String(currTask.output.dropLast())
@@ -451,9 +451,9 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     }
     
     //MARK: NSURL Delegate
-    var downloading = false
-    var downloadError: NSError?
-    var downloadPath: String!
+    @objc var downloading = false
+    @objc var downloadError: NSError?
+    @objc var downloadPath: String!
     
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         downloadError = downloadTask.error as NSError?
@@ -548,14 +548,14 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         return nil
     }
     
-    func startSigning() {
+    @objc func startSigning() {
         controlsEnabled(false)
         
         //MARK: Get output filename
         let saveDialog = NSSavePanel()
         saveDialog.allowedFileTypes = ["ipa"]
         saveDialog.nameFieldStringValue = InputFileText.stringValue.lastPathComponent.stringByDeletingPathExtension
-        if saveDialog.runModal() == NSFileHandlingPanelOKButton {
+        if saveDialog.runModal().rawValue == NSFileHandlingPanelOKButton {
             outputFile = saveDialog.url!.path
             Thread.detachNewThreadSelector(#selector(self.signingThread), toTarget: self, with: nil)
         } else {
@@ -564,7 +564,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         }
     }
     
-    func signingThread(){
+    @objc func signingThread(){
         
         
         //MARK: Set up variables
@@ -640,7 +640,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                     alert.addButton(withTitle: "No")
                     alert.informativeText = "You appear to have a error with your codesigning certificate, do you want me to try and fix the problem?"
                     let response = alert.runModal()
-                    if response == NSAlertFirstButtonReturn {
+                    if response == NSApplication.ModalResponse.alertFirstButtonReturn {
                         iASShared.fixSigning(tempFolder)
                         if self.testSigning(signingCertificate!, tempFolder: tempFolder) == false {
                             let errorAlert = NSAlert()
@@ -1133,7 +1133,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 break
             
             default:
-                NSApplication.shared().windows[0].makeFirstResponder(self)
+                NSApplication.shared.windows[0].makeFirstResponder(self)
                 startSigning()
         }
     }
@@ -1141,7 +1141,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     @IBAction func statusLabelClick(_ sender: NSButton) {
         if let outputFile = self.outputFile {
             if fileManager.fileExists(atPath: outputFile) {
-                NSWorkspace.shared().activateFileViewerSelecting([URL(fileURLWithPath: outputFile)])
+                NSWorkspace.shared.activateFileViewerSelecting([URL(fileURLWithPath: outputFile)])
             }
         }
     }

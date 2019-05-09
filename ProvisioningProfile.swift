@@ -17,7 +17,7 @@ struct ProvisioningProfile {
         teamID: String,
         rawXML: String,
         entitlements: AnyObject?
-    fileprivate let delegate = NSApplication.shared().delegate as! AppDelegate
+    fileprivate let delegate = NSApplication.shared.delegate as! AppDelegate
     
     static func getProfiles() -> [ProvisioningProfile] {
         var output: [ProvisioningProfile] = []
