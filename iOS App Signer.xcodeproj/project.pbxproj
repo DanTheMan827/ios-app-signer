@@ -197,7 +197,7 @@
 					652408C71BE743D4006FA4C6 = {
 						CreatedOnToolsVersion = 7.1;
 						DevelopmentTeam = 7PM929Z8M2;
-						LastSwiftMigration = 0940;
+						LastSwiftMigration = 1020;
 						SystemCapabilities = {
 							com.apple.Sandbox = {
 								enabled = 0;
@@ -211,6 +211,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -360,7 +361,7 @@
 				PRODUCT_NAME = "iOS App Signer";
 				SWIFT_OBJC_BRIDGING_HEADER = "iOS App Signer-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -376,7 +377,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.DanTheMan827.AppSigner;
 				PRODUCT_NAME = "iOS App Signer";
 				SWIFT_OBJC_BRIDGING_HEADER = "iOS App Signer-Bridging-Header.h";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};

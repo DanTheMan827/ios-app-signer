@@ -58,7 +58,7 @@ class UpdatesController: NSWindowController {
                                     DispatchQueue.main.async {
                                         // update some UI
                                         if updatesWindow == nil {
-                                            updatesWindow = UpdatesController(windowNibName: NSNib.Name(rawValue: "Updates"))
+                                            updatesWindow = UpdatesController(windowNibName: "Updates")
                                         }
                                         updatesWindow!.showWindow([currentVersion,releases])
                                     }

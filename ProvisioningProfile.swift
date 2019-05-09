@@ -73,7 +73,7 @@ struct ProvisioningProfile {
                     let name = (results as AnyObject).value(forKey: "Name") as? String,
                     let entitlements = (results as AnyObject).value(forKey: "Entitlements"),
                     let applicationIdentifier = (entitlements as AnyObject).value(forKey: "application-identifier") as? String,
-                    let periodIndex = applicationIdentifier.characters.index(of: ".") {
+                    let periodIndex = applicationIdentifier.firstIndex(of: ".") {
                         self.filename = filename
                         self.expires = expirationDate
                         self.created = creationDate

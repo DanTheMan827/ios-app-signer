@@ -94,7 +94,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     }
     
     override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
-        let pasteboard = sender.draggingPasteboard()
+        let pasteboard = sender.draggingPasteboard
         if let board = pasteboard.propertyList(forType: NSPasteboard.PasteboardType(rawValue: "NSFilenamesPboardType")) as? NSArray {
             if let filePath = board[0] as? String {
                 
@@ -113,13 +113,13 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     }
     
     @objc func checkExtension(_ drag: NSDraggingInfo) -> Bool {
-        if let board = drag.draggingPasteboard().propertyList(forType: NSPasteboard.PasteboardType(rawValue: "NSFilenamesPboardType")) as? NSArray,
+        if let board = drag.draggingPasteboard.propertyList(forType: NSPasteboard.PasteboardType(rawValue: "NSFilenamesPboardType")) as? NSArray,
             let path = board[0] as? String {
                 return self.fileTypes.contains(path.pathExtension.lowercased())
         }
-        if let types = drag.draggingPasteboard().types {
+        if let types = drag.draggingPasteboard.types {
             if types.contains(NSPasteboard.PasteboardType(rawValue: "NSURLPboardType")) {
-                if let url = NSURL(from: drag.draggingPasteboard()),
+                if let url = NSURL(from: drag.draggingPasteboard),
                     let suffix = url.pathExtension {
                         return self.urlFileTypes.contains(suffix.lowercased())
                 }
@@ -307,7 +307,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 setStatus("Provisioning profile expired")
                 chooseProvisioningProfile(ProvisioningProfilesPopup)
             }
-            if profile.appID.index(of: "*") == nil {
+            if profile.appID.firstIndex(of: "*") == nil {
                 // Not a wildcard profile
                 NewApplicationIDTextField.stringValue = profile.appID
                 NewApplicationIDTextField.isEnabled = false
