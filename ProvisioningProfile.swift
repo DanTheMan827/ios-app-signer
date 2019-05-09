@@ -46,14 +46,13 @@ struct ProvisioningProfile {
         var newProfiles = [ProvisioningProfile]()
         var names = [String]()
         for profile in output {
-            if !names.contains(profile.name) {
+            if !names.contains("\(profile.name)\(profile.appID)") {
                 newProfiles.append(profile)
-                names.append(profile.name)
+                names.append("\(profile.name)\(profile.appID)")
                 NSLog("\(profile.name), \(profile.created)")
             }
         }
         return newProfiles;
-        return output
     }
     
     init?(filename: String){
