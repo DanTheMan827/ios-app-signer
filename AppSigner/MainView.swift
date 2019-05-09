@@ -22,6 +22,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     @IBOutlet var appDisplayName: NSTextField!
     @IBOutlet var appShortVersion: NSTextField!
     @IBOutlet var appVersion: NSTextField!
+    @IBOutlet var extraSigingFiles: NSTextField!
     
     //MARK: Variables
     var provisioningProfiles:[ProvisioningProfile] = []
@@ -46,6 +47,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     let codesignPath = "/usr/bin/codesign"
     let securityPath = "/usr/bin/security"
     let chmodPath = "/bin/chmod"
+//    let plistbuddyPath = "/usr/libexec/plistbuddy"
     
     //MARK: Drag / Drop
     var fileTypes: [String] = ["ipa","deb","app","xcarchive","mobileprovision"]
@@ -306,9 +308,9 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 chooseProvisioningProfile(ProvisioningProfilesPopup)
             }
             if profile.appID.characters.index(of: "*") == nil {
-                // Not a wildcard profile
+                // Not a wildcard profile, who care?
                 NewApplicationIDTextField.stringValue = profile.appID
-                NewApplicationIDTextField.isEnabled = false
+                NewApplicationIDTextField.isEnabled = true
             } else {
                 // Wildcard profile
                 if NewApplicationIDTextField.isEnabled == false {
@@ -340,6 +342,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 NewApplicationIDTextField.stringValue = PreviousNewApplicationID
                 StartButton.isEnabled = true
                 appDisplayName.isEnabled = true
+                extraSigingFiles.isEnabled = true
             } else {
                 // Backup previous values
                 PreviousNewApplicationID = NewApplicationIDTextField.stringValue
@@ -352,11 +355,12 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 NewApplicationIDTextField.isEnabled = false
                 StartButton.isEnabled = false
                 appDisplayName.isEnabled = false
+                extraSigingFiles.isEnabled = false
             }
         }
     }
     
-    func recursiveDirectorySearch(_ path: String, extensions: [String], found: ((_ file: String) -> Void)){
+    func recursiveDirectorySearch(_ path: String, extensions: [String], specificFiles: [String]?, found: ((_ file: String) -> Void)){
         
         if let files = try? fileManager.contentsOfDirectory(atPath: path) {
             var isDirectory: ObjCBool = true
@@ -365,12 +369,15 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 let currentFile = path.stringByAppendingPathComponent(file)
                 fileManager.fileExists(atPath: currentFile, isDirectory: &isDirectory)
                 if isDirectory.boolValue {
-                    recursiveDirectorySearch(currentFile, extensions: extensions, found: found)
+                    recursiveDirectorySearch(currentFile, extensions: extensions,specificFiles:specificFiles, found: found)
                 }
                 if extensions.contains(file.pathExtension) {
                     found(currentFile)
                 }
-                
+                else if specificFiles != nil && specificFiles!.contains(file)
+                {
+                    found(currentFile)
+                }
             }
         }
     }
@@ -500,7 +507,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         //MARK: Get output filename
         let saveDialog = NSSavePanel()
         saveDialog.allowedFileTypes = ["ipa"]
-        saveDialog.nameFieldStringValue = InputFileText.stringValue.lastPathComponent.stringByDeletingPathExtension
+        saveDialog.nameFieldStringValue = InputFileText.stringValue.lastPathComponent.stringByDeletingPathExtension + "_resign"
         if saveDialog.runModal() == NSFileHandlingPanelOKButton {
             outputFile = saveDialog.url!.path
             Thread.detachNewThreadSelector(#selector(self.signingThread), toTarget: self, with: nil)
@@ -535,6 +542,11 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         let inputStartsWithHTTP = inputFile.lowercased().substring(to: inputFile.characters.index(inputFile.startIndex, offsetBy: 4)) == "http"
         var eggCount: Int = 0
         var continueSigning: Bool? = nil
+        var specificFiles: [String]? = nil
+        
+        if self.extraSigingFiles.stringValue != "" {
+            specificFiles = self.extraSigingFiles.stringValue .components(separatedBy: ",")
+        }
         
         //MARK: Sanity checks
         
@@ -826,10 +838,11 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                             setStatus("Unable to read entitlements from provisioning profile")
                             warnings += 1
                         }
-                        if profile.appID != "*" && (newApplicationID != "" && newApplicationID != profile.appID) {
-                            setStatus("Unable to change App ID to \(newApplicationID), provisioning profile won't allow it")
-                            cleanup(tempFolder); return
-                        }
+                        // not a problem
+//                        if profile.appID != "*" && (newApplicationID != "" && newApplicationID != profile.appID) {
+//                            setStatus("Unable to change App ID to \(newApplicationID), provisioning profile won't allow it")
+//                            cleanup(tempFolder); return
+//                        }
                     } else {
                         setStatus("Unable to parse provisioning profile, it may be corrupt")
                         warnings += 1
@@ -848,17 +861,28 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                     if let oldAppID = getPlistKey(appBundleInfoPlist, keyName: "CFBundleIdentifier") {
                         func changeAppexID(_ appexFile: String){
                             let appexPlist = appexFile.stringByAppendingPathComponent("Info.plist")
-                            if let appexBundleID = getPlistKey(appexPlist, keyName: "CFBundleIdentifier"){
-                                let newAppexID = "\(newApplicationID)\(appexBundleID.substring(from: oldAppID.endIndex))"
+                            // 修复微信改bundleid后安装失败问题
+                            let pluginInfoPlist = NSMutableDictionary(contentsOfFile: appexPlist)
+                            if let appexBundleID = pluginInfoPlist?["CFBundleIdentifier"] as? String{
+                                let newAppexID = appexBundleID.replacingOccurrences(of:oldAppID, with:newApplicationID)
                                 setStatus("Changing \(appexFile) id to \(newAppexID)")
-                                setPlistKey(appexPlist, keyName: "CFBundleIdentifier", value: newAppexID)
+                                pluginInfoPlist?["CFBundleIdentifier"] = newAppexID
                             }
-                            if Process().execute(defaultsPath, workingDirectory: nil, arguments: ["read", appexPlist,"WKCompanionAppBundleIdentifier"]).status == 0 {
-                                setPlistKey(appexPlist, keyName: "WKCompanionAppBundleIdentifier", value: newApplicationID)
+                            if (pluginInfoPlist?["WKCompanionAppBundleIdentifier"] as? String) != nil {
+                                pluginInfoPlist?["WKCompanionAppBundleIdentifier"] = newApplicationID
                             }
-                            recursiveDirectorySearch(appexFile, extensions: ["app"], found: changeAppexID)
+                            
+                            if let dictionaryArray = pluginInfoPlist?["NSExtension"] as? [String:AnyObject],
+                                let attributes : NSMutableDictionary = dictionaryArray["NSExtensionAttributes"] as? NSMutableDictionary,
+                                let wkAppBundleIdentifier = attributes["WKAppBundleIdentifier"] as? String{
+                                let newAppexID = wkAppBundleIdentifier.replacingOccurrences(of:oldAppID, with:newApplicationID)
+                                attributes["WKAppBundleIdentifier"] = newAppexID
+                            }
+                            
+                            pluginInfoPlist!.write(toFile: appexPlist, atomically: true)
                         }
-                        recursiveDirectorySearch(appBundlePath, extensions: ["appex"], found: changeAppexID)
+                        recursiveDirectorySearch(appBundlePath, extensions: ["app"], specificFiles: nil, found: changeAppexID)
+                        recursiveDirectorySearch(appBundlePath, extensions: ["appex"], specificFiles: nil, found: changeAppexID)
                     }
                     
                     setStatus("Changing App ID to \(newApplicationID)")
@@ -953,19 +977,19 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                         Log.write("Error extracting \(shortName)")
                         return
                     }
-                    recursiveDirectorySearch(currentEggPath, extensions: ["egg"], found: signEgg)
-                    recursiveDirectorySearch(currentEggPath, extensions: signableExtensions, found: eggSigningFunction)
+                    recursiveDirectorySearch(currentEggPath, extensions: ["egg"], specificFiles: nil, found: signEgg)
+                    recursiveDirectorySearch(currentEggPath, extensions: signableExtensions, specificFiles: specificFiles, found: eggSigningFunction)
                     setStatus("Compressing \(shortName)")
                     self.zip(currentEggPath, outputFile: eggFile)                    
                 }
                 
-                recursiveDirectorySearch(appBundlePath, extensions: ["egg"], found: signEgg)
+                recursiveDirectorySearch(appBundlePath, extensions: ["egg"], specificFiles: nil, found: signEgg)
                 
                 //MARK: Codesigning - App
                 let signingFunction = generateFileSignFunc(payloadDirectory, entitlementsPath: entitlementsPlist, signingCertificate: signingCertificate!)
                 
                 
-                recursiveDirectorySearch(appBundlePath, extensions: signableExtensions, found: signingFunction)
+                recursiveDirectorySearch(appBundlePath, extensions: signableExtensions, specificFiles: specificFiles, found: signingFunction)
                 signingFunction(appBundlePath)
                 
                 //MARK: Codesigning - Verification
