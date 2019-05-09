@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import Foundation
 
 class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDownloadDelegate {
     
@@ -196,7 +197,6 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     }
     
     func setStatus(_ status: String){
-        Log.write(status)
         if (!Thread.isMainThread){
             DispatchQueue.main.sync{
                 setStatus(status)
@@ -204,6 +204,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         }
         else{
             StatusLabel.stringValue = status
+            Log.write(status)
         }
     }
     
@@ -399,9 +400,12 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     
     /// check if Mach-O file
     func checkMachOFile(_ path: String) -> Bool {
-        let task = Process().execute("/usr/bin/file", workingDirectory: nil, arguments: [path])
-        let fileContent = task.output.replacingOccurrences(of: "\(path): ", with: "")
-        return fileContent.starts(with: "Mach-O")
+        if let file = FileHandle(forReadingAtPath: path) {
+            let data = file.readData(ofLength: 4)
+            file.closeFile()
+            return data.elementsEqual([0xCE, 0xFA, 0xED, 0xFE]) || data.elementsEqual([0xCF, 0xFA, 0xED, 0xFE])
+        }
+        return false
     }
     
     func unzip(_ inputFile: String, outputPath: String)->AppSignerTaskOutput {
