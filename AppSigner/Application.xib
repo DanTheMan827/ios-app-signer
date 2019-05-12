@@ -261,7 +261,7 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <progressIndicator wantsLayer="YES" maxValue="100" displayedWhenStopped="NO" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="9a5-Oe-N79">
+                    <progressIndicator hidden="YES" wantsLayer="YES" maxValue="100" displayedWhenStopped="NO" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="9a5-Oe-N79">
                         <rect key="frame" x="120" y="2" width="424" height="20"/>
                     </progressIndicator>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="w01-jO-HKq">

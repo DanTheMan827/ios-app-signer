@@ -468,6 +468,9 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         downloading = false
         downloadProgress.doubleValue = 0.0
         downloadProgress.stopAnimation(nil)
+        DispatchQueue.main.async {
+            self.downloadProgress.isHidden = true
+        }
     }
     
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
@@ -577,6 +580,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         var newVersion : String = ""
 
         DispatchQueue.main.sync {
+            downloadProgress.isHidden = true
             inputFile = self.InputFileText.stringValue
             signingCertificate = self.CodesigningCertsPopup.selectedItem?.title
             newApplicationID = self.NewApplicationIDTextField.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
@@ -694,6 +698,9 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 
                 let downloadTask = defaultSession.downloadTask(with: url)
                 setStatus("Downloading file")
+                DispatchQueue.main.async {
+                    self.downloadProgress.isHidden = false
+                }
                 downloadProgress.startAnimation(nil)
                 downloadTask.resume()
                 defaultSession.finishTasksAndInvalidate()
