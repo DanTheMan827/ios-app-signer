@@ -399,11 +399,18 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     }
     
     /// check if Mach-O file
+    let signableExtensions = ["dylib","so","0","vis","pvr","framework","appex","app"]
     @objc func checkMachOFile(_ path: String) -> Bool {
         if let file = FileHandle(forReadingAtPath: path) {
             let data = file.readData(ofLength: 4)
             file.closeFile()
-            return data.elementsEqual([0xCE, 0xFA, 0xED, 0xFE]) || data.elementsEqual([0xCF, 0xFA, 0xED, 0xFE])
+            var machOFile = data.elementsEqual([0xCE, 0xFA, 0xED, 0xFE]) || data.elementsEqual([0xCF, 0xFA, 0xED, 0xFE]) || data.elementsEqual([0xCA, 0xFE, 0xBA, 0xBE])
+            
+            if machOFile == false && signableExtensions.contains(path.lastPathComponent.pathExtension.lowercased()) {
+                Log.write("Detected binary by extension: \(path)")
+                machOFile = true
+            }
+            return machOFile
         }
         return false
     }
