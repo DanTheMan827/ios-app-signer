@@ -121,7 +121,7 @@
             <windowCollectionBehavior key="collectionBehavior" fullScreenNone="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="240" width="550" height="242"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1080"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="550" height="242"/>
             <value key="maxSize" type="size" width="9999" height="242"/>
             <view key="contentView" id="se5-gp-TjO" customClass="MainView" customModule="iOS_App_Signer" customModuleProvider="target">
@@ -181,7 +181,7 @@
                         </connections>
                     </button>
                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aVt-Sy-tta">
-                        <rect key="frame" x="134" y="180" width="411" height="25"/>
+                        <rect key="frame" x="134" y="180" width="411" height="26"/>
                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="Yf9-38-1CN">
                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="menu"/>
@@ -198,7 +198,7 @@
                         </connections>
                     </popUpButton>
                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4SO-6J-jzo">
-                        <rect key="frame" x="134" y="151" width="411" height="25"/>
+                        <rect key="frame" x="134" y="151" width="411" height="26"/>
                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="xup-Rd-N3A">
                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="menu"/>
@@ -287,13 +287,20 @@
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QZI-Qs-VwV">
-                        <rect key="frame" x="136" y="64" width="406" height="22"/>
+                        <rect key="frame" x="136" y="64" width="254" height="22"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="This changes the app version number" drawsBackground="YES" id="2PE-H9-BWc">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
+                    <button toolTip="Don't resign extension bundles as they might contain their own code signature" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Cco-fM-ZOR">
+                        <rect key="frame" x="396" y="66" width="148" height="18"/>
+                        <buttonCell key="cell" type="check" title="Ignore PlugIns folder" bezelStyle="regularSquare" imagePosition="left" inset="2" id="Nw2-Zf-Zab">
+                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                    </button>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XPd-ts-72C">
                         <rect key="frame" x="136" y="34" width="340" height="22"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="This changes the app short version number" drawsBackground="YES" id="Y13-6l-O4U">
@@ -317,11 +324,13 @@
                     <constraint firstItem="YSK-IJ-CeM" firstAttribute="top" secondItem="4SO-6J-jzo" secondAttribute="bottom" constant="8" id="32c-gm-COb"/>
                     <constraint firstItem="XPd-ts-72C" firstAttribute="top" secondItem="QZI-Qs-VwV" secondAttribute="bottom" constant="8" id="3nG-dj-HRJ"/>
                     <constraint firstItem="tPN-Hd-sKi" firstAttribute="width" secondItem="YJU-Yl-45B" secondAttribute="width" id="59U-gL-Fmw"/>
+                    <constraint firstItem="Cco-fM-ZOR" firstAttribute="leading" secondItem="QZI-Qs-VwV" secondAttribute="trailing" constant="8" id="5O9-rz-wR2"/>
                     <constraint firstItem="9a5-Oe-N79" firstAttribute="centerY" secondItem="w01-jO-HKq" secondAttribute="centerY" id="7bO-Pm-RKf"/>
                     <constraint firstItem="4Sa-9c-2wd" firstAttribute="width" secondItem="YJU-Yl-45B" secondAttribute="width" id="8T7-Mo-JRF"/>
                     <constraint firstAttribute="trailing" secondItem="jID-Ce-koR" secondAttribute="trailing" constant="8" id="9dv-Y0-YhM"/>
                     <constraint firstItem="aVt-Sy-tta" firstAttribute="centerY" secondItem="YJU-Yl-45B" secondAttribute="centerY" id="9eT-9n-hbW"/>
                     <constraint firstItem="XPd-ts-72C" firstAttribute="leading" secondItem="a8r-Py-WHA" secondAttribute="trailing" constant="8" id="B2j-S3-B4d"/>
+                    <constraint firstItem="Cco-fM-ZOR" firstAttribute="centerY" secondItem="QZI-Qs-VwV" secondAttribute="centerY" id="Dxy-RE-KH1"/>
                     <constraint firstItem="QZI-Qs-VwV" firstAttribute="top" secondItem="qJN-16-XSx" secondAttribute="bottom" constant="8" id="ENc-tB-q80"/>
                     <constraint firstItem="9a5-Oe-N79" firstAttribute="leading" secondItem="zUI-5c-Yv6" secondAttribute="trailing" constant="6" id="EbS-UA-l9f"/>
                     <constraint firstItem="a8r-Py-WHA" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="8" id="Hmd-zS-9iO"/>
@@ -330,7 +339,6 @@
                     <constraint firstItem="aVt-Sy-tta" firstAttribute="leading" secondItem="YJU-Yl-45B" secondAttribute="trailing" constant="8" id="NQP-Rj-e4f"/>
                     <constraint firstItem="Q7q-HU-46D" firstAttribute="leading" secondItem="XPd-ts-72C" secondAttribute="trailing" constant="8" id="NRb-bP-gRW"/>
                     <constraint firstItem="ciM-lE-ANv" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="8" id="NW3-Cj-bTu"/>
-                    <constraint firstAttribute="trailing" secondItem="QZI-Qs-VwV" secondAttribute="trailing" constant="8" id="NdS-wv-fxf"/>
                     <constraint firstAttribute="trailing" secondItem="9a5-Oe-N79" secondAttribute="trailing" constant="6" id="Okg-LD-ks1"/>
                     <constraint firstItem="4Sa-9c-2wd" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="8" id="Osz-hK-Auj"/>
                     <constraint firstItem="a8r-Py-WHA" firstAttribute="width" secondItem="YJU-Yl-45B" secondAttribute="width" id="OzJ-Tw-bVa"/>
@@ -338,6 +346,7 @@
                     <constraint firstItem="GdX-jd-F08" firstAttribute="centerY" secondItem="4Sa-9c-2wd" secondAttribute="centerY" id="Qfi-gW-YMQ"/>
                     <constraint firstItem="qJN-16-XSx" firstAttribute="leading" secondItem="Zay-Rf-RG2" secondAttribute="trailing" constant="8" id="R2C-LQ-K7X"/>
                     <constraint firstItem="GdX-jd-F08" firstAttribute="leading" secondItem="4Sa-9c-2wd" secondAttribute="trailing" constant="8" id="SAk-3c-sQS"/>
+                    <constraint firstAttribute="trailing" secondItem="Cco-fM-ZOR" secondAttribute="trailing" constant="8" id="VZJ-Ag-a03"/>
                     <constraint firstItem="YSK-IJ-CeM" firstAttribute="leading" secondItem="tPN-Hd-sKi" secondAttribute="trailing" constant="8" id="WHV-Hr-P3M"/>
                     <constraint firstItem="YSK-IJ-CeM" firstAttribute="centerY" secondItem="tPN-Hd-sKi" secondAttribute="centerY" id="WKY-eZ-IAc"/>
                     <constraint firstItem="QZI-Qs-VwV" firstAttribute="leading" secondItem="ciM-lE-ANv" secondAttribute="trailing" constant="8" id="Wqv-wQ-Fel"/>
@@ -382,6 +391,7 @@
                     <outlet property="appShortVersion" destination="XPd-ts-72C" id="W0S-Ph-LL6"/>
                     <outlet property="appVersion" destination="QZI-Qs-VwV" id="Z3A-3i-3aV"/>
                     <outlet property="downloadProgress" destination="9a5-Oe-N79" id="tYC-2T-i1O"/>
+                    <outlet property="ignorePluginsCheckbox" destination="Cco-fM-ZOR" id="j12-55-dIk"/>
                 </connections>
             </view>
             <contentBorderThickness minY="25"/>

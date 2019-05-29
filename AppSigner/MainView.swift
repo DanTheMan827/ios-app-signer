@@ -23,7 +23,8 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     @IBOutlet var appDisplayName: NSTextField!
     @IBOutlet var appShortVersion: NSTextField!
     @IBOutlet var appVersion: NSTextField!
-    
+    @IBOutlet var ignorePluginsCheckbox: NSButton!
+
     //MARK: Variables
     var provisioningProfiles:[ProvisioningProfile] = []
     @objc var codesigningCerts: [String] = []
@@ -33,6 +34,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     @objc var outputFile: String?
     var startSize: CGFloat?
     @objc var NibLoaded = false
+    var shouldCheckPlugins: Bool!
     
     //MARK: Constants
     @objc let defaults = UserDefaults()
@@ -363,7 +365,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
             for file in files {
                 let currentFile = path.stringByAppendingPathComponent(file)
                 fileManager.fileExists(atPath: currentFile, isDirectory: &isDirectory)
-                if isDirectory.boolValue {
+                if isDirectory.boolValue && allowRecursiveSearchAt(path) {
                     recursiveMachOSearch(currentFile, found: found)
                 }
                 if checkMachOFile(currentFile) {
@@ -394,6 +396,10 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 
             }
         }
+    }
+
+    func allowRecursiveSearchAt(_ path: String) -> Bool {
+        return shouldCheckPlugins || path.lastPathComponent != "PlugIns"
     }
     
     /// check if Mach-O file
@@ -587,6 +593,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
             newDisplayName = self.appDisplayName.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
             newShortVersion = self.appShortVersion.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
             newVersion = self.appVersion.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+            shouldCheckPlugins = ignorePluginsCheckbox.state == .off
         }
 
         var provisioningFile = self.profileFilename
@@ -904,6 +911,10 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                     
                     if let oldAppID = getPlistKey(appBundleInfoPlist, keyName: "CFBundleIdentifier") {
                         func changeAppexID(_ appexFile: String){
+                            guard allowRecursiveSearchAt(appexFile.stringByDeletingLastPathComponent) else {
+                                return
+                            }
+
                             let appexPlist = appexFile.stringByAppendingPathComponent("Info.plist")
                             if let appexBundleID = getPlistKey(appexPlist, keyName: "CFBundleIdentifier"){
                                 let newAppexID = "\(newApplicationID)\(appexBundleID.substring(from: oldAppID.endIndex))"
