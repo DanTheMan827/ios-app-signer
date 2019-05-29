@@ -547,18 +547,23 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     }
     
     @objc func startSigning() {
-        controlsEnabled(false)
-        
-        //MARK: Get output filename
-        let saveDialog = NSSavePanel()
-        saveDialog.allowedFileTypes = ["ipa"]
-        saveDialog.nameFieldStringValue = InputFileText.stringValue.lastPathComponent.stringByDeletingPathExtension
-        if saveDialog.runModal().rawValue == NSFileHandlingPanelOKButton {
-            outputFile = saveDialog.url!.path
-            Thread.detachNewThreadSelector(#selector(self.signingThread), toTarget: self, with: nil)
+        let inputFile = InputFileText.stringValue
+        if inputFile.pathExtension.lowercased() == "appex" {
+            outputFile = inputFile
         } else {
-            outputFile = nil
-            controlsEnabled(true)
+            //MARK: Get output filename
+            let saveDialog = NSSavePanel()
+            saveDialog.allowedFileTypes = ["ipa"]
+            saveDialog.nameFieldStringValue = inputFile.lastPathComponent.stringByDeletingPathExtension
+            if saveDialog.runModal().rawValue == NSFileHandlingPanelOKButton {
+                outputFile = saveDialog.url!.path
+            } else {
+                outputFile = nil
+            }
+        }
+        if outputFile != nil {
+            controlsEnabled(false)
+            Thread.detachNewThreadSelector(#selector(self.signingThread), toTarget: self, with: nil)
         }
     }
     
@@ -1054,14 +1059,29 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
             } catch let error as NSError {
                 setStatus("Error deleting output file")
                 Log.write(error.localizedDescription)
-                cleanup(tempFolder); return
+                cleanup(tempFolder)
+                return
             }
         }
-        setStatus("Packaging IPA")
-        let zipTask = self.zip(workingDirectory, outputFile: outputFile!)
-        if zipTask.status != 0 {
-            setStatus("Error packaging IPA")
+
+        switch outputFile?.pathExtension.lowercased() {
+        case "ipa":
+            setStatus("Packaging IPA")
+            let zipTask = self.zip(workingDirectory, outputFile: outputFile!)
+            if zipTask.status != 0 {
+                setStatus("Error packaging IPA")
+            }
+        case "appex":
+            do {
+                try fileManager.copyItem(atPath: payloadDirectory.stringByAppendingPathComponent(inputFile.lastPathComponent), toPath: outputFile!)
+            } catch let error as NSError {
+                setStatus("Error copying appex bundle to \(outputFile!)")
+                Log.write(error.localizedDescription)
+            }
+        default:
+            break
         }
+
         //MARK: Cleanup
         cleanup(tempFolder)
         setStatus("Done, output at \(outputFile!)")
