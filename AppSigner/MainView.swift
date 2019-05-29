@@ -511,9 +511,10 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
             let fileName = file.lastPathComponent.stringByDeletingPathExtension
             filePath = file.stringByAppendingPathComponent(fileName)
         } else if fileExtension == "app" || fileExtension == "appex" {
-            // appene execute file in app
-            let fileName = file.lastPathComponent.stringByDeletingPathExtension
-            filePath = file.stringByAppendingPathComponent(fileName)
+            // read executable file from Info.plist
+            let infoPlist = file.stringByAppendingPathComponent("Info.plist")
+            let executableFile = getPlistKey(infoPlist, keyName: "CFBundleExecutable")!
+            filePath = file.stringByAppendingPathComponent(executableFile)
             needEntitlements = hasEntitlements
         } else {
             //
