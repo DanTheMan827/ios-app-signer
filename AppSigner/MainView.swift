@@ -50,13 +50,13 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
 //    let plistbuddyPath = "/usr/libexec/plistbuddy"
     
     //MARK: Drag / Drop
-    @objc var fileTypes: [String] = ["ipa","deb","app","xcarchive","mobileprovision"]
+    @objc var fileTypes: [String] = ["ipa","deb","app","xcarchive","mobileprovision","appex"]
     @objc var urlFileTypes: [String] = ["ipa","deb"]
     @objc var fileTypeIsOk = false
     
     @objc func fileDropped(_ filename: String){
         switch(filename.pathExtension.lowercased()){
-        case "ipa", "deb", "app", "xcarchive":
+        case "ipa", "deb", "app", "xcarchive", "appex":
             InputFileText.stringValue = filename
             break
             
@@ -1129,7 +1129,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         openDialog.canChooseDirectories = false
         openDialog.allowsMultipleSelection = false
         openDialog.allowsOtherFileTypes = false
-        openDialog.allowedFileTypes = ["ipa","IPA","deb","DEB","app","APP","xcarchive","XCARCHIVE"]
+        openDialog.allowedFileTypes = ["ipa","IPA","deb","DEB","app","APP","xcarchive","XCARCHIVE","appex","APPEX"]
         openDialog.runModal()
         if let filename = openDialog.urls.first {
             InputFileText.stringValue = filename.path
