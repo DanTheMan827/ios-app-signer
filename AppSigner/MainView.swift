@@ -50,22 +50,20 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
 //    let plistbuddyPath = "/usr/libexec/plistbuddy"
     
     //MARK: Drag / Drop
-    @objc var fileTypes: [String] = ["ipa","deb","app","xcarchive","mobileprovision","appex"]
-    @objc var urlFileTypes: [String] = ["ipa","deb"]
+    static let urlFileTypes = ["ipa", "deb"]
+    static let allowedFileTypes = urlFileTypes + ["app", "appex", "xcarchive"]
+    static let fileTypes = allowedFileTypes + ["mobileprovision"]
     @objc var fileTypeIsOk = false
     
     @objc func fileDropped(_ filename: String){
-        switch(filename.pathExtension.lowercased()){
-        case "ipa", "deb", "app", "xcarchive", "appex":
+        switch filename.pathExtension.lowercased() {
+        case let ext where MainView.allowedFileTypes.contains(ext):
             InputFileText.stringValue = filename
-            break
-            
         case "mobileprovision":
             ProvisioningProfilesPopup.selectItem(at: 1)
             checkProfileID(ProvisioningProfile(filename: filename))
+        default:
             break
-        default: break
-            
         }
     }
     
@@ -115,13 +113,13 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     @objc func checkExtension(_ drag: NSDraggingInfo) -> Bool {
         if let board = drag.draggingPasteboard.propertyList(forType: NSPasteboard.PasteboardType(rawValue: "NSFilenamesPboardType")) as? NSArray,
             let path = board[0] as? String {
-                return self.fileTypes.contains(path.pathExtension.lowercased())
+                return MainView.fileTypes.contains(path.pathExtension.lowercased())
         }
         if let types = drag.draggingPasteboard.types {
             if types.contains(NSPasteboard.PasteboardType(rawValue: "NSURLPboardType")) {
                 if let url = NSURL(from: drag.draggingPasteboard),
                     let suffix = url.pathExtension {
-                        return self.urlFileTypes.contains(suffix.lowercased())
+                        return MainView.urlFileTypes.contains(suffix.lowercased())
                 }
             }
         }
@@ -490,48 +488,37 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     //MARK: Codesigning
     @discardableResult
     func codeSign(_ file: String, certificate: String, entitlements: String?,before:((_ file: String, _ certificate: String, _ entitlements: String?)->Void)?, after: ((_ file: String, _ certificate: String, _ entitlements: String?, _ codesignTask: AppSignerTaskOutput)->Void)?)->AppSignerTaskOutput{
-        
-        let hasEntitlements: Bool = ({
-            if entitlements == nil {
-                return false
-            } else {
-                if fileManager.fileExists(atPath: entitlements!) {
-                    return true
-                } else {
-                    return false
-                }
-            }
-        })()
-        
+
         var needEntitlements: Bool = false
-        var filePath = file
-        let fileExtension = file.lastPathComponent.pathExtension
-        if fileExtension == "framework" {
-            // appene execute file in framework
+        let filePath: String
+        switch file.pathExtension.lowercased() {
+        case "framework":
+            // append executable file in framework
             let fileName = file.lastPathComponent.stringByDeletingPathExtension
             filePath = file.stringByAppendingPathComponent(fileName)
-        } else if fileExtension == "app" || fileExtension == "appex" {
+        case "app", "appex":
             // read executable file from Info.plist
             let infoPlist = file.stringByAppendingPathComponent("Info.plist")
             let executableFile = getPlistKey(infoPlist, keyName: "CFBundleExecutable")!
             filePath = file.stringByAppendingPathComponent(executableFile)
-            needEntitlements = hasEntitlements
-        } else {
-            //
+
+            if let entitlementsPath = entitlements, fileManager.fileExists(atPath: entitlementsPath) {
+                needEntitlements = true
+            }
+        default:
+            filePath = file
         }
-        
+
         if let beforeFunc = before {
             beforeFunc(file, certificate, entitlements)
         }
-        var arguments = [String]()
-        
+
+        var arguments = ["-f", "-s", certificate]
         if needEntitlements {
-            arguments.append("--entitlements")
-            arguments.append(entitlements!)
+            arguments += ["--entitlements", entitlements!]
         }
-        arguments.append(contentsOf: ["-f", "-s", certificate])
         arguments.append(filePath)
-        
+
         let codesignTask = Process().execute(codesignPath, workingDirectory: nil, arguments: arguments)
         if let afterFunc = after {
             afterFunc(file, certificate, entitlements, codesignTask)
@@ -772,7 +759,6 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 setStatus("Error processing deb file")
                 cleanup(tempFolder); return
             }
-            break
             
         case "ipa":
             //MARK: --Unzip ipa
@@ -789,7 +775,6 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 setStatus("Error extracting ipa file")
                 cleanup(tempFolder); return
             }
-            break
             
         case "app", "appex":
             //MARK: --Copy app bundle
@@ -805,7 +790,6 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 setStatus("Error copying app to payload directory")
                 cleanup(tempFolder); return
             }
-            break
             
         case "xcarchive":
             //MARK: --Copy app bundle from xcarchive
@@ -821,7 +805,6 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 setStatus("Error copying app to payload directory")
                 cleanup(tempFolder); return
             }
-            break
             
         default:
             setStatus("Unsupported input file")
@@ -1094,7 +1077,6 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 NewApplicationIDTextField.isEnabled = true
                 NewApplicationIDTextField.stringValue = ""
             }
-            break
             
         case 1:
             let openDialog = NSOpenPanel()
@@ -1110,17 +1092,14 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 sender.selectItem(at: 0)
                 chooseProvisioningProfile(sender)
             }
-            break
             
         case 2:
             sender.selectItem(at: 0)
             chooseProvisioningProfile(sender)
-            break
             
         default:
             let profile = provisioningProfiles[sender.indexOfSelectedItem - 3]
             checkProfileID(profile)
-            break
         }
         
     }
@@ -1130,7 +1109,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         openDialog.canChooseDirectories = false
         openDialog.allowsMultipleSelection = false
         openDialog.allowsOtherFileTypes = false
-        openDialog.allowedFileTypes = ["ipa","IPA","deb","DEB","app","APP","xcarchive","XCARCHIVE","appex","APPEX"]
+        openDialog.allowedFileTypes = MainView.allowedFileTypes + MainView.allowedFileTypes.map({ $0.uppercased() })
         openDialog.runModal()
         if let filename = openDialog.urls.first {
             InputFileText.stringValue = filename.path
@@ -1142,14 +1121,11 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     }
     
     @IBAction func doSign(_ sender: NSButton) {
-        switch(true){
-            case (codesigningCerts.count == 0):
-                showCodesignCertsErrorAlert()
-                break
-            
-            default:
-                NSApplication.shared.windows[0].makeFirstResponder(self)
-                startSigning()
+        if codesigningCerts.count > 0 {
+            NSApplication.shared.windows[0].makeFirstResponder(self)
+            startSigning()
+        } else {
+            showCodesignCertsErrorAlert()
         }
     }
     
