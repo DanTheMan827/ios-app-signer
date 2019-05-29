@@ -510,7 +510,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
             // appene execute file in framework
             let fileName = file.lastPathComponent.stringByDeletingPathExtension
             filePath = file.stringByAppendingPathComponent(fileName)
-        } else if fileExtension == "app" {
+        } else if fileExtension == "app" || fileExtension == "appex" {
             // appene execute file in app
             let fileName = file.lastPathComponent.stringByDeletingPathExtension
             filePath = file.stringByAppendingPathComponent(fileName)
@@ -790,7 +790,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
             }
             break
             
-        case "app":
+        case "app", "appex":
             //MARK: --Copy app bundle
             if !inputIsDirectory.boolValue {
                 setStatus("Unsupported input file")
