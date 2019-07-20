@@ -37,6 +37,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     var shouldCheckPlugins: Bool!
     
     //MARK: Constants
+    let signableExtensions = ["dylib","so","0","vis","pvr","framework","appex","app"]
     @objc let defaults = UserDefaults()
     @objc let fileManager = FileManager.default
     @objc let bundleID = Bundle.main.bundleIdentifier
@@ -358,23 +359,6 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         }
     }
     
-    @objc func recursiveMachOSearch(_ path: String, found: ((_ file: String) -> Void)){
-        if let files = try? fileManager.contentsOfDirectory(atPath: path) {
-            var isDirectory: ObjCBool = true
-            
-            for file in files {
-                let currentFile = path.stringByAppendingPathComponent(file)
-                fileManager.fileExists(atPath: currentFile, isDirectory: &isDirectory)
-                if isDirectory.boolValue && allowRecursiveSearchAt(path) {
-                    recursiveMachOSearch(currentFile, found: found)
-                }
-                if checkMachOFile(currentFile) {
-                    found(currentFile)
-                }
-            }
-        }
-    }
-    
     @objc func recursiveDirectorySearch(_ path: String, extensions: [String], found: ((_ file: String) -> Void)){
         
         if let files = try? fileManager.contentsOfDirectory(atPath: path) {
@@ -392,6 +376,8 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                     } else {
                         //NSLog("couldnt find: %@", file)
                     }
+                } else if isDirectory.boolValue == false && checkMachOFile(file) {
+                    found(currentFile)
                 }
                 
             }
@@ -403,7 +389,6 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     }
     
     /// check if Mach-O file
-    let signableExtensions = ["dylib","so","0","vis","pvr","framework","appex","app"]
     @objc func checkMachOFile(_ path: String) -> Bool {
         if let file = FileHandle(forReadingAtPath: path) {
             let data = file.readData(ofLength: 4)
@@ -1026,7 +1011,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                         return
                     }
                     recursiveDirectorySearch(currentEggPath, extensions: ["egg"], found: signEgg)
-                    recursiveMachOSearch(currentEggPath, found: eggSigningFunction)
+                    recursiveDirectorySearch(currentEggPath, extensions: signableExtensions, found: eggSigningFunction)
                     setStatus("Compressing \(shortName)")
                     _ = self.zip(currentEggPath, outputFile: eggFile)                    
                 }
@@ -1036,8 +1021,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 //MARK: Codesigning - App
                 let signingFunction = generateFileSignFunc(payloadDirectory, entitlementsPath: entitlementsPlist, signingCertificate: signingCertificate!)
                 
-                
-                recursiveMachOSearch(appBundlePath, found: signingFunction)
+                recursiveDirectorySearch(appBundlePath, extensions: signableExtensions, found: signingFunction)
                 signingFunction(appBundlePath)
                 
                 //MARK: Codesigning - Verification
