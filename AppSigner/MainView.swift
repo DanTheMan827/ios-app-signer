@@ -376,7 +376,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                     } else {
                         //NSLog("couldnt find: %@", file)
                     }
-                } else if isDirectory.boolValue == false && checkMachOFile(file) {
+                } else if isDirectory.boolValue == false && checkMachOFile(currentFile) {
                     found(currentFile)
                 }
                 
