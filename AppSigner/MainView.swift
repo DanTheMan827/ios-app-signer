@@ -268,7 +268,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 output.append(rawResult[index+1])
             }
         }
-        return output
+        return output.sorted()
     }
     
     @objc func showCodesignCertsErrorAlert(){
