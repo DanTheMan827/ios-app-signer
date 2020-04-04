@@ -16,7 +16,7 @@ struct AppSignerTaskOutput {
     }
 }
 extension Process {
-    func launchSyncronous() -> AppSignerTaskOutput {
+    func launchSynchronous() -> AppSignerTaskOutput {
         self.standardInput = FileHandle.nullDevice
         let pipe = Pipe()
         self.standardOutput = pipe
@@ -48,7 +48,7 @@ extension Process {
         if workingDirectory != nil {
             self.currentDirectoryPath = workingDirectory!
         }
-        return self.launchSyncronous()
+        return self.launchSynchronous()
     }
     
 }
