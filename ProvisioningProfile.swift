@@ -55,7 +55,7 @@ struct ProvisioningProfile {
         return newProfiles;
     }
     
-    init?(filename: String){
+    init?(filename: String, skipGetTaskAllow: Bool = false){
         let securityArgs = ["cms","-D","-i", filename]
         
          let taskOutput = Process().execute("/usr/bin/security", workingDirectory: nil, arguments: securityArgs)
@@ -66,6 +66,23 @@ struct ProvisioningProfile {
                 Log.write("Unable to find xml start tag in profile")
                 self.rawXML = taskOutput.output
             }
+            
+            if skipGetTaskAllow {
+                Log.write("Skipping get-task-allow entitlement...");
+                
+                if let results = try? PropertyListSerialization.propertyList(from: self.rawXML.data(using: String.Encoding.utf8)!, options: PropertyListSerialization.MutabilityOptions(), format: nil) {
+                    var resultsdict = results as! Dictionary<String, AnyObject>
+                    var entitlements = resultsdict["Entitlements"] as! Dictionary<String, AnyObject>
+                    entitlements.removeValue(forKey: "get-task-allow")
+                    resultsdict["Entitlements"] = entitlements as AnyObject
+
+                    let data = PropertyListSerialization.dataFromPropertyList(resultsdict, format: PropertyListSerialization.PropertyListFormat.xml, errorDescription: nil)!
+                    self.rawXML = String(data: data, encoding: .utf8)!
+                    Log.write("Skipped get-task-allow entitlement!");
+                }
+            }
+
+            
             
             if let results = try? PropertyListSerialization.propertyList(from: self.rawXML.data(using: String.Encoding.utf8)!, options: PropertyListSerialization.MutabilityOptions(), format: nil) {
                 if let expirationDate = (results as AnyObject).value(forKey: "ExpirationDate") as? Date,

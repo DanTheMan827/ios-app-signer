@@ -24,7 +24,9 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     @IBOutlet var appShortVersion: NSTextField!
     @IBOutlet var appVersion: NSTextField!
     @IBOutlet var ignorePluginsCheckbox: NSButton!
+    @IBOutlet var noGetTaskAllowCheckbox: NSButton!
 
+    
     //MARK: Variables
     var provisioningProfiles:[ProvisioningProfile] = []
     @objc var codesigningCerts: [String] = []
@@ -35,7 +37,8 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     var startSize: CGFloat?
     @objc var NibLoaded = false
     var shouldCheckPlugins: Bool!
-    
+    var shouldSkipGetTaskAllow: Bool!
+
     //MARK: Constants
     let signableExtensions = ["dylib","so","0","vis","pvr","framework","appex","app"]
     @objc let defaults = UserDefaults()
@@ -579,6 +582,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
             newShortVersion = self.appShortVersion.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
             newVersion = self.appVersion.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
             shouldCheckPlugins = ignorePluginsCheckbox.state == .off
+            shouldSkipGetTaskAllow = noGetTaskAllowCheckbox.state == .on
         }
 
         var provisioningFile = self.profileFilename
@@ -858,7 +862,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 if provisioningFile != nil || useAppBundleProfile {
                     setStatus("Parsing entitlements")
                     
-                    if let profile = ProvisioningProfile(filename: useAppBundleProfile ? appBundleProvisioningFilePath : provisioningFile!){
+                    if let profile = ProvisioningProfile(filename: useAppBundleProfile ? appBundleProvisioningFilePath : provisioningFile!, skipGetTaskAllow: shouldSkipGetTaskAllow){
                         if let entitlements = profile.getEntitlementsPlist(tempFolder) {
                             Log.write("–––––––––––––––––––––––\n\(entitlements)")
                             Log.write("–––––––––––––––––––––––")
