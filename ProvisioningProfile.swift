@@ -15,8 +15,7 @@ struct ProvisioningProfile {
         expires: Date,
         appID: String,
         teamID: String,
-        rawXML: String,
-        entitlements: AnyObject?
+        entitlements: [String : AnyObject]
     fileprivate let delegate = NSApplication.shared.delegate as! AppDelegate
     
     static func getProfiles() -> [ProvisioningProfile] {
@@ -55,41 +54,27 @@ struct ProvisioningProfile {
         return newProfiles;
     }
     
-    init?(filename: String, skipGetTaskAllow: Bool = false){
+    init?(filename: String){
         let securityArgs = ["cms","-D","-i", filename]
         
          let taskOutput = Process().execute("/usr/bin/security", workingDirectory: nil, arguments: securityArgs)
+         let rawXML: String
          if taskOutput.status == 0 {
             if let xmlIndex = taskOutput.output.range(of: "<?xml") {
-                self.rawXML = taskOutput.output.substring(from: xmlIndex.lowerBound)
+                rawXML = taskOutput.output.substring(from: xmlIndex.lowerBound)
             } else {
                 Log.write("Unable to find xml start tag in profile")
-                self.rawXML = taskOutput.output
-            }
-            
-            if skipGetTaskAllow {
-                Log.write("Skipping get-task-allow entitlement...");
-                
-                if let results = try? PropertyListSerialization.propertyList(from: self.rawXML.data(using: String.Encoding.utf8)!, options: PropertyListSerialization.MutabilityOptions(), format: nil) {
-                    var resultsdict = results as! Dictionary<String, AnyObject>
-                    var entitlements = resultsdict["Entitlements"] as! Dictionary<String, AnyObject>
-                    entitlements.removeValue(forKey: "get-task-allow")
-                    resultsdict["Entitlements"] = entitlements as AnyObject
-
-                    let data = PropertyListSerialization.dataFromPropertyList(resultsdict, format: PropertyListSerialization.PropertyListFormat.xml, errorDescription: nil)!
-                    self.rawXML = String(data: data, encoding: .utf8)!
-                    Log.write("Skipped get-task-allow entitlement!");
-                }
+                rawXML = taskOutput.output
             }
 
             
             
-            if let results = try? PropertyListSerialization.propertyList(from: self.rawXML.data(using: String.Encoding.utf8)!, options: PropertyListSerialization.MutabilityOptions(), format: nil) {
-                if let expirationDate = (results as AnyObject).value(forKey: "ExpirationDate") as? Date,
-                    let creationDate = (results as AnyObject).value(forKey: "CreationDate") as? Date,
-                    let name = (results as AnyObject).value(forKey: "Name") as? String,
-                    let entitlements = (results as AnyObject).value(forKey: "Entitlements"),
-                    let applicationIdentifier = (entitlements as AnyObject).value(forKey: "application-identifier") as? String,
+            if let results = try? PropertyListSerialization.propertyList(from: rawXML.data(using: String.Encoding.utf8)!, options: .mutableContainers, format: nil) as? [String : AnyObject] {
+                if let expirationDate = results["ExpirationDate"] as? Date,
+                    let creationDate = results["CreationDate"] as? Date,
+                    let name = results["Name"] as? String,
+                    let entitlements = results["Entitlements"] as? [String : AnyObject],
+                    let applicationIdentifier = entitlements["application-identifier"] as? String,
                     let periodIndex = applicationIdentifier.firstIndex(of: ".") {
                         self.filename = filename
                         self.expires = expirationDate
@@ -97,7 +82,7 @@ struct ProvisioningProfile {
                         self.appID = applicationIdentifier.substring(from: applicationIdentifier.index(periodIndex, offsetBy: 1))
                         self.teamID = applicationIdentifier.substring(to: periodIndex)
                         self.name = name
-                        self.entitlements = entitlements as AnyObject?
+                        self.entitlements = entitlements
                 } else {
                     Log.write("Error processing \(filename.lastPathComponent)")
                     return nil
@@ -112,22 +97,27 @@ struct ProvisioningProfile {
         }
     }
     
-    func getEntitlementsPlist(_ tempFolder: String) -> NSString? {
-        let mobileProvisionPlist = tempFolder.stringByAppendingPathComponent("mobileprovision.plist")
-        do {
-            try self.rawXML.write(toFile: mobileProvisionPlist, atomically: false, encoding: String.Encoding.utf8)
-            let plistBuddy = Process().execute("/usr/libexec/PlistBuddy", workingDirectory: nil, arguments: ["-c", "Print :Entitlements",mobileProvisionPlist, "-x"])
-            if plistBuddy.status == 0 {
-                return plistBuddy.output as NSString?
-            } else {
-                Log.write("PlistBuddy Failed")
-                Log.write(plistBuddy.output)
-                return nil
-            }
-        } catch let error as NSError {
-            Log.write("Error writing mobileprovision.plist")
-            Log.write(error.localizedDescription)
-            return nil
+    mutating func removeGetTaskAllow() {
+        if let _ = entitlements.removeValue(forKey: "get-task-allow") {
+            Log.write("Skipped get-task-allow entitlement!");
+        } else {
+            Log.write("get-task-allow entitlement not found!");
         }
+    }
+    
+    mutating func update(trueAppID: String) {
+        guard let oldIdentifier = entitlements["application-identifier"] as? String else {
+            Log.write("Error reading application-identifier")
+            return
+        }
+        let newIdentifier = teamID + "." + trueAppID
+        entitlements["application-identifier"] = newIdentifier as AnyObject
+        Log.write("Updated application-identifier from '\(oldIdentifier)' to '\(newIdentifier)'")
+        // TODO: update any other wildcard entitlements
+    }
+    
+    func getEntitlementsPlist() -> String? {
+        let data = PropertyListSerialization.dataFromPropertyList(entitlements, format: PropertyListSerialization.PropertyListFormat.xml, errorDescription: nil)!
+        return String(data: data, encoding: .utf8)
     }
 }

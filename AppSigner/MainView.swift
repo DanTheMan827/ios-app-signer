@@ -858,16 +858,32 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                     }
                 }
                 
+                let bundleID = getPlistKey(appBundleInfoPlist, keyName: "CFBundleIdentifier")
+                
                 //MARK: Generate entitlements.plist
                 if provisioningFile != nil || useAppBundleProfile {
                     setStatus("Parsing entitlements")
                     
-                    if let profile = ProvisioningProfile(filename: useAppBundleProfile ? appBundleProvisioningFilePath : provisioningFile!, skipGetTaskAllow: shouldSkipGetTaskAllow){
-                        if let entitlements = profile.getEntitlementsPlist(tempFolder) {
+                    if var profile = ProvisioningProfile(filename: useAppBundleProfile ? appBundleProvisioningFilePath : provisioningFile!){
+                        if shouldSkipGetTaskAllow {
+                            profile.removeGetTaskAllow()
+                        }
+                        let isWildcard = profile.appID == "*" // TODO: support com.example.* wildcard
+                        if !isWildcard && (newApplicationID != "" && newApplicationID != profile.appID) {
+                            setStatus("Unable to change App ID to \(newApplicationID), provisioning profile won't allow it")
+                            cleanup(tempFolder); return
+                        } else if isWildcard {
+                            if newApplicationID != "" {
+                                profile.update(trueAppID: newApplicationID)
+                            } else if let existingBundleID = bundleID {
+                                profile.update(trueAppID: existingBundleID)
+                            }
+                        }
+                        if let entitlements = profile.getEntitlementsPlist() {
                             Log.write("–––––––––––––––––––––––\n\(entitlements)")
                             Log.write("–––––––––––––––––––––––")
                             do {
-                                try entitlements.write(toFile: entitlementsPlist, atomically: false, encoding: String.Encoding.utf8.rawValue)
+                                try entitlements.write(toFile: entitlementsPlist, atomically: false, encoding: .utf8)
                                 setStatus("Saved entitlements to \(entitlementsPlist)")
                             } catch let error as NSError {
                                 setStatus("Error writing entitlements.plist, \(error.localizedDescription)")
@@ -875,10 +891,6 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                         } else {
                             setStatus("Unable to read entitlements from provisioning profile")
                             warnings += 1
-                        }
-                        if profile.appID != "*" && (newApplicationID != "" && newApplicationID != profile.appID) {
-                            setStatus("Unable to change App ID to \(newApplicationID), provisioning profile won't allow it")
-                            cleanup(tempFolder); return
                         }
                     } else {
                         setStatus("Unable to parse provisioning profile, it may be corrupt")
@@ -895,7 +907,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                 //MARK: Change Application ID
                 if newApplicationID != "" {
                     
-                    if let oldAppID = getPlistKey(appBundleInfoPlist, keyName: "CFBundleIdentifier") {
+                    if let oldAppID = bundleID {
                         func changeAppexID(_ appexFile: String){
                             guard allowRecursiveSearchAt(appexFile.stringByDeletingLastPathComponent) else {
                                 return
