@@ -437,12 +437,8 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         return "\(size)B"
     }
     @objc func getPlistKey(_ plist: String, keyName: String)->String? {
-        let currTask = Process().execute(defaultsPath, workingDirectory: nil, arguments: ["read", plist, keyName])
-        if currTask.status == 0 {
-            return String(currTask.output.dropLast())
-        } else {
-            return nil
-        }
+        let dictionary = NSDictionary(contentsOfFile: plist);
+        return dictionary?[keyName] as? String
     }
     
     func setPlistKey(_ plist: String, keyName: String, value: String)->AppSignerTaskOutput {
