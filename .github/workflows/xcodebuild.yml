@@ -32,6 +32,5 @@ jobs:
         uses: sersoft-gmbh/xcodebuild-action@v1
         with:
           project: iOS App Signer.xcodeproj
-          scheme: AppSigner
           destination: platform=macOS
           action: build
