@@ -24,6 +24,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      
+      - name: List
+        run: xcodebuild --list "iOS App Signer.xcodeproj"
+        
       - name: Build
         uses: sersoft-gmbh/xcodebuild-action@v1
         with:
