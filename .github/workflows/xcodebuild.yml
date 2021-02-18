@@ -26,11 +26,4 @@ jobs:
         uses: actions/checkout@v2
       
       - name: List
-        run: xcodebuild -list -workspace "iOS App Signer.xcodeproj/project.xcworkspace"
-        
-      - name: Build
-        uses: sersoft-gmbh/xcodebuild-action@v1
-        with:
-          project: iOS App Signer.xcodeproj
-          destination: platform=macOS
-          action: build
+        run: xcodebuild build -workspace "iOS App Signer.xcodeproj/project.xcworkspace" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
