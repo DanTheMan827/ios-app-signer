@@ -27,3 +27,9 @@ jobs:
       
       - name: Build
         run: xcodebuild build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO && find .
+        
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: release
+          path: build/Release/iOS App Signer.app
