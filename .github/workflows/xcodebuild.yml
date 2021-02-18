@@ -26,4 +26,4 @@ jobs:
         uses: actions/checkout@v2
       
       - name: Build
-        run: xcodebuild build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+        run: xcodebuild build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO && find .
