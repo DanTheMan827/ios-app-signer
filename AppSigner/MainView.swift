@@ -526,6 +526,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
             let verificationTask = Process().execute(codesignPath, workingDirectory: nil, arguments: ["-v",codesignTempFile])
             try? fileManager.removeItem(atPath: codesignTempFile)
             if verificationTask.status == 0 {
+                Log.write("Error testing codesign: \(verificationTask.output)")
                 return true
             } else {
                 return false
