@@ -510,6 +510,10 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         arguments.append(filePath)
 
         let codesignTask = Process().execute(codesignPath, workingDirectory: nil, arguments: arguments)
+        if codesignTask.status != 0 {
+            Log.write("Error codesign: \(codesignTask.output)")
+        }
+        
         if let afterFunc = after {
             afterFunc(file, certificate, entitlements, codesignTask)
         }
