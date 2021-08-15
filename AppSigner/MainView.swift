@@ -25,6 +25,8 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     @IBOutlet var appVersion: NSTextField!
     @IBOutlet var ignorePluginsCheckbox: NSButton!
     @IBOutlet var noGetTaskAllowCheckbox: NSButton!
+    @IBOutlet var InputAppIconText: NSTextField!
+    @IBOutlet var BrowseAppIconButton: NSButton!
 
     
     //MARK: Variables
@@ -1165,6 +1167,18 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
             }
         }
     }
-    
+    @IBAction func doAppIconBrowse(_ sender: AnyObject) {
+//        let openDialog = NSOpenPanel()
+//        openDialog.canChooseFiles = true
+//        openDialog.canChooseDirectories = false
+//        openDialog.allowsMultipleSelection = false
+//        openDialog.allowsOtherFileTypes = false
+//        openDialog.allowedFileTypes = MainView.allowedFileTypes + MainView.allowedFileTypes.map({ $0.uppercased() })
+//        openDialog.runModal()
+//        if let filename = openDialog.urls.first {
+//            InputFileText.stringValue = filename.path
+//        }
+    }
+
 }
 

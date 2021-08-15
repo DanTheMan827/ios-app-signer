@@ -196,7 +196,7 @@
 				TargetAttributes = {
 					652408C71BE743D4006FA4C6 = {
 						CreatedOnToolsVersion = 7.1;
-						DevelopmentTeam = 7PM929Z8M2;
+						DevelopmentTeam = YH23FJA92F;
 						LastSwiftMigration = 1020;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
@@ -357,7 +357,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = YH23FJA92F;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = AppSigner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
@@ -379,7 +379,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = YH23FJA92F;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = AppSigner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
