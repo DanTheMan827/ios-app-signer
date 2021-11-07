@@ -5,7 +5,7 @@ Supported input types are: ipa, deb, app, xcarchive
 
 Usage
 ------
-This app requires Xcode to be installed, it has only been successfully tested on OS X 10.11 at this time.
+This app requires Xcode to be installed, it has run successfully on the new macOS 12 Monterey.
 
 You need a provisioning profile and signing certificate, you can get these from Xcode by creating a new project.
 
