@@ -869,12 +869,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                         if shouldSkipGetTaskAllow {
                             profile.removeGetTaskAllow()
                         }
-                        var isWildcard = profile.appID == "*"
-                        if !isWildcard {
-                            if profile.appID.reversed().starts(with: "*.") { // support com.example.* wildcard
-                                isWildcard = true
-                            }
-                        }
+                        let isWildcard = profile.appID == "*" || profile.appID.suffix(2) == ".*"
                         if !isWildcard && (newApplicationID != "" && newApplicationID != profile.appID) {
                             setStatus("Unable to change App ID to \(newApplicationID), provisioning profile won't allow it")
                             cleanup(tempFolder); return
