@@ -869,17 +869,21 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                         if shouldSkipGetTaskAllow {
                             profile.removeGetTaskAllow()
                         }
-                        let isWildcard = profile.appID == "*" // TODO: support com.example.* wildcard
-                        if !isWildcard && (newApplicationID != "" && newApplicationID != profile.appID) {
-                            setStatus("Unable to change App ID to \(newApplicationID), provisioning profile won't allow it")
-                            cleanup(tempFolder); return
-                        } else if isWildcard {
-                            if newApplicationID != "" {
+
+                        let hasNewAppID = !newApplicationID.isEmpty
+                        if let wildcardIndex = profile.appID.firstIndex(of: "*") {
+                            let allowedPrefix = profile.appID.prefix(upTo: wildcardIndex)
+                            if hasNewAppID, newApplicationID.starts(with: allowedPrefix) {
                                 profile.update(trueAppID: newApplicationID)
                             } else if let existingBundleID = bundleID {
                                 profile.update(trueAppID: existingBundleID)
                             }
+                        } else if hasNewAppID, newApplicationID != profile.appID {
+                            setStatus("Unable to change App ID to \(newApplicationID), provisioning profile won't allow it")
+                            cleanup(tempFolder)
+                            return
                         }
+
                         if let entitlements = profile.getEntitlementsPlist() {
                             Log.write("–––––––––––––––––––––––\n\(entitlements)")
                             Log.write("–––––––––––––––––––––––")
