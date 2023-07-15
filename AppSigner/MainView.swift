@@ -503,7 +503,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
             beforeFunc(file, certificate, entitlements)
         }
 
-        var arguments = ["-f", "-s", certificate]
+        var arguments = ["-f", "-s", certificate, "--generate-entitlement-der"]
         if needEntitlements {
             arguments += ["--entitlements", entitlements!]
         }
