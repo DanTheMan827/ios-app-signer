@@ -25,6 +25,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     @IBOutlet var appVersion: NSTextField!
     @IBOutlet var ignorePluginsCheckbox: NSButton!
     @IBOutlet var noGetTaskAllowCheckbox: NSButton!
+    @IBOutlet var showDevWarningsCheckbox: NSButton!
 
     
     //MARK: Variables
@@ -302,33 +303,65 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         
     }
     
-    func checkProfileID(_ profile: ProvisioningProfile?){
-        if let profile = profile {
-            self.profileFilename = profile.filename
-            setStatus("Selected provisioning profile \(profile.appID)")
-            if profile.expires.timeIntervalSince1970 < Date().timeIntervalSince1970 {
-                ProvisioningProfilesPopup.selectItem(at: 0)
-                setStatus("Provisioning profile expired")
-                chooseProvisioningProfile(ProvisioningProfilesPopup)
-            }
-            if profile.appID.firstIndex(of: "*") == nil {
-                // Not a wildcard profile
-                NewApplicationIDTextField.stringValue = profile.appID
-                NewApplicationIDTextField.isEnabled = false
-            } else {
-                // Wildcard profile
-                if NewApplicationIDTextField.isEnabled == false {
-                    NewApplicationIDTextField.stringValue = ""
-                    NewApplicationIDTextField.isEnabled = true
-                }
-            }
-        } else {
+    func checkProfileID(
+        _ profile: ProvisioningProfile?
+    ){
+
+        guard let profile = profile
+        else {
+
             ProvisioningProfilesPopup.selectItem(at: 0)
             setStatus("Invalid provisioning profile")
             chooseProvisioningProfile(ProvisioningProfilesPopup)
+            return
+        }
+
+        self.profileFilename = profile.filename
+        setStatus("Selected provisioning profile \(profile.appID)")
+
+        if profile.expires.timeIntervalSince1970 < Date().timeIntervalSince1970 {
+
+            ProvisioningProfilesPopup.selectItem(at: 0)
+            setStatus("Provisioning profile expired")
+            chooseProvisioningProfile(ProvisioningProfilesPopup)
+        }
+
+        if profile.appID.firstIndex(of: "*") == nil {
+
+            // Not a wildcard profile
+            NewApplicationIDTextField.stringValue = profile.appID
+            NewApplicationIDTextField.isEnabled = false
+        }
+
+        else {
+
+            // Wildcard profile
+            if NewApplicationIDTextField.isEnabled == false {
+                NewApplicationIDTextField.stringValue = ""
+                NewApplicationIDTextField.isEnabled = true
+            }
+        }
+
+        //  Check development profile:
+        if profile.isDevelopmentProfile() && showDevWarningsCheckbox.state != .off {
+
+            DispatchQueue.main.async {
+
+                self.showDevelopmentProfileAlert()
+            }
         }
     }
-    
+
+    @objc
+    func showDevelopmentProfileAlert() {
+
+        let alert = NSAlert()
+        alert.messageText = "Development Profile"
+        alert.informativeText = "Warning, this is a development profile. If you're re-signing an app meant for sideloading, you should use an Ad-Hoc profile."
+        alert.addButton(withTitle: "Okay")
+        alert.runModal()
+    }
+
     @objc func controlsEnabled(_ enabled: Bool){
         
         if (!Thread.isMainThread){
