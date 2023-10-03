@@ -166,9 +166,9 @@
             <value key="maxSize" type="size" width="9999" height="242"/>
             <view key="contentView" misplaced="YES" id="se5-gp-TjO" customClass="MainView" customModule="iOS_App_Signer" customModuleProvider="target">
                 <rect key="frame" x="0.0" y="0.0" width="550" height="278"/>
-                <autoresizingMask key="autoresizingMask"/>
+                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
-                    <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YSK-IJ-CeM">
+                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YSK-IJ-CeM">
                         <rect key="frame" x="136" y="162" width="406" height="21"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="This is where you would change the application identifier" drawsBackground="YES" id="395-ue-2J0">
                             <font key="font" metaFont="system"/>
@@ -176,7 +176,7 @@
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YJU-Yl-45B">
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YJU-Yl-45B">
                         <rect key="frame" x="6" y="221" width="124" height="16"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Signing Certificate:" id="WUr-cp-F8p">
                             <font key="font" metaFont="system"/>
@@ -184,7 +184,7 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tPN-Hd-sKi">
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tPN-Hd-sKi">
                         <rect key="frame" x="6" y="165" width="124" height="16"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="New Application ID:" id="WPy-tB-bJ4">
                             <font key="font" metaFont="system"/>
@@ -192,7 +192,7 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4Sa-9c-2wd">
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4Sa-9c-2wd">
                         <rect key="frame" x="6" y="250" width="124" height="16"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Input File:" id="ZCT-YD-39f">
                             <font key="font" metaFont="system"/>
@@ -254,7 +254,7 @@
                             <action selector="chooseProvisioningProfile:" target="se5-gp-TjO" id="lZb-yq-7dF"/>
                         </connections>
                     </popUpButton>
-                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DTS-Xr-BlP">
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DTS-Xr-BlP">
                         <rect key="frame" x="6" y="193" width="124" height="16"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Provisioning Profile:" id="aX0-sJ-gW1">
                             <font key="font" metaFont="system"/>
@@ -262,7 +262,7 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GdX-jd-F08">
+                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GdX-jd-F08">
                         <rect key="frame" x="136" y="247" width="333" height="21"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" continuous="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="File path or URL accepted" drawsBackground="YES" usesSingleLineMode="YES" id="fri-IK-93r">
                             <font key="font" metaFont="system"/>
@@ -270,7 +270,7 @@
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qJN-16-XSx">
+                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qJN-16-XSx">
                         <rect key="frame" x="136" y="133" width="406" height="21"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="This changes the app title on the home screen" drawsBackground="YES" id="KLQ-qo-m8y">
                             <font key="font" metaFont="system"/>
@@ -278,7 +278,7 @@
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Zay-Rf-RG2">
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Zay-Rf-RG2">
                         <rect key="frame" x="6" y="136" width="124" height="16"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="App Display Name:" id="pA5-gE-hQU">
                             <font key="font" metaFont="system"/>
@@ -286,7 +286,7 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField hidden="YES" focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zUI-5c-Yv6">
+                    <textField hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zUI-5c-Yv6">
                         <rect key="frame" x="4" y="4" width="112" height="16"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Downloading file" id="6Z9-g9-hsM">
                             <font key="font" metaFont="systemBold"/>
@@ -294,7 +294,7 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="50" translatesAutoresizingMaskIntoConstraints="NO" id="ldw-vd-vcX">
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="50" translatesAutoresizingMaskIntoConstraints="NO" id="ldw-vd-vcX">
                         <rect key="frame" x="4" y="4" width="544" height="16"/>
                         <textFieldCell key="cell" lineBreakMode="truncatingMiddle" allowsUndo="NO" sendsActionOnEndEditing="YES" title="Downloading file" usesSingleLineMode="YES" id="4uJ-DO-E2U">
                             <font key="font" metaFont="systemBold"/>
@@ -318,7 +318,7 @@
                             <action selector="statusLabelClick:" target="se5-gp-TjO" id="pH3-Yf-e06"/>
                         </connections>
                     </button>
-                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ciM-lE-ANv">
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ciM-lE-ANv">
                         <rect key="frame" x="6" y="107" width="124" height="16"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="App Version:" id="j50-ne-bw4">
                             <font key="font" metaFont="system"/>
@@ -326,7 +326,7 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QZI-Qs-VwV">
+                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QZI-Qs-VwV">
                         <rect key="frame" x="136" y="104" width="248" height="21"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="This changes the app version number" drawsBackground="YES" id="2PE-H9-BWc">
                             <font key="font" metaFont="system"/>
@@ -370,7 +370,7 @@
                             <real value="3.4028234663852886e+38"/>
                         </customSpacing>
                     </stackView>
-                    <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XPd-ts-72C">
+                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XPd-ts-72C">
                         <rect key="frame" x="136" y="32" width="348" height="21"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="This changes the app short version number" drawsBackground="YES" id="Y13-6l-O4U">
                             <font key="font" metaFont="system"/>
@@ -378,7 +378,7 @@
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="a8r-Py-WHA">
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="a8r-Py-WHA">
                         <rect key="frame" x="6" y="35" width="124" height="16"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="App Short Version:" id="ksF-cb-1aW">
                             <font key="font" metaFont="system"/>

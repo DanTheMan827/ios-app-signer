@@ -196,7 +196,6 @@
 				TargetAttributes = {
 					652408C71BE743D4006FA4C6 = {
 						CreatedOnToolsVersion = 7.1;
-						DevelopmentTeam = 8734RMR67V;
 						LastSwiftMigration = 1020;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
@@ -357,12 +356,12 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 8734RMR67V;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = AppSigner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				PRODUCT_BUNDLE_IDENTIFIER = com.declanland.AppSigner;
+				PRODUCT_BUNDLE_IDENTIFIER = com.DanTheMan827.AppSigner;
 				PRODUCT_NAME = "iOS App Signer";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "iOS App Signer-Bridging-Header.h";
@@ -379,12 +378,12 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 8734RMR67V;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = AppSigner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				PRODUCT_BUNDLE_IDENTIFIER = com.declanland.AppSigner;
+				PRODUCT_BUNDLE_IDENTIFIER = com.DanTheMan827.AppSigner;
 				PRODUCT_NAME = "iOS App Signer";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "iOS App Signer-Bridging-Header.h";
