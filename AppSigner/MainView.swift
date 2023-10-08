@@ -261,8 +261,6 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         }
         let rawResult = securityResult.output.components(separatedBy: "\"")
         
-        var index: Int
-        
         for index in stride(from: 0, through: rawResult.count - 2, by: 2) {
             if !(rawResult.count - 1 < index + 1) {
                 output.append(rawResult[index+1])
