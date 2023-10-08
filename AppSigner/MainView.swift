@@ -261,8 +261,6 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         }
         let rawResult = securityResult.output.components(separatedBy: "\"")
         
-        var index: Int
-        
         for index in stride(from: 0, through: rawResult.count - 2, by: 2) {
             if !(rawResult.count - 1 < index + 1) {
                 output.append(rawResult[index+1])
@@ -512,6 +510,15 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         let codesignTask = Process().execute(codesignPath, workingDirectory: nil, arguments: arguments)
         if codesignTask.status != 0 {
             Log.write("Error codesign: \(codesignTask.output)")
+            
+            if (codesignTask.output.contains("ambiguous")) {
+                let alert = NSAlert()
+                alert.messageText = "Codesign failed due to ambiguous certificates"
+                alert.informativeText = "\(codesignTask.output)\nOpen Keychain Access and remove the duplicate certificates."
+                alert.alertStyle = .warning
+                alert.addButton(withTitle: "OK")
+                alert.runModal()
+            }
         }
         
         if let afterFunc = after {
