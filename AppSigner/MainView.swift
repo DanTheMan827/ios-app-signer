@@ -543,6 +543,10 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     
     @objc func startSigning() {
         let inputFile = InputFileText.stringValue
+        if (inputFile.count < 4) {
+            return
+        }
+        
         if inputFile.pathExtension.lowercased() == "appex" {
             outputFile = inputFile
         } else {
