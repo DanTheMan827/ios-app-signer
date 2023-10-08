@@ -510,6 +510,15 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         let codesignTask = Process().execute(codesignPath, workingDirectory: nil, arguments: arguments)
         if codesignTask.status != 0 {
             Log.write("Error codesign: \(codesignTask.output)")
+            
+            if (codesignTask.output.contains("ambiguous")) {
+                let alert = NSAlert()
+                alert.messageText = "Codesign failed due to ambiguous certificates"
+                alert.informativeText = "\(codesignTask.output)\nOpen Keychain Access and remove the duplicate certificates."
+                alert.alertStyle = .warning
+                alert.addButton(withTitle: "OK")
+                alert.runModal()
+            }
         }
         
         if let afterFunc = after {
