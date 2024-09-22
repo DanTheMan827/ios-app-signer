@@ -19,39 +19,43 @@ struct ProvisioningProfile {
     fileprivate let delegate = NSApplication.shared.delegate as! AppDelegate
     
     static func getProfiles() -> [ProvisioningProfile] {
-        var output: [ProvisioningProfile] = []
-        
         let fileManager = FileManager()
-        if let libraryDirectory = fileManager.urls(for: .libraryDirectory, in: .userDomainMask).first {
-                let provisioningProfilesPath = libraryDirectory.path.stringByAppendingPathComponent("MobileDevice/Provisioning Profiles") as NSString
-                if let provisioningProfiles = try? fileManager.contentsOfDirectory(atPath: provisioningProfilesPath as String) {
-                    
-                    for provFile in provisioningProfiles {
-                        if provFile.pathExtension == "mobileprovision" {
-                            let profileFilename = provisioningProfilesPath.appendingPathComponent(provFile)
-                            if let profile = ProvisioningProfile(filename: profileFilename) {
-                                output.append(profile)
-                            }
-                        }
-                    }
+        
+        guard let libraryDirectory = fileManager.urls(for: .libraryDirectory, in: .userDomainMask).first else { return [] }
+
+        let preMacOSSequouiaPath = libraryDirectory
+            .path
+            .stringByAppendingPathComponent("MobileDevice/Provisioning Profiles")
+        
+        let macOSSequoiaPath = libraryDirectory
+            .path
+            .stringByAppendingPathComponent("Developer/Xcode/UserData/Provisioning Profiles")
+        
+        let profiles = [preMacOSSequouiaPath, macOSSequoiaPath]
+            .flatMap { (profilesPath: String) -> [String] in
+                let contents = (try? fileManager.contentsOfDirectory(atPath: profilesPath)) ?? []
+                return contents.map { (profile: String) -> String in
+                    profilesPath.stringByAppendingPathComponent(profile)
                 }
-        }
-
-        // distinct
-        output = output.sorted(by: {
-            $0.created.timeIntervalSince1970 > $1.created.timeIntervalSince1970
-        })
-
-        var newProfiles = [ProvisioningProfile]()
-        var names = [String]()
-        for profile in output {
-            if !names.contains("\(profile.name)\(profile.appID)") {
-                newProfiles.append(profile)
-                names.append("\(profile.name)\(profile.appID)")
+            }
+            .filter { path in
+                path.pathExtension == "mobileprovision"
+            }
+            .compactMap { path in
+                ProvisioningProfile(filename: path)
+            }
+            .sorted { lhs, rhs in
+                lhs.created.timeIntervalSince1970 > rhs.created.timeIntervalSince1970
+            }
+        
+        var names = Set<String>()
+        return profiles.filter { profile in
+            let inserted = names.insert("\(profile.name)\(profile.appID)").inserted
+            if inserted {
                 NSLog("\(profile.name), \(profile.created)")
             }
+            return inserted
         }
-        return newProfiles;
     }
     
     init?(filename: String){
