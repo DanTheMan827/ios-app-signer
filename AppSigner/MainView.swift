@@ -25,6 +25,8 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     @IBOutlet var appVersion: NSTextField!
     @IBOutlet var ignorePluginsCheckbox: NSButton!
     @IBOutlet var noGetTaskAllowCheckbox: NSButton!
+    @IBOutlet var InputAppIconText: NSTextField!
+    @IBOutlet var BrowseAppIconButton: NSButton!
 
     
     //MARK: Variables
@@ -60,7 +62,9 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     static let allowedFileTypes = urlFileTypes + ["app", "appex", "xcarchive"]
     static let fileTypes = allowedFileTypes + ["mobileprovision"]
     @objc var fileTypeIsOk = false
-    
+
+    static let allowedImageTypes = ["png"]
+
     @objc func fileDropped(_ filename: String){
         switch filename.pathExtension.lowercased() {
         case let ext where MainView.allowedFileTypes.contains(ext):
@@ -444,7 +448,12 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     func setPlistKey(_ plist: String, keyName: String, value: String)->AppSignerTaskOutput {
         return Process().execute(defaultsPath, workingDirectory: nil, arguments: ["write", plist, keyName, value])
     }
-    
+
+    @objc func getPlistDictionaryKey(_ plist: String, keyName: String)->[String:AnyObject]? {
+        let dictionary = NSDictionary(contentsOfFile: plist)
+        return dictionary?[keyName] as? Dictionary
+    }
+
     //MARK: NSURL Delegate
     @objc var downloading = false
     @objc var downloadError: NSError?
@@ -573,6 +582,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
         var newDisplayName : String = ""
         var newShortVersion : String = ""
         var newVersion : String = ""
+        var newAppIcon : String = ""
 
         DispatchQueue.main.sync {
             downloadProgress.isHidden = true
@@ -582,6 +592,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
             newDisplayName = self.appDisplayName.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
             newShortVersion = self.appShortVersion.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
             newVersion = self.appVersion.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+            newAppIcon = self.InputAppIconText.stringValue
             shouldCheckPlugins = ignorePluginsCheckbox.state == .off
             shouldSkipGetTaskAllow = noGetTaskAllowCheckbox.state == .on
         }
@@ -979,6 +990,36 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                     }
                 }
                 
+                func replaceIcons(for key: String, newImage: NSImage) {
+                    if let plist = NSMutableDictionary(contentsOfFile: appBundleInfoPlist) {
+                        if let iconsDictionary = plist[key] as? [String:AnyObject] {
+                            if let primaryIcon = iconsDictionary["CFBundlePrimaryIcon"] as? NSMutableDictionary {
+                                primaryIcon["CFBundleIconName"] = "AltIcon"
+                                if let iconFiles = primaryIcon["CFBundleIconFiles"] as? [String] {
+                                    for iconFile in iconFiles {
+                                        let finalIconName = iconFile.hasSuffix("76x76") ? iconFile.appending("@2x~ipad") : iconFile.appending("@2x")
+                                        if let iconPath = appBundlePath.stringByAppendingPathComponent(finalIconName).stringByAppendingPathExtension("png") {
+                                            if let image = NSImage(contentsOfFile: iconPath) {
+                                                if let resizedImage = newImage.resizedImage(newSize: image.size) {
+                                                    resizedImage.pngWrite(to: URL(fileURLWithPath: iconPath))
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                plist.write(toFile: appBundleInfoPlist, atomically: true)
+                            }
+                        }
+                    }
+                }
+                
+                //MARK: Change App Icon
+                if newAppIcon != "" {
+                    if let newImage = NSImage(contentsOfFile: newAppIcon) {
+                        replaceIcons(for: "CFBundleIcons", newImage: newImage)
+                        replaceIcons(for: "CFBundleIcons~ipad", newImage: newImage)
+                    }
+                }
                 
                 func generateFileSignFunc(_ payloadDirectory:String, entitlementsPath: String, signingCertificate: String)->((_ file:String)->Void){
                     
@@ -1165,6 +1206,52 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
             }
         }
     }
-    
+    @IBAction func doAppIconBrowse(_ sender: AnyObject) {
+        let openDialog = NSOpenPanel()
+        openDialog.canChooseFiles = true
+        openDialog.canChooseDirectories = false
+        openDialog.allowsMultipleSelection = false
+        openDialog.allowsOtherFileTypes = false
+        openDialog.allowedFileTypes = MainView.allowedImageTypes + MainView.allowedImageTypes.map({ $0.uppercased() })
+        openDialog.runModal()
+        if let filename = openDialog.urls.first {
+            InputAppIconText.stringValue = filename.path
+        }
+    }
+
 }
 
+extension NSImage {
+
+    var pngData: Data? {
+        guard let tiffRepresentation = tiffRepresentation, let bitmapImage = NSBitmapImageRep(data: tiffRepresentation) else { return nil }
+        return bitmapImage.representation(using: .png, properties: [:])
+    }
+    @discardableResult func pngWrite(to url: URL, options: Data.WritingOptions = .atomic) -> Bool {
+        do {
+            try pngData?.write(to: url, options: options)
+            return true
+        } catch {
+            print(error)
+            return false
+        }
+    }
+
+    func resizedImage(newSize: NSSize) -> NSImage? {
+        let sourceImage = self
+        
+        if !sourceImage.isValid {
+            return nil
+        } else {
+            let resizedImage = NSImage(size: newSize)
+            resizedImage.lockFocus()
+            sourceImage.size = newSize
+            NSGraphicsContext.current?.imageInterpolation = .high
+            sourceImage.draw(at: .zero, from: CGRect(origin: .zero, size: newSize), operation: .copy, fraction: 1.0)
+            resizedImage.unlockFocus()
+            
+            return resizedImage
+        }
+    }
+
+}
