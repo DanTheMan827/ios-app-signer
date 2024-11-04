@@ -255,7 +255,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     
     @objc func getCodesigningCerts() -> [String] {
         var output: [String] = []
-        let securityResult = Process().execute(securityPath, workingDirectory: nil, arguments: ["find-identity","-v","-p","codesigning"])
+        let securityResult = Process().execute(securityPath, workingDirectory: nil, arguments: ["find-identity","-v","-p","appleID"])
         if securityResult.output.count < 1 {
             return output
         }
