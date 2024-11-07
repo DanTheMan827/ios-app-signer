@@ -6,14 +6,18 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner" customClass="NSApplication"/>
+        <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
+            <connections>
+                <outlet property="delegate" destination="aMe-uV-AHx" id="r9d-Cx-dXX"/>
+            </connections>
+        </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
-        <customObject id="aMe-uV-AHx">
+        <customObject id="aMe-uV-AHx" customClass="AppDelegate" customModule="iOS_App_Signer" customModuleProvider="target">
             <connections>
                 <outlet property="mainView" destination="se5-gp-TjO" id="Mal-fb-Nqp"/>
             </connections>
         </customObject>
-        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customObject id="-3" userLabel="Application" customClass="NSButton"/>
         <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
         <menu title="Main Menu" systemMenu="main" id="AYu-sK-qS6">
             <items>
