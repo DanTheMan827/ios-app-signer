@@ -27,6 +27,8 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     @IBOutlet var noGetTaskAllowCheckbox: NSButton!
 
     
+    @IBOutlet var NewEntitlementsTextField: NSTextField!
+    
     //MARK: Variables
     var provisioningProfiles:[ProvisioningProfile] = []
     @objc var codesigningCerts: [String] = []
@@ -38,6 +40,7 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     @objc var NibLoaded = false
     var shouldCheckPlugins: Bool!
     var shouldSkipGetTaskAllow: Bool!
+    @objc var NewEntitlementsPath: String!
 
     //MARK: Constants
     let signableExtensions = ["dylib","so","0","vis","pvr","framework","appex","app"]
@@ -283,7 +286,13 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
             }
         }
     }
-    
+    @objc func showNewEntitlementsPathErrorAlert(){
+        let alert = NSAlert()
+        alert.messageText = "Entitlements file not found"
+        alert.informativeText = "Please enter a valid path to an entitlements file."
+        alert.addButton(withTitle: "OK")
+        alert.runModal()
+    }
     @objc func populateCodesigningCerts() {
         CodesigningCertsPopup.removeAllItems()
         self.codesigningCerts = getCodesigningCerts()
@@ -999,6 +1008,10 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                     
                     
                     let useEntitlements: Bool = ({
+                        // 检查自定义 entitlements 路径
+                        if !NewEntitlementsPath.isEmpty && fileManager.fileExists(atPath: NewEntitlementsPath) {
+                            return true 
+                        }
                         if fileManager.fileExists(atPath: entitlementsPath) {
                             return true
                         }
@@ -1022,7 +1035,9 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
                     }
                     
                     func output(_ file:String){
-                        codeSign(file, certificate: signingCertificate, entitlements: entitlementsPath, before: beforeFunc, after: afterFunc)
+                        // 优先使用自定义 entitlements 路径
+                        let finalEntitlementsPath = !NewEntitlementsPath.isEmpty ? NewEntitlementsPath : entitlementsPath
+                        codeSign(file, certificate: signingCertificate, entitlements: finalEntitlementsPath, before: beforeFunc, after: afterFunc)
                     }
                     return output
                 }
@@ -1165,6 +1180,16 @@ class MainView: NSView, URLSessionDataDelegate, URLSessionDelegate, URLSessionDo
     }
     
     @IBAction func doSign(_ sender: NSButton) {
+    
+       // 安全地获取 Entitlements 路径
+        if let textField = NewEntitlementsTextField {
+            NewEntitlementsPath = textField.stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !NewEntitlementsPath.isEmpty && !fileManager.fileExists(atPath: NewEntitlementsPath) {
+                showNewEntitlementsPathErrorAlert()
+                return
+            }
+        }
+
         if codesigningCerts.count > 0 {
             NSApplication.shared.windows[0].makeFirstResponder(self)
             startSigning()

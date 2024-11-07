@@ -456,6 +456,7 @@
                     <outlet property="CodesigningCertsPopup" destination="aVt-Sy-tta" id="Agf-8A-13v"/>
                     <outlet property="InputFileText" destination="GdX-jd-F08" id="7p7-B8-sHq"/>
                     <outlet property="NewApplicationIDTextField" destination="YSK-IJ-CeM" id="G8I-Gb-Khr"/>
+                    <outlet property="NewEntitlementsTextField" destination="ihE-dE-BGe" id="gzB-gk-IAJ"/>
                     <outlet property="ProvisioningProfilesPopup" destination="4SO-6J-jzo" id="nfx-Js-6Gt"/>
                     <outlet property="StartButton" destination="Q7q-HU-46D" id="SQy-93-exx"/>
                     <outlet property="StatusLabel" destination="ldw-vd-vcX" id="fto-fM-rz3"/>
